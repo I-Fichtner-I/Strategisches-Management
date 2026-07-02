@@ -221,22 +221,43 @@
     }</div></details>`;
   }
 
-  /* ---------- Tab-Navigation ---------- */
-  function showView(name) {
-    $$(".tab").forEach((t) => t.classList.toggle("is-active", t.dataset.view === name));
+  /* ---------- Navigation (Kapitelstruktur) ---------- */
+  function setNavActive(el) {
+    $$("#nav .nav-item").forEach((i) => i.classList.remove("is-active"));
+    if (el) el.classList.add("is-active");
+  }
+  function showView(name, anchor) {
     $$(".view").forEach((v) => v.classList.toggle("is-active", v.id === "view-" + name));
     if (name === "bcg") drawBCG();
     if (name === "stakeholder") drawStakeholder();
     if (name === "dossier") buildDossier();
+    if (anchor) {
+      const el = document.getElementById(anchor);
+      if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-  $("#tabs").addEventListener("click", (e) => {
-    const btn = e.target.closest(".tab");
-    if (btn) showView(btn.dataset.view);
+  const sidebar = $("#sidebar");
+  function closeSidebarOnMobile() {
+    if (sidebar && window.matchMedia("(max-width: 900px)").matches) sidebar.classList.remove("open");
+  }
+  $("#nav").addEventListener("click", (e) => {
+    const btn = e.target.closest(".nav-item");
+    if (!btn) return;
+    setNavActive(btn);
+    showView(btn.dataset.view, btn.dataset.anchor);
+    closeSidebarOnMobile();
   });
+  const navToggle = $("#nav-toggle");
+  if (navToggle) navToggle.addEventListener("click", () => sidebar && sidebar.classList.toggle("open"));
   document.addEventListener("click", (e) => {
     const g = e.target.closest("[data-goto]");
-    if (g) { e.preventDefault(); showView(g.dataset.goto); }
+    if (g) {
+      e.preventDefault();
+      showView(g.dataset.goto);
+      setNavActive($(`#nav .nav-item[data-view="${g.dataset.goto}"]`));
+      closeSidebarOnMobile();
+    }
   });
 
   /* ---------- Generisches Listen-Werkzeug (PESTEL, Wertkette, BMC) ----------
