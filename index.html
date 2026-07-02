@@ -4,20 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Strategy Toolkit – Strategisches Management</title>
-  <meta name="description" content="Interaktives Werkzeug für strategisches Management: Stakeholder-Matrix, PESTEL, Five Forces, Wertkette, SWOT, BCG-Portfolio, Business Model Canvas und Balanced Scorecard." />
+  <meta name="description" content="Interaktives Werkzeug mit Wissensbasis für strategisches Management: Abell, Stakeholder, SMART-Ziele, PESTEL, Five Forces, Wertkette, Szenario-Analyse, Kennzahlen, SWOT, BCG, Business Model Canvas und Balanced Scorecard." />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
   <header class="app-header">
     <div class="wrap">
       <h1>Strategy&nbsp;Toolkit</h1>
-      <p class="tagline">Werkzeuge für das strategische Management</p>
+      <p class="tagline">Werkzeuge &amp; Wissen für das strategische Management</p>
       <nav class="tabs" id="tabs">
         <button class="tab is-active" data-view="prozess">Prozess</button>
+        <button class="tab" data-view="abell">Abell</button>
         <button class="tab" data-view="stakeholder">Stakeholder</button>
+        <button class="tab" data-view="ziele">Ziele</button>
         <button class="tab" data-view="pestel">PESTEL</button>
         <button class="tab" data-view="forces">Five&nbsp;Forces</button>
         <button class="tab" data-view="wertkette">Wertkette</button>
+        <button class="tab" data-view="szenario">Szenario</button>
+        <button class="tab" data-view="kennzahlen">Kennzahlen</button>
         <button class="tab" data-view="swot">SWOT</button>
         <button class="tab" data-view="bcg">BCG</button>
         <button class="tab" data-view="bmc">Canvas</button>
@@ -32,27 +36,42 @@
     <!-- PROZESS -->
     <section class="view is-active" id="view-prozess">
       <h2>Der strategische Management-Prozess</h2>
-      <p class="lead">Das Toolkit führt entlang des idealtypischen Prozesses. Jeder Schritt liefert
-      Bausteine für den nächsten – die Analyse-Ergebnisse fließen zusammen in die Strategiewahl
-      und deren Umsetzung.</p>
+      <p class="lead">Jedes Werkzeug enthält oben einen Bereich <strong>„Theorie &amp; Leitfragen"</strong>
+      mit Definition, Vorgehen und Leitfragen – so beantwortet das Tool die typischen Klausur- und
+      Übungsfragen und führt zugleich durch die Anwendung.</p>
       <ol class="process">
-        <li><span class="step-no">1</span><div><strong>Zielplanung</strong><br><a href="#" data-goto="stakeholder">Stakeholder</a> &amp; Ziele</div></li>
-        <li><span class="step-no">2</span><div><strong>Umweltanalyse</strong><br><a href="#" data-goto="pestel">PESTEL</a> &amp; <a href="#" data-goto="forces">Five&nbsp;Forces</a></div></li>
-        <li><span class="step-no">3</span><div><strong>Unternehmensanalyse</strong><br><a href="#" data-goto="wertkette">Wertkette</a></div></li>
+        <li><span class="step-no">1</span><div><strong>Zielplanung</strong><br><a href="#" data-goto="abell">Abell</a>, <a href="#" data-goto="stakeholder">Stakeholder</a> &amp; <a href="#" data-goto="ziele">Ziele</a></div></li>
+        <li><span class="step-no">2</span><div><strong>Umweltanalyse</strong><br><a href="#" data-goto="pestel">PESTEL</a>, <a href="#" data-goto="forces">Five&nbsp;Forces</a> &amp; <a href="#" data-goto="szenario">Szenario</a></div></li>
+        <li><span class="step-no">3</span><div><strong>Unternehmensanalyse</strong><br><a href="#" data-goto="wertkette">Wertkette</a> &amp; <a href="#" data-goto="kennzahlen">Kennzahlen</a></div></li>
         <li><span class="step-no">4</span><div><strong>Zusammenführung</strong><br><a href="#" data-goto="swot">SWOT</a> &amp; <a href="#" data-goto="bcg">Portfolio</a></div></li>
         <li><span class="step-no">5</span><div><strong>Strategiewahl</strong><br>Normstrategien (TOWS)</div></li>
         <li><span class="step-no">6</span><div><strong>Umsetzung &amp; Kontrolle</strong><br><a href="#" data-goto="bmc">Canvas</a> &amp; <a href="#" data-goto="bsc">Scorecard</a></div></li>
       </ol>
       <div class="tool-cards">
+        <button class="tool-card" data-goto="abell"><h3>Abell-Marktabgrenzung</h3><p>Den relevanten Markt über Kundengruppen, -funktionen und Technologien definieren.</p></button>
         <button class="tool-card" data-goto="stakeholder"><h3>Stakeholder-Matrix</h3><p>Anspruchsgruppen nach Macht und Interesse positionieren und passend steuern.</p></button>
+        <button class="tool-card" data-goto="ziele"><h3>SMART-Ziele</h3><p>Ziele formulieren und automatisch auf die SMART-Kriterien prüfen.</p></button>
         <button class="tool-card" data-goto="pestel"><h3>PESTEL-Analyse</h3><p>Die globale Umwelt in sechs Einflussfeldern systematisch erfassen.</p></button>
-        <button class="tool-card" data-goto="forces"><h3>Porters Five Forces</h3><p>Branchenattraktivität über die fünf Wettbewerbskräfte bewerten.</p></button>
+        <button class="tool-card" data-goto="forces"><h3>Porters Five Forces</h3><p>Branchenattraktivität bewerten – mit Checkliste je Wettbewerbskraft.</p></button>
         <button class="tool-card" data-goto="wertkette"><h3>Wertkette</h3><p>Primär- und Unterstützungsaktivitäten des Unternehmens analysieren.</p></button>
+        <button class="tool-card" data-goto="szenario"><h3>Szenario-Analyse</h3><p>Alternative Zukunftsszenarien strukturiert entwickeln.</p></button>
+        <button class="tool-card" data-goto="kennzahlen"><h3>Strategische Kennzahlen</h3><p>EBITDA-Marge und EVA berechnen; wert- vs. traditionell einordnen.</p></button>
         <button class="tool-card" data-goto="swot"><h3>SWOT-Analyse</h3><p>Analyse-Ergebnisse bündeln – inkl. abgeleiteter TOWS-Normstrategien.</p></button>
         <button class="tool-card" data-goto="bcg"><h3>BCG-Portfolio</h3><p>Geschäftseinheiten nach Wachstum und Marktanteil positionieren.</p></button>
         <button class="tool-card" data-goto="bmc"><h3>Business Model Canvas</h3><p>Das Geschäftsmodell in neun Bausteinen entwickeln.</p></button>
         <button class="tool-card" data-goto="bsc"><h3>Balanced Scorecard</h3><p>Strategie über vier Perspektiven in Ziele und Kennzahlen übersetzen.</p></button>
       </div>
+    </section>
+
+    <!-- ABELL -->
+    <section class="view" id="view-abell">
+      <div class="view-head">
+        <h2>Abell-Marktabgrenzung</h2>
+        <p class="lead">Den relevanten Markt dreidimensional definieren: <strong>Wer</strong> (Kundengruppen),
+        <strong>Was</strong> (Kundenfunktionen/Bedürfnisse) und <strong>Wie</strong> (Technologien).</p>
+      </div>
+      <div class="kb-slot" data-kb="abell"></div>
+      <div class="list-tool cols-3" id="abell-root"></div>
     </section>
 
     <!-- STAKEHOLDER -->
@@ -62,6 +81,7 @@
         <p class="lead">Anspruchsgruppen nach <strong>Macht</strong> und <strong>Interesse</strong>
         (je 1–5) einordnen. Die Position bestimmt die passende Steuerungsstrategie.</p>
       </div>
+      <div class="kb-slot" data-kb="stakeholder"></div>
       <div class="bcg-layout">
         <div class="bcg-chart-box">
           <canvas id="stk-canvas" width="640" height="520" role="img"
@@ -86,6 +106,31 @@
       </p>
     </section>
 
+    <!-- ZIELE (SMART) -->
+    <section class="view" id="view-ziele">
+      <div class="view-head">
+        <h2>SMART-Ziele &amp; Zielhierarchie</h2>
+        <p class="lead">Ziele formulieren und markieren, welche <strong>SMART</strong>-Kriterien erfüllt
+        sind. Das Tool zeigt, ob ein Ziel vollständig SMART ist.</p>
+      </div>
+      <div class="kb-slot" data-kb="ziele"></div>
+      <form class="ziele-form" id="ziele-form">
+        <input type="text" name="ziel" required placeholder="Ziel formulieren, z. B. „Marktanteil in DACH bis Ende 2027 auf 15 % steigern“" />
+        <div class="smart-checks">
+          <label title="Spezifisch"><input type="checkbox" name="s" /> S</label>
+          <label title="Messbar"><input type="checkbox" name="m" /> M</label>
+          <label title="Attraktiv / Akzeptiert"><input type="checkbox" name="a" /> A</label>
+          <label title="Realistisch"><input type="checkbox" name="r" /> R</label>
+          <label title="Terminiert"><input type="checkbox" name="t" /> T</label>
+        </div>
+        <button type="submit">Hinzufügen</button>
+      </form>
+      <table class="bcg-table" id="ziele-table">
+        <thead><tr><th>Ziel</th><th>S</th><th>M</th><th>A</th><th>R</th><th>T</th><th>Bewertung</th><th></th></tr></thead>
+        <tbody id="ziele-tbody"></tbody>
+      </table>
+    </section>
+
     <!-- PESTEL -->
     <section class="view" id="view-pestel">
       <div class="view-head">
@@ -94,6 +139,7 @@
         Symbol als <strong>Chance&nbsp;(＋)</strong> oder <strong>Risiko&nbsp;(–)</strong> markieren –
         markierte Faktoren fließen automatisch in die SWOT.</p>
       </div>
+      <div class="kb-slot" data-kb="pestel"></div>
       <div class="list-tool cols-3" id="pestel-root"></div>
     </section>
 
@@ -102,8 +148,10 @@
       <div class="view-head">
         <h2>Porters Five Forces</h2>
         <p class="lead">Jede Wettbewerbskraft von 1 (schwach) bis 5 (stark) bewerten. Je stärker die
-        Kräfte, desto <strong>geringer</strong> die Branchenattraktivität.</p>
+        Kräfte, desto <strong>geringer</strong> die Branchenattraktivität. Die Checkliste unten zeigt,
+        <em>wann</em> eine Kraft stark ist.</p>
       </div>
+      <div class="kb-slot" data-kb="forces"></div>
       <div class="forces" id="forces-list"></div>
       <div class="forces-result">
         <div class="gauge"><div class="gauge-fill" id="forces-gauge"></div></div>
@@ -112,6 +160,7 @@
           <span class="score-label" id="forces-verdict">Branchenattraktivität</span>
         </div>
       </div>
+      <div class="checklist" id="forces-checklist"></div>
     </section>
 
     <!-- WERTKETTE -->
@@ -122,10 +171,62 @@
         Unterstützungsaktivitäten. Über das Symbol als <strong>Stärke&nbsp;(＋)</strong> oder
         <strong>Schwäche&nbsp;(–)</strong> markieren – markierte Aktivitäten fließen automatisch in die SWOT.</p>
       </div>
+      <div class="kb-slot" data-kb="wertkette"></div>
       <h3 class="sub">Unterstützungsaktivitäten</h3>
       <div class="list-tool cols-4" id="vc-support"></div>
       <h3 class="sub">Primäraktivitäten</h3>
       <div class="list-tool cols-5" id="vc-primary"></div>
+    </section>
+
+    <!-- SZENARIO -->
+    <section class="view" id="view-szenario">
+      <div class="view-head">
+        <h2>Szenario-Analyse</h2>
+        <p class="lead">Alternative Zukunftsbilder strukturiert entwickeln: Problem &amp; Zeithorizont
+        festlegen, Einflussfaktoren sammeln und zwei kontrastierende Szenarien beschreiben.</p>
+      </div>
+      <div class="kb-slot" data-kb="szenario"></div>
+      <label class="field-label">Problemstellung &amp; Zeithorizont
+        <input type="text" id="szenario-frage" placeholder="z. B. Markt für autonomes Fahren bis 2035" />
+      </label>
+      <h3 class="sub">Einflussfaktoren (Deskriptoren)</h3>
+      <div class="list-tool cols-1" id="szenario-root"></div>
+      <div class="scenario-grid">
+        <div class="scenario-card pos">
+          <h3>Positives Szenario (Best Case)</h3>
+          <textarea id="szenario-a" placeholder="Ausprägungen der Einflussfaktoren, Entwicklungspfad und Konsequenzen …"></textarea>
+        </div>
+        <div class="scenario-card neg">
+          <h3>Negatives Szenario (Worst Case)</h3>
+          <textarea id="szenario-b" placeholder="Ausprägungen der Einflussfaktoren, Entwicklungspfad und Konsequenzen …"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- KENNZAHLEN -->
+    <section class="view" id="view-kennzahlen">
+      <div class="view-head">
+        <h2>Strategische Kennzahlen</h2>
+        <p class="lead">Traditionelle (buchhalterische) und wertorientierte (kapitalkostenbasierte)
+        Steuerungsgrößen berechnen und einordnen.</p>
+      </div>
+      <div class="kb-slot" data-kb="kennzahlen"></div>
+      <div class="calc-grid">
+        <form class="calc-card" id="calc-ebitda">
+          <h3>EBITDA &amp; EBITDA-Marge</h3>
+          <label>EBIT (Mio. €)<input type="number" step="any" name="ebit" placeholder="120" /></label>
+          <label>Abschreibungen &amp; Amortisation (Mio. €)<input type="number" step="any" name="da" placeholder="40" /></label>
+          <label>Umsatz (Mio. €)<input type="number" step="any" name="umsatz" placeholder="800" /></label>
+          <div class="calc-out" id="out-ebitda">EBITDA: –<br>EBITDA-Marge: –</div>
+        </form>
+        <form class="calc-card" id="calc-eva">
+          <h3>EVA (Economic Value Added)</h3>
+          <label>NOPAT (Mio. €)<input type="number" step="any" name="nopat" placeholder="90" /></label>
+          <label>Investiertes Kapital (Mio. €)<input type="number" step="any" name="kapital" placeholder="600" /></label>
+          <label>WACC (%)<input type="number" step="any" name="wacc" placeholder="8" /></label>
+          <div class="calc-out" id="out-eva">Kapitalkosten: –<br>EVA: –</div>
+        </form>
+      </div>
     </section>
 
     <!-- SWOT -->
@@ -137,6 +238,7 @@
         übernommen (Bereich „Aus Analyse"). Aus der Kombination entstehen unten die vier
         <strong>TOWS-Normstrategien</strong>.</p>
       </div>
+      <div class="kb-slot" data-kb="swot"></div>
       <div class="swot-grid">
         <div class="swot-cell cell-s">
           <h3>Stärken <span>(intern, positiv)</span></h3>
@@ -180,6 +282,7 @@
         <p class="lead">Geschäftseinheiten anlegen; die Blasengröße entspricht dem Umsatz. Grenzen:
         Marktwachstum 10&nbsp;%, relativer Marktanteil 1,0.</p>
       </div>
+      <div class="kb-slot" data-kb="bcg"></div>
       <div class="bcg-layout">
         <div class="bcg-chart-box">
           <canvas id="bcg-canvas" width="640" height="520" role="img"
@@ -209,6 +312,7 @@
         <p class="lead">Das Geschäftsmodell in neun Bausteinen entwickeln – von den Schlüsselpartnern
         bis zu den Einnahmequellen.</p>
       </div>
+      <div class="kb-slot" data-kb="bmc"></div>
       <div class="bmc" id="bmc-root" data-grid="1"></div>
     </section>
 
@@ -219,6 +323,7 @@
         <p class="lead">Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und
         Maßnahmen übersetzen.</p>
       </div>
+      <div class="kb-slot" data-kb="bsc"></div>
       <div class="bsc" id="bsc-root"></div>
     </section>
 

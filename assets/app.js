@@ -47,6 +47,12 @@
     { key: "process", label: "Interne Prozesse" },
     { key: "learning", label: "Lernen & Entwicklung" },
   ];
+  const ABELL_CATS = [
+    { key: "groups", label: "Kundengruppen (Wer?)" },
+    { key: "functions", label: "Kundenfunktionen (Was?)" },
+    { key: "technologies", label: "Technologien (Wie?)" },
+  ];
+  const SZENARIO_CATS = [{ key: "factors", label: "Einflussfaktoren" }];
 
   const defaultState = () => ({
     swot: emptyLists(["strengths", "weaknesses", "opportunities", "threats"]),
@@ -60,6 +66,10 @@
     valuechain: emptyLists(VC_SUPPORT.concat(VC_PRIMARY).map((c) => c.key)),
     bmc: emptyLists(BMC_BLOCKS.map((c) => c.key)),
     bsc: emptyLists(BSC_VIEWS.map((c) => c.key)),
+    abell: emptyLists(ABELL_CATS.map((c) => c.key)),
+    ziele: [],
+    szenario: { frage: "", factors: [], a: "", b: "" },
+    kennzahlen: { ebit: "", da: "", umsatz: "", nopat: "", kapital: "", wacc: "" },
   });
 
   let state = load();
@@ -89,6 +99,117 @@
   }
   function cssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  /* ---------- Wissensbasis (Theorie & Leitfragen je Werkzeug) ---------- */
+  const KB = {
+    abell: {
+      def: "Die Marktabgrenzung nach <strong>Abell</strong> definiert den relevanten Markt nicht über Produkte, sondern über den gestifteten Nutzen – dreidimensional entlang von Kundengruppen (<em>wer</em>), Kundenfunktionen/Bedürfnissen (<em>was</em>) und Technologien (<em>wie</em>). So wird bewusst festgelegt, wie breit oder eng der Markt gefasst wird.",
+      vorgehen: ["Kundengruppen bestimmen (Wer wird bedient?)", "Kundenfunktionen/Bedürfnisse bestimmen (Welches Problem wird gelöst?)", "Technologien bestimmen (Womit wird der Nutzen erbracht?)", "Kombinationen betrachten und Markt bewusst breit oder eng abgrenzen"],
+      leitfragen: ["Wer sind die relevanten Kundengruppen?", "Welche Funktionen/Bedürfnisse erfüllen wir?", "Mit welchen (alternativen) Technologien?", "Wie verändert sich der Markt bei breiterer/engerer Abgrenzung?"],
+    },
+    stakeholder: {
+      def: "<strong>Stakeholder</strong> sind alle Anspruchsgruppen, die ein Interesse am Unternehmen haben oder von dessen Handeln betroffen sind. Die <strong>Macht-Interesse-Matrix</strong> ordnet sie nach Einfluss (Macht) und Betroffenheit (Interesse) und leitet daraus die Steuerungsstrategie ab.",
+      vorgehen: ["Stakeholder identifizieren", "Nach intern/extern sowie primär/sekundär einordnen", "Macht und Interesse einschätzen (1–5)", "Steuerungsstrategie ableiten: Eng managen · Zufrieden halten · Informiert halten · Beobachten"],
+      leitfragen: ["Wer beeinflusst uns oder ist betroffen?", "Interne vs. externe, primäre vs. sekundäre Stakeholder?", "Welche (teils widersprüchlichen) Interessen bestehen?", "Wie wirken die Positionen auf die interne Steuerung?"],
+    },
+    ziele: {
+      def: "<strong>SMART</strong> steht für <strong>S</strong>pezifisch, <strong>M</strong>essbar, <strong>A</strong>ttraktiv/akzeptiert, <strong>R</strong>ealistisch und <strong>T</strong>erminiert. In der <strong>Zielhierarchie</strong> werden Ziele von der Vision/dem Leitbild über strategische bis zu operativen Zielen abgeleitet.",
+      vorgehen: ["Zielinhalt, -ausmaß und Zeitbezug festlegen", "Ziel an den fünf SMART-Kriterien prüfen", "In die Zielhierarchie einordnen (Vision → strategisch → operativ)", "Zielbeziehungen prüfen (komplementär, konkurrierend, indifferent)"],
+      leitfragen: ["Zielfunktionen: Orientierung, Koordination, Motivation, Kontrolle – welche stehen im Vordergrund?", "Ist das Ziel eindeutig und messbar?", "Ist es zugleich anspruchsvoll und erreichbar?", "Bis wann soll es erreicht sein?"],
+    },
+    pestel: {
+      def: "<strong>PESTEL</strong> analysiert die globale (Makro-)Umwelt in sechs Feldern – <strong>P</strong>olitisch, <strong>E</strong>konomisch, <strong>S</strong>ozio-kulturell, <strong>T</strong>echnologisch, <strong>E</strong>kologisch, <strong>L</strong>egal/rechtlich – und identifiziert daraus Chancen und Risiken.",
+      leitfragen: ["Welche Faktoren je Feld sind für die Branche relevant?", "Wirkt ein Faktor als Chance (＋) oder Risiko (–)?", "Welche Trends sind besonders dynamisch?", "Welche Faktoren sollten in Szenarien vertieft werden?"],
+    },
+    forces: {
+      def: "Die <strong>Branchenstrukturanalyse (Five Forces)</strong> nach Porter beurteilt die Attraktivität einer Branche anhand von fünf Wettbewerbskräften. Je stärker die Kräfte insgesamt, desto <strong>geringer</strong> das Gewinnpotenzial und die Attraktivität der Branche.",
+      leitfragen: ["Wie stark ist jede der fünf Kräfte (siehe Checkliste)?", "Welche Kraft dominiert und warum?", "Wie könnte sich die Branchenstruktur künftig verändern?", "Welche strategischen Konsequenzen ergeben sich?"],
+    },
+    wertkette: {
+      def: "Die <strong>Wertkette</strong> nach Porter zerlegt das Unternehmen in wertschöpfende <strong>Primäraktivitäten</strong> (Eingangslogistik, Produktion, Ausgangslogistik, Marketing &amp; Vertrieb, Kundendienst) und <strong>Unterstützungsaktivitäten</strong> (Infrastruktur, Personal, Technologie, Beschaffung). Ziel ist es, Quellen von Wettbewerbsvorteilen (Kosten oder Differenzierung) aufzudecken.",
+      leitfragen: ["In welchen Aktivitäten entsteht besonderer Wert?", "Wo liegen Stärken (＋) bzw. Schwächen (–)?", "Wo bestehen Ansatzpunkte für eine Differenzierungsstrategie?", "Wie sind die Aktivitäten verknüpft (Verknüpfungen/Schnittstellen)?"],
+    },
+    szenario: {
+      def: "Die <strong>Szenario-Analyse</strong> entwickelt mehrere plausible, in sich konsistente Zukunftsbilder, um mit Unsicherheit strukturiert umzugehen. Im <em>Szenariotrichter</em> spannen extreme Szenarien (Best/Worst Case) den Möglichkeitsraum auf.",
+      vorgehen: ["Problem &amp; Zeithorizont festlegen", "Einflussfaktoren (Deskriptoren) bestimmen", "Je Faktor mögliche Ausprägungen/Projektionen bilden", "Zu konsistenten Szenarien bündeln (z. B. Best/Worst Case)", "Konsequenzen und Strategien ableiten"],
+      leitfragen: ["Was genau ist die Problemstellung?", "Welche Einflussfaktoren sind entscheidend und unsicher?", "Wie sieht ein plausibler Entwicklungspfad je Szenario aus?", "Welche Frühindikatoren kündigen ein Szenario an?"],
+    },
+    kennzahlen: {
+      def: "Strategische Steuerungsgrößen unterscheiden sich in <strong>traditionelle</strong> (buchhalterisch, vergangenheitsorientiert – z. B. EBIT, EBITDA, EBITDA-Marge) und <strong>wertorientierte</strong> Kennzahlen (berücksichtigen die Kapitalkosten – z. B. EVA, CFROI). Weitere Dimensionen: absolut vs. relativ, finanziell vs. nicht-finanziell.",
+      extra:
+        "<div class='kb-cards'>" +
+        "<div><h5>EBIT</h5><p>Earnings before Interest and Taxes – operatives Ergebnis vor Zinsen und Steuern.</p></div>" +
+        "<div><h5>EBITDA</h5><p>EBIT + Abschreibungen &amp; Amortisation. Zeigt die operative Ertragskraft unabhängig von Investitions-/Abschreibungspolitik.</p></div>" +
+        "<div><h5>EBITDA-Marge</h5><p>EBITDA ÷ Umsatz. Relative Kennzahl der operativen Profitabilität; erlaubt Vergleiche zwischen Unternehmen.</p></div>" +
+        "<div><h5>EVA</h5><p>Economic Value Added = NOPAT − (investiertes Kapital × WACC). Positiver EVA = Wertschaffung über den Kapitalkosten.</p></div>" +
+        "<div><h5>CFROI</h5><p>Cash Flow Return on Investment – wertorientierte Rendite auf Basis von Brutto-Cashflow und Bruttoinvestitionsbasis; mit den Kapitalkosten zu vergleichen.</p></div>" +
+        "</div>",
+      leitfragen: ["Ist die Kennzahl wertorientiert oder traditionell?", "Absolut oder relativ, finanziell oder nicht-finanziell?", "Berücksichtigt sie die Kapitalkosten?", "Wie aussagekräftig ist sie für die strategische Steuerung?"],
+    },
+    swot: {
+      def: "Die <strong>SWOT-Analyse</strong> bündelt interne <strong>Stärken/Schwächen</strong> und externe <strong>Chancen/Risiken</strong>. Über die <strong>TOWS-Matrix</strong> werden daraus Normstrategien abgeleitet: SO (ausbauen), ST (absichern), WO (aufholen), WT (vermeiden).",
+      leitfragen: ["Sind interne (S/W) und externe (O/T) Faktoren sauber getrennt?", "Welche Kombinationen ergeben schlagkräftige Strategien?", "Welche SO-Strategie nutzt Stärken für Chancen?", "Wo ist das Unternehmen durch W×T besonders verwundbar?"],
+    },
+    bcg: {
+      def: "Das <strong>BCG-Portfolio</strong> positioniert Geschäftseinheiten nach <strong>Marktwachstum</strong> (y) und <strong>relativem Marktanteil</strong> (x): Stars, Question Marks, Cash Cows und Dogs. Daraus folgen Normstrategien (investieren, selektieren, abschöpfen, desinvestieren).",
+      leitfragen: ["Wie ist jede Einheit positioniert?", "Fließen Mittel von Cash Cows zu Stars/Question Marks?", "Welche Question Marks sind ausbauwürdig?", "Bei welchen Dogs ist Desinvestition sinnvoll?"],
+    },
+    bmc: {
+      def: "Das <strong>Business Model Canvas</strong> beschreibt ein Geschäftsmodell in neun Bausteinen und macht die Logik der Wertschöpfung – vom Kundensegment über das Wertangebot bis zu Kosten und Erlösen – auf einen Blick sichtbar.",
+      leitfragen: ["Welches Wertangebot löst welches Kundenproblem?", "Passen Kanäle und Kundenbeziehungen zu den Segmenten?", "Welche Schlüsselressourcen/-aktivitäten sind unverzichtbar?", "Tragen die Erlösquellen die Kostenstruktur?"],
+    },
+    bsc: {
+      def: "Die <strong>Balanced Scorecard</strong> übersetzt die Strategie ausgewogen in vier Perspektiven (Finanzen, Kunden, interne Prozesse, Lernen &amp; Entwicklung) und verknüpft je Perspektive Ziele, Kennzahlen, Zielwerte und Maßnahmen über Ursache-Wirkungs-Ketten.",
+      leitfragen: ["Sind alle vier Perspektiven ausgewogen berücksichtigt?", "Bestehen plausible Ursache-Wirkungs-Beziehungen?", "Ist jedes Ziel mit Kennzahl und Zielwert hinterlegt?", "Sind konkrete Maßnahmen zugeordnet?"],
+    },
+  };
+
+  // Checkliste: Wann ist eine Wettbewerbskraft STARK? (Ausprägung der Treiber)
+  const FORCES_CHECKLIST = [
+    { force: "Bedrohung durch neue Anbieter", note: "stark, wenn die Markteintrittsbarrieren niedrig sind", drivers: [
+      ["Skaleneffekte (Economies of Scale)", "niedrig"], ["Produktdifferenzierung", "niedrig"], ["Kapitalbedarf", "niedrig"],
+      ["Wechselkosten", "niedrig"], ["Kontrolle der Vertriebskanäle durch Etablierte", "niedrig"],
+      ["Geschütztes Wissen der Etablierten", "niedrig"], ["Zugang der Etablierten zu Rohstoffen", "niedrig"], ["Zugang zu staatlichen Subventionen", "niedrig"],
+    ]},
+    { force: "Verhandlungsmacht der Abnehmer", note: "stark, wenn Abnehmer Druck ausüben können", drivers: [
+      ["Konzentration der Abnehmer (relativ zu Anbietern)", "hoch"], ["Wechselkosten der Abnehmer", "niedrig"],
+      ["Produktdifferenzierung der Anbieter", "niedrig"], ["Drohung der Rückwärtsintegration durch Abnehmer", "hoch"],
+      ["Gewinnsituation der Abnehmer", "niedrig"], ["Bedeutung des Inputs für die Qualität des Abnehmerprodukts", "niedrig"],
+    ]},
+    { force: "Verhandlungsmacht der Lieferanten", note: "stark, wenn Lieferanten Druck ausüben können", drivers: [
+      ["Konzentration der Lieferanten (relativ zur Abnehmerbranche)", "hoch"], ["Verfügbarkeit von Substituten", "niedrig"],
+      ["Bedeutung des Kunden für den Lieferanten", "niedrig"], ["Differenzierung der Lieferantenprodukte", "hoch"],
+      ["Wechselkosten des Abnehmers", "hoch"], ["Drohung der Vorwärtsintegration durch Lieferanten", "hoch"],
+    ]},
+    { force: "Bedrohung durch Ersatzprodukte", note: "stark, wenn attraktive Substitute existieren", drivers: [
+      ["Differenzierung/Attraktivität des Substituts", "hoch"], ["Verbesserungsrate des Preis-Leistungs-Verhältnisses des Substituts", "hoch"],
+    ]},
+    { force: "Rivalität unter Wettbewerbern", note: "stark, wenn der Verdrängungswettbewerb intensiv ist", drivers: [
+      ["Anzahl der Wettbewerber", "hoch"], ["Branchenwachstum", "niedrig"], ["Fixkosten", "hoch"], ["Lagerkosten", "hoch"],
+      ["Produktdifferenzierung", "niedrig"], ["Wechselkosten", "niedrig"], ["Austrittsbarrieren", "hoch"], ["Strategische Bedeutung des Geschäfts", "hoch"],
+    ]},
+  ];
+
+  function renderKnowledge() {
+    $$(".kb-slot").forEach((slot) => {
+      const k = KB[slot.dataset.kb];
+      if (!k) return;
+      let inner = `<p>${k.def}</p>`;
+      if (k.vorgehen) inner += `<h4>Vorgehen</h4><ol>${k.vorgehen.map((x) => `<li>${x}</li>`).join("")}</ol>`;
+      if (k.extra) inner += k.extra;
+      if (k.leitfragen) inner += `<h4>Leitfragen</h4><ul>${k.leitfragen.map((x) => `<li>${x}</li>`).join("")}</ul>`;
+      slot.innerHTML = `<details class="kb"><summary>Theorie &amp; Leitfragen</summary><div class="kb-body">${inner}</div></details>`;
+    });
+  }
+
+  function renderForcesChecklist() {
+    const box = $("#forces-checklist"); if (!box) return;
+    box.innerHTML = `<details class="kb"><summary>Checkliste: Wann ist eine Wettbewerbskraft stark?</summary><div class="kb-body">${
+      FORCES_CHECKLIST.map((f) => `<div class="cl-force"><h4>${f.force}</h4><p class="cl-note">${f.note}:</p><ul class="cl-list">${
+        f.drivers.map((d) => `<li><span>${d[0]}</span><span class="cl-val cl-${d[1]}">${d[1]}</span></li>`).join("")
+      }</ul></div>`).join("")
+    }</div></details>`;
   }
 
   /* ---------- Tab-Navigation ---------- */
@@ -505,6 +626,81 @@
     });
   }
 
+  /* ---------- SMART-Ziele ---------- */
+  const SMART = ["s", "m", "a", "r", "t"];
+  $("#ziele-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const z = { ziel: String(fd.get("ziel")).trim() };
+    SMART.forEach((c) => (z[c] = !!fd.get(c)));
+    if (!z.ziel) return;
+    state.ziele.push(z); save(); e.target.reset(); renderZiele();
+  });
+  function renderZiele() {
+    const tb = $("#ziele-tbody"); tb.innerHTML = "";
+    state.ziele.forEach((z, i) => {
+      const count = SMART.filter((c) => z[c]).length;
+      const verdict = count === 5 ? '<span class="badge ok">SMART ✓</span>' : `<span class="badge warn">${count}/5</span>`;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${escapeHtml(z.ziel)}</td>` + SMART.map((c) => `<td>${z[c] ? "✓" : "–"}</td>`).join("") + `<td>${verdict}</td>`;
+      const td = document.createElement("td");
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.textContent = "×"; btn.setAttribute("aria-label", "Entfernen");
+      btn.addEventListener("click", () => { state.ziele.splice(i, 1); save(); renderZiele(); });
+      td.appendChild(btn); tr.appendChild(td); tb.appendChild(tr);
+    });
+  }
+
+  /* ---------- Szenario-Analyse ---------- */
+  function wireSzenario() {
+    const map = { frage: "#szenario-frage", a: "#szenario-a", b: "#szenario-b" };
+    Object.keys(map).forEach((key) => {
+      const el = $(map[key]);
+      el.addEventListener("input", () => { state.szenario[key] = el.value; save(); });
+    });
+  }
+  function setSzenarioValues() {
+    $("#szenario-frage").value = state.szenario.frage || "";
+    $("#szenario-a").value = state.szenario.a || "";
+    $("#szenario-b").value = state.szenario.b || "";
+  }
+
+  /* ---------- Strategische Kennzahlen ---------- */
+  function numOf(v) { const n = parseFloat(v); return isFinite(n) ? n : null; }
+  function fmtNum(n) { return n == null ? "–" : n.toLocaleString("de-DE", { maximumFractionDigits: 2 }); }
+  function wireKennzahlen() {
+    ["#calc-ebitda", "#calc-eva"].forEach((sel) => {
+      const form = $(sel);
+      form.addEventListener("submit", (e) => e.preventDefault());
+      $$("input", form).forEach((inp) => {
+        inp.addEventListener("input", () => { state.kennzahlen[inp.name] = inp.value; save(); computeKennzahlen(); });
+      });
+    });
+  }
+  function setKennzahlenValues() {
+    ["#calc-ebitda", "#calc-eva"].forEach((sel) => {
+      $$("input", $(sel)).forEach((inp) => {
+        const v = state.kennzahlen[inp.name];
+        inp.value = (v === undefined || v === null) ? "" : v;
+      });
+    });
+    computeKennzahlen();
+  }
+  function computeKennzahlen() {
+    const k = state.kennzahlen;
+    const ebit = numOf(k.ebit), da = numOf(k.da), umsatz = numOf(k.umsatz);
+    let ebitda = null, marge = null;
+    if (ebit != null && da != null) ebitda = ebit + da;
+    if (ebitda != null && umsatz != null && umsatz !== 0) marge = ebitda / umsatz * 100;
+    $("#out-ebitda").innerHTML = `EBITDA: <strong>${fmtNum(ebitda)}</strong> Mio. €<br>EBITDA-Marge: <strong>${marge == null ? "–" : fmtNum(marge) + " %"}</strong>`;
+    const nopat = numOf(k.nopat), kapital = numOf(k.kapital), wacc = numOf(k.wacc);
+    let kk = null, eva = null;
+    if (kapital != null && wacc != null) kk = kapital * wacc / 100;
+    if (nopat != null && kk != null) eva = nopat - kk;
+    const verdict = eva == null ? "" : (eva >= 0 ? ' <span class="badge ok">Wert geschaffen</span>' : ' <span class="badge warn">Wert vernichtet</span>');
+    $("#out-eva").innerHTML = `Kapitalkosten: <strong>${fmtNum(kk)}</strong> Mio. €<br>EVA: <strong>${fmtNum(eva)}</strong> Mio. €${verdict}`;
+  }
+
   /* ---------- Strategie-Dossier ---------- */
   function stkQuadrant(s) {
     const hp = s.power >= 3, hi = s.interest >= 3;
@@ -524,7 +720,8 @@
     const now = new Date().toLocaleDateString("de-DE", { year: "numeric", month: "long", day: "numeric" });
     parts.push(`<header class="dossier-head"><h1>Strategie-Dossier</h1><p class="dossier-date">Erstellt am ${now}</p></header>`);
 
-    const section = (title, inner) => `<section class="dossier-sec"><h2>${title}</h2>${inner}</section>`;
+    let secNo = 0;
+    const section = (title, inner) => { secNo++; return `<section class="dossier-sec"><h2>${secNo} · ${title}</h2>${inner}</section>`; };
     const empty = '<p class="dossier-empty">— keine Einträge —</p>';
     const ulOf = (arr) => arr.length ? `<ul>${arr.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : empty;
     const sentimentUl = (items) => {
@@ -533,38 +730,78 @@
       const mark = (s) => s > 0 ? '<span class="mk pos">＋</span>' : s < 0 ? '<span class="mk neg">–</span>' : '<span class="mk neu">·</span>';
       return `<ul>${rel.map((it) => `<li>${mark(it.sign)} ${esc(it.text)}</li>`).join("")}</ul>`;
     };
+    const catGrid = (cats, store) => `<div class="dossier-grid">${cats.map((c) =>
+      `<div class="dossier-block"><h3>${c.label}</h3>${ulOf(store[c.key] || [])}</div>`).join("")}</div>`;
 
-    // 1 Stakeholder
+    // Abell
+    parts.push(section("Abell-Marktabgrenzung", catGrid(ABELL_CATS, state.abell)));
+
+    // Stakeholder
     const stk = state.stakeholders.length
       ? `<table class="dossier-table"><thead><tr><th>Stakeholder</th><th>Macht</th><th>Interesse</th><th>Strategie</th></tr></thead><tbody>${
           state.stakeholders.map((s) => `<tr><td>${esc(s.name)}</td><td>${s.power}</td><td>${s.interest}</td><td>${stkQuadrant(s)}</td></tr>`).join("")
         }</tbody></table>` + chartImg("#stk-canvas", drawStakeholder)
       : empty;
-    parts.push(section("1 · Stakeholder-Matrix", stk));
+    parts.push(section("Stakeholder-Matrix", stk));
 
-    // 2 PESTEL
-    parts.push(section("2 · PESTEL-Analyse",
+    // SMART-Ziele
+    const ziele = state.ziele.length
+      ? `<table class="dossier-table"><thead><tr><th>Ziel</th><th>S</th><th>M</th><th>A</th><th>R</th><th>T</th><th>Bewertung</th></tr></thead><tbody>${
+          state.ziele.map((z) => { const cnt = SMART.filter((c) => z[c]).length; return `<tr><td>${esc(z.ziel)}</td>` + SMART.map((c) => `<td>${z[c] ? "✓" : "–"}</td>`).join("") + `<td>${cnt === 5 ? "SMART ✓" : cnt + "/5"}</td></tr>`; }).join("")
+        }</tbody></table>` : empty;
+    parts.push(section("SMART-Ziele", ziele));
+
+    // PESTEL
+    parts.push(section("PESTEL-Analyse",
       `<div class="dossier-grid">${PESTEL_CATS.map((c) =>
         `<div class="dossier-block"><h3>${c.label}</h3>${sentimentUl(state.pestel[c.key])}</div>`).join("")}</div>`));
 
-    // 3 Five Forces
+    // Five Forces
     const vals = FORCES.map((f) => state.forces[f.key].v);
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
     const attractiveness = Math.round(((5 - avg) / 4) * 100);
     const forcesTbl = `<table class="dossier-table"><thead><tr><th>Wettbewerbskraft</th><th>Bewertung</th><th>Notiz</th></tr></thead><tbody>${
       FORCES.map((f) => { const fx = state.forces[f.key]; return `<tr><td>${f.label}</td><td>${fx.v} · ${forceLevel(fx.v)}</td><td>${esc(fx.note || "")}</td></tr>`; }).join("")
     }</tbody></table><p class="dossier-kpi">Branchenattraktivität: <strong>${attractiveness}/100</strong> · Ø Kräfte ${avg.toFixed(1)}</p>`;
-    parts.push(section("3 · Porters Five Forces", forcesTbl));
+    parts.push(section("Porters Five Forces", forcesTbl));
 
-    // 4 Wertkette
-    parts.push(section("4 · Wertkette",
+    // Wertkette
+    parts.push(section("Wertkette",
       `<h3 class="dossier-sub">Unterstützungsaktivitäten</h3><div class="dossier-grid">${
         VC_SUPPORT.map((c) => `<div class="dossier-block"><h3>${c.label}</h3>${sentimentUl(state.valuechain[c.key])}</div>`).join("")
       }</div><h3 class="dossier-sub">Primäraktivitäten</h3><div class="dossier-grid">${
         VC_PRIMARY.map((c) => `<div class="dossier-block"><h3>${c.label}</h3>${sentimentUl(state.valuechain[c.key])}</div>`).join("")
       }</div>`));
 
-    // 5 SWOT + TOWS
+    // Szenario-Analyse
+    const sz = state.szenario;
+    const szInner = (sz.frage || (sz.factors && sz.factors.length) || sz.a || sz.b)
+      ? `${sz.frage ? `<p class="dossier-kpi">Problemstellung: <strong>${esc(sz.frage)}</strong></p>` : ""}
+         <h3 class="dossier-sub">Einflussfaktoren</h3>${ulOf(sz.factors || [])}
+         <div class="dossier-grid cols2">
+           <div class="dossier-block"><h3>Positives Szenario</h3>${sz.a ? `<p>${esc(sz.a)}</p>` : empty}</div>
+           <div class="dossier-block"><h3>Negatives Szenario</h3>${sz.b ? `<p>${esc(sz.b)}</p>` : empty}</div>
+         </div>` : empty;
+    parts.push(section("Szenario-Analyse", szInner));
+
+    // Strategische Kennzahlen
+    const k = state.kennzahlen;
+    const kEbit = numOf(k.ebit), kDa = numOf(k.da), kUm = numOf(k.umsatz);
+    const kEbitda = (kEbit != null && kDa != null) ? kEbit + kDa : null;
+    const kMarge = (kEbitda != null && kUm != null && kUm !== 0) ? kEbitda / kUm * 100 : null;
+    const kNopat = numOf(k.nopat), kKap = numOf(k.kapital), kWacc = numOf(k.wacc);
+    const kKk = (kKap != null && kWacc != null) ? kKap * kWacc / 100 : null;
+    const kEva = (kNopat != null && kKk != null) ? kNopat - kKk : null;
+    const anyK = [kEbit, kDa, kUm, kNopat, kKap, kWacc].some((x) => x != null);
+    const kInner = anyK ? `<table class="dossier-table"><tbody>
+        <tr><td>EBITDA</td><td>${fmtNum(kEbitda)} Mio. €</td></tr>
+        <tr><td>EBITDA-Marge</td><td>${kMarge == null ? "–" : fmtNum(kMarge) + " %"}</td></tr>
+        <tr><td>Kapitalkosten</td><td>${fmtNum(kKk)} Mio. €</td></tr>
+        <tr><td>EVA</td><td>${fmtNum(kEva)} Mio. €${kEva == null ? "" : (kEva >= 0 ? " (Wert geschaffen)" : " (Wert vernichtet)")}</td></tr>
+      </tbody></table>` : empty;
+    parts.push(section("Strategische Kennzahlen", kInner));
+
+    // SWOT + TOWS
     const d = derivedSwot();
     const swotField = (manual, der) => ulOf(manual.concat(der));
     const swotHtml = `<div class="dossier-grid cols2">
@@ -580,7 +817,7 @@
       <div class="dossier-block"><h3>WO – Aufholen</h3>${ulOf(tow("tows-wo"))}</div>
       <div class="dossier-block"><h3>WT – Vermeiden</h3>${ulOf(tow("tows-wt"))}</div>
     </div>`;
-    parts.push(section("5 · SWOT & Normstrategien", swotHtml + towsHtml));
+    parts.push(section("SWOT & Normstrategien", swotHtml + towsHtml));
 
     // 6 BCG
     const bcg = state.bcg.length
@@ -588,15 +825,15 @@
           state.bcg.map((u) => `<tr><td>${esc(u.name)}</td><td>${u.growth}%</td><td>${u.share}×</td><td>${u.revenue}</td><td>${bcgQuadrant(u)}</td></tr>`).join("")
         }</tbody></table>` + chartImg("#bcg-canvas", drawBCG)
       : empty;
-    parts.push(section("6 · BCG-Portfolio", bcg));
+    parts.push(section("BCG-Portfolio", bcg));
 
     // 7 Business Model Canvas
-    parts.push(section("7 · Business Model Canvas",
+    parts.push(section("Business Model Canvas",
       `<div class="dossier-grid cols3">${BMC_BLOCKS.map((c) =>
         `<div class="dossier-block"><h3>${c.label}</h3>${ulOf(state.bmc[c.key] || [])}</div>`).join("")}</div>`));
 
     // 8 Balanced Scorecard
-    parts.push(section("8 · Balanced Scorecard",
+    parts.push(section("Balanced Scorecard",
       BSC_VIEWS.map((p) => {
         const rows = state.bsc[p.key] || [];
         const body = rows.length
@@ -623,8 +860,8 @@
   $("#btn-reset").addEventListener("click", () => {
     if (confirm("Wirklich alle Eingaben löschen?")) {
       state = defaultState(); save();
-      $("#pestel-root").innerHTML = ""; $("#vc-support").innerHTML = "";
-      $("#vc-primary").innerHTML = ""; $("#bmc-root").innerHTML = "";
+      ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root"]
+        .forEach((sel) => { const el = $(sel); if (el) el.innerHTML = ""; });
       initAll();
     }
   });
@@ -651,8 +888,17 @@
       { sentiment: true, pos: "Stärke", neg: "Schwäche", onChange: refreshSwotDerived });
     initListTool("#bmc-root", state.bmc, BMC_BLOCKS);
     buildBSC();
+    initListTool("#abell-root", state.abell, ABELL_CATS);
+    renderZiele();
+    initListTool("#szenario-root", state.szenario, SZENARIO_CATS);
+    setSzenarioValues();
+    setKennzahlenValues();
+    renderKnowledge();
+    renderForcesChecklist();
     refreshSwotDerived();
   }
   wireSwotForms();
+  wireSzenario();
+  wireKennzahlen();
   initAll();
 })();
