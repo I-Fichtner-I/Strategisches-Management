@@ -19,9 +19,24 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der Zielplanun
 | **BCG-Portfolio** | Zusammenführung | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz): Stars / Question Marks / Cash Cows / Dogs. |
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
 | **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
+| **Strategie-Dossier** | Gesamt­dokument | Fasst alle Werkzeuge in einem druckfertigen Bericht zusammen – inkl. eingebetteter Diagramme und automatischer Einordnung (Stakeholder-Strategie, BCG-Kategorie, Branchenattraktivität). Per „Als PDF exportieren" als PDF sicherbar. |
 
 Alle Eingaben werden automatisch im Browser gespeichert (localStorage) und lassen
 sich als PDF exportieren.
+
+### Automatischer Datenfluss
+
+Die Analyse-Ergebnisse fließen zusammen: In **PESTEL** und **Wertkette** lässt sich
+jeder Eintrag per Symbol als positiv (＋) oder negativ (–) markieren. Diese Einträge
+– zusammen mit den **Five-Forces**-Bewertungen (starke Kraft → Risiko, schwache Kraft
+→ Chance) – erscheinen automatisch im Bereich „Aus Analyse" der **SWOT** und speisen
+die daraus abgeleiteten **TOWS-Normstrategien**.
+
+```
+Wertkette (＋/–) ─┐
+PESTEL   (＋/–) ─┼─▶  SWOT  ─▶  TOWS-Normstrategien (SO · ST · WO · WT)
+Five Forces     ─┘
+```
 
 ## Nutzung
 
