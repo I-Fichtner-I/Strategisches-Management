@@ -27,6 +27,7 @@
         <button class="tab" data-view="bcg">BCG</button>
         <button class="tab" data-view="bmc">Canvas</button>
         <button class="tab" data-view="bsc">Scorecard</button>
+        <button class="tab" data-view="fallstudie">Fallstudie</button>
         <button class="tab" data-view="quiz">Selbsttest</button>
         <button class="tab" data-view="dossier">Dossier</button>
       </nav>
@@ -342,6 +343,38 @@
       <div class="bsc" id="bsc-root"></div>
     </section>
 
+    <!-- FALLSTUDIE (Teil A) -->
+    <section class="view" id="view-fallstudie">
+      <div class="view-head">
+        <h2>Fallstudien-Report (Teil A)</h2>
+        <p class="lead">Baustelle für die Fallstudie der Portfolioprüfung: Unternehmen wählen, den
+        Bericht nach wissenschaftlichen Standards gliedern, Quellen sammeln und die KI-Nutzung
+        dokumentieren. Der Seitenzähler hilft, das Limit von <strong>15 Seiten Text</strong> einzuhalten.
+        Prüfungssprache Teil A ist Englisch.</p>
+      </div>
+      <div class="kb-slot" data-kb="fallstudie"></div>
+
+      <label class="field-label">Unternehmen (Auswahl aus der Fallstudien-Liste)
+        <select id="fs-company-select"><option value="">– bitte wählen –</option></select>
+      </label>
+      <div id="fs-profile" class="fs-profile"></div>
+
+      <div class="fs-meta">
+        <label class="field-label">Titel der Fallstudie<input type="text" id="fs-titel" placeholder="z. B. Strategic Analysis of …" /></label>
+        <label class="field-label">Gruppe / Autor:innen<input type="text" id="fs-gruppe" placeholder="Namen der Gruppenmitglieder" /></label>
+      </div>
+
+      <div id="fs-sections"></div>
+
+      <div class="list-tool cols-1" id="fs-sources"></div>
+
+      <label class="field-label">Dokumentation der KI-Nutzung (verpflichtend)
+        <textarea id="fs-ki" placeholder="Welche KI-Tools wurden wofür genutzt? (z. B. Recherche, Strukturierung, Übersetzung) – Aussagen kritisch geprüft und belegt."></textarea>
+      </label>
+
+      <div class="fs-counter" id="fs-counter"></div>
+    </section>
+
     <!-- SELBSTTEST -->
     <section class="view" id="view-quiz">
       <div class="view-head">
@@ -397,6 +430,7 @@
     <span class="save-hint">Eingaben werden automatisch im Browser gespeichert.</span>
   </footer>
 
+  <script src="assets/companies.js"></script>
   <script src="assets/app.js"></script>
 </body>
 </html>

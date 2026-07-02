@@ -28,6 +28,8 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 | **BCG-Portfolio** | Zusammenführung | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz): Stars / Question Marks / Cash Cows / Dogs. |
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
 | **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
+| **Fallstudien-Report (Teil A)** | Prüfungsleistung | Bericht für die Fallstudie: Firmenauswahl aus einer Bibliothek mit **20 Unternehmensprofilen** (echte Eckdaten), gegliederte Struktur nach wissenschaftlichen Standards, Quellenverzeichnis, KI-Nutzungs-Doku und **Seitenzähler** gegen das 15-Seiten-Limit. |
+| **Selbsttest** | Klausurvorbereitung | Lernkarten und ein Multiple-Choice-Quiz mit Sofort-Feedback. |
 | **Strategie-Dossier** | Gesamt­dokument | Fasst alle Werkzeuge in einem druckfertigen Bericht zusammen – inkl. eingebetteter Diagramme und automatischer Einordnung (Stakeholder-Strategie, BCG-Kategorie, Branchenattraktivität). Per „Als PDF exportieren" als PDF sicherbar. |
 
 Alle Eingaben werden automatisch im Browser gespeichert (localStorage) und lassen

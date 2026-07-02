@@ -363,6 +363,34 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .quiz-explain { margin: 12px 0 0; font-size: .9rem; color: var(--text-secondary);
   border-left: 3px solid var(--series-1); padding: 6px 0 6px 12px; }
 
+/* Fallstudien-Report */
+#fs-company-select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--page); color: var(--text-primary); font: inherit; margin-top: 6px; }
+.fs-profile { margin-bottom: 20px; }
+.fs-profile:empty { display: none; }
+.fs-profile { background: var(--surface-1); border: 1px solid var(--border); border-top: 4px solid var(--series-1);
+  border-radius: var(--radius); padding: 16px; }
+.fs-profile-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.fs-profile-head h3 { margin: 0; font-size: 1.1rem; }
+.fs-dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; margin: 0; }
+.fs-dl > div { display: grid; grid-template-columns: 130px 1fr; gap: 8px; font-size: .9rem; }
+.fs-dl dt { color: var(--muted); font-weight: 600; margin: 0; }
+.fs-dl dd { margin: 0; }
+.fs-fy { color: var(--muted); }
+.fs-note { margin: 12px 0 0; font-size: .8rem; color: var(--muted); font-style: italic; }
+.fs-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fs-section .field-label { display: block; margin-bottom: 14px; }
+.fs-en { color: var(--muted); font-weight: 400; font-size: .82rem; font-style: italic; }
+#fs-sections textarea, #fs-ki { width: 100%; min-height: 90px; resize: vertical; font: inherit; margin-top: 6px;
+  padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--page); color: var(--text-primary); }
+.fs-counter { margin: 8px 0 0; padding: 12px 14px; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: .95rem; }
+.fs-report-text { white-space: normal; font-size: .9rem; color: var(--text-secondary); margin: 0 0 10px; }
+
+@media (max-width: 720px) {
+  .fs-dl, .fs-dl > div, .fs-meta { grid-template-columns: 1fr; }
+}
+
 /* Print / PDF – nur das Dossier drucken */
 @media print {
   .app-header, .app-footer, .no-print { display: none !important; }

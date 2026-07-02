@@ -70,6 +70,10 @@
     ziele: [],
     szenario: { frage: "", factors: [], a: "", b: "" },
     kennzahlen: { ebit: "", da: "", umsatz: "", nopat: "", kapital: "", wacc: "" },
+    fallstudie: {
+      company: "", titel: "", gruppe: "", ki: "", sources: [],
+      sections: { einleitung: "", ueberblick: "", extern: "", intern: "", swotopt: "", diskussion: "", fazit: "" },
+    },
   });
 
   let state = load();
@@ -162,6 +166,11 @@
     bsc: {
       def: "Die <strong>Balanced Scorecard</strong> übersetzt die Strategie ausgewogen in vier Perspektiven (Finanzen, Kunden, interne Prozesse, Lernen &amp; Entwicklung) und verknüpft je Perspektive Ziele, Kennzahlen, Zielwerte und Maßnahmen über Ursache-Wirkungs-Ketten.",
       leitfragen: ["Sind alle vier Perspektiven ausgewogen berücksichtigt?", "Bestehen plausible Ursache-Wirkungs-Beziehungen?", "Ist jedes Ziel mit Kennzahl und Zielwert hinterlegt?", "Sind konkrete Maßnahmen zugeordnet?"],
+    },
+    fallstudie: {
+      def: "<strong>Prüfungsleistung Teil A</strong> ist eine Fallstudie in der Gruppe (3–4 Personen): Recherche, Analyse und kritische Diskussion der aktuellen Lage, des Umfelds und der Strategie eines gewählten Unternehmens – mit den passenden Methoden dieses Toolkits.",
+      vorgehen: ["Unternehmen aus der Liste wählen und Überblick verschaffen", "Externe Analyse (PESTEL, Five Forces) und interne Analyse (Wertkette, Ressourcen)", "In SWOT/Portfolio bündeln und strategische Optionen ableiten", "Bestehende Strategie kritisch diskutieren", "Bericht (max. 15 Seiten Text) und Präsentation (20 + 10 Min.) erstellen"],
+      leitfragen: ["Sind Fachbegriffe präzise definiert?", "Sind alle Quellen korrekt zitiert (wörtlich & sinngemäß)?", "Liegt der Text unter 15 Seiten (ohne Abbildungen/Quellen)?", "Ist die KI-Nutzung dokumentiert und sind Aussagen belegt?", "Ist die eidesstattliche Erklärung beigefügt?"],
     },
   };
 
@@ -701,6 +710,104 @@
     $("#out-eva").innerHTML = `Kapitalkosten: <strong>${fmtNum(kk)}</strong> Mio. €<br>EVA: <strong>${fmtNum(eva)}</strong> Mio. €${verdict}`;
   }
 
+  /* ---------- Fallstudien-Report (Teil A) ---------- */
+  const COMPANIES = window.TOOLKIT_COMPANIES || [];
+  const FS_SECTIONS = [
+    { key: "einleitung", label: "1 · Einleitung & Zielsetzung", en: "Introduction & objectives" },
+    { key: "ueberblick", label: "2 · Unternehmensüberblick", en: "Company overview" },
+    { key: "extern", label: "3 · Externe Analyse (Umwelt & Branche)", en: "External analysis" },
+    { key: "intern", label: "4 · Interne Analyse (Ressourcen & Wertkette)", en: "Internal analysis" },
+    { key: "swotopt", label: "5 · SWOT & strategische Optionen", en: "SWOT & strategic options" },
+    { key: "diskussion", label: "6 · Kritische Diskussion der Strategie", en: "Critical discussion of the strategy" },
+    { key: "fazit", label: "7 · Fazit", en: "Conclusion" },
+  ];
+  const WORDS_PER_PAGE = 450;
+
+  function countWords(s) { return ((s || "").trim().match(/\S+/g) || []).length; }
+
+  function populateCompanySelect() {
+    const sel = $("#fs-company-select");
+    if (!sel || sel.dataset.filled) return;
+    COMPANIES.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c.name; o.textContent = c.name; sel.appendChild(o);
+    });
+    sel.dataset.filled = "1";
+  }
+
+  function renderFsProfile() {
+    const box = $("#fs-profile");
+    const c = COMPANIES.find((x) => x.name === state.fallstudie.company);
+    if (!c) { box.innerHTML = ""; return; }
+    box.innerHTML = `
+      <div class="fs-profile-head"><h3>${escapeHtml(c.name)}</h3>
+        <button type="button" id="fs-apply" class="primary-btn">Als Unternehmensüberblick übernehmen</button></div>
+      <dl class="fs-dl">
+        <div><dt>Rechtsform</dt><dd>${escapeHtml(c.legal)}</dd></div>
+        <div><dt>Sitz</dt><dd>${escapeHtml(c.hq)}</dd></div>
+        <div><dt>Branche</dt><dd>${escapeHtml(c.sector)}</dd></div>
+        <div><dt>Geschäftsfelder</dt><dd>${c.fields.map(escapeHtml).join(", ")}</dd></div>
+        <div><dt>Märkte</dt><dd>${escapeHtml(c.markets)}</dd></div>
+        <div><dt>Umsatz</dt><dd>${escapeHtml(c.revenue)} <span class="fs-fy">(${escapeHtml(c.fy)})</span></dd></div>
+        <div><dt>Mitarbeitende</dt><dd>${escapeHtml(c.employees)}</dd></div>
+        <div><dt>Strategie</dt><dd>${escapeHtml(c.strategy)}</dd></div>
+      </dl>
+      <p class="fs-note">Kennzahlen sind gerundete Näherungswerte – im Bericht mit aktuellem Geschäftsbericht belegen und zitieren.</p>`;
+    $("#fs-apply").addEventListener("click", () => {
+      const text = `${c.name} (${c.legal}, Sitz: ${c.hq}) ist in der Branche ${c.sector} tätig. `
+        + `Geschäftsfelder: ${c.fields.join(", ")}. Märkte: ${c.markets}. `
+        + `Größe: Umsatz ${c.revenue}, ${c.employees} Mitarbeitende (${c.fy}). `
+        + `Strategischer Fokus: ${c.strategy}`;
+      const ta = $("#fs-sec-ueberblick");
+      if (ta.value.trim() && !confirm("Den vorhandenen Unternehmensüberblick überschreiben?")) return;
+      ta.value = text; state.fallstudie.sections.ueberblick = text; save(); updateFsCounter();
+    });
+  }
+
+  function buildFsSections() {
+    const root = $("#fs-sections");
+    if (!root || root.dataset.built) return;
+    FS_SECTIONS.forEach((s) => {
+      const wrap = document.createElement("div");
+      wrap.className = "fs-section";
+      const lab = document.createElement("label");
+      lab.className = "field-label";
+      lab.innerHTML = `${s.label} <span class="fs-en">${s.en}</span>`;
+      const ta = document.createElement("textarea");
+      ta.id = "fs-sec-" + s.key;
+      ta.addEventListener("input", () => { state.fallstudie.sections[s.key] = ta.value; save(); updateFsCounter(); });
+      lab.appendChild(ta); wrap.appendChild(lab); root.appendChild(wrap);
+    });
+    root.dataset.built = "1";
+  }
+
+  function updateFsCounter() {
+    const words = FS_SECTIONS.reduce((sum, s) => sum + countWords(state.fallstudie.sections[s.key]), 0);
+    const pages = words === 0 ? 0 : Math.max(1, Math.round(words / WORDS_PER_PAGE));
+    const over = pages > 15;
+    $("#fs-counter").innerHTML = `≈ <strong>${pages}</strong> Seiten Text · ${words} Wörter · Limit 15 Seiten`
+      + (over ? ' <span class="badge warn">Limit überschritten</span>' : (pages ? ' <span class="badge ok">im Limit</span>' : ""));
+  }
+
+  function wireFallstudie() {
+    const sel = $("#fs-company-select");
+    sel.addEventListener("change", () => { state.fallstudie.company = sel.value; save(); renderFsProfile(); });
+    $("#fs-titel").addEventListener("input", (e) => { state.fallstudie.titel = e.target.value; save(); });
+    $("#fs-gruppe").addEventListener("input", (e) => { state.fallstudie.gruppe = e.target.value; save(); });
+    $("#fs-ki").addEventListener("input", (e) => { state.fallstudie.ki = e.target.value; save(); });
+    buildFsSections();
+  }
+
+  function setFallstudieValues() {
+    $("#fs-company-select").value = state.fallstudie.company || "";
+    $("#fs-titel").value = state.fallstudie.titel || "";
+    $("#fs-gruppe").value = state.fallstudie.gruppe || "";
+    $("#fs-ki").value = state.fallstudie.ki || "";
+    FS_SECTIONS.forEach((s) => { const ta = $("#fs-sec-" + s.key); if (ta) ta.value = state.fallstudie.sections[s.key] || ""; });
+    renderFsProfile();
+    updateFsCounter();
+  }
+
   /* ---------- Selbsttest: Lernkarten & Quiz ---------- */
   const FLASHCARDS = [
     ["Strategie", "Langfristig orientierte Entscheidungen zur Sicherung der erfolgreichen Existenz eines Unternehmens – legt Domänen und Ressourcenverwendung fest."],
@@ -833,6 +940,22 @@
     const catGrid = (cats, store) => `<div class="dossier-grid">${cats.map((c) =>
       `<div class="dossier-block"><h3>${c.label}</h3>${ulOf(store[c.key] || [])}</div>`).join("")}</div>`;
 
+    // Fallstudien-Report (Teil A)
+    const fs = state.fallstudie;
+    const fsWords = FS_SECTIONS.reduce((sum, s) => sum + countWords(fs.sections[s.key]), 0);
+    const fsHasContent = fs.company || fs.titel || fsWords > 0;
+    if (fsHasContent) {
+      const meta = `${fs.titel ? `<p class="dossier-kpi">Titel: <strong>${esc(fs.titel)}</strong></p>` : ""}`
+        + `${fs.company ? `<p class="dossier-kpi">Unternehmen: <strong>${esc(fs.company)}</strong></p>` : ""}`
+        + `${fs.gruppe ? `<p class="dossier-kpi">Gruppe: ${esc(fs.gruppe)}</p>` : ""}`;
+      const body = FS_SECTIONS.map((s) => fs.sections[s.key]
+        ? `<h3 class="dossier-sub">${s.label}</h3><p class="fs-report-text">${esc(fs.sections[s.key]).replace(/\n/g, "<br>")}</p>` : "").join("");
+      const src = (fs.sources && fs.sources.length) ? `<h3 class="dossier-sub">Quellenverzeichnis</h3>${ulOf(fs.sources)}` : "";
+      const ki = fs.ki ? `<h3 class="dossier-sub">Dokumentation der KI-Nutzung</h3><p class="fs-report-text">${esc(fs.ki).replace(/\n/g, "<br>")}</p>` : "";
+      const cnt = `<p class="dossier-kpi">Umfang: ≈ ${fsWords === 0 ? 0 : Math.max(1, Math.round(fsWords / WORDS_PER_PAGE))} Seiten Text · ${fsWords} Wörter (Limit 15 Seiten)</p>`;
+      parts.push(section("Fallstudien-Report (Teil A)", meta + cnt + body + src + ki));
+    }
+
     // Abell
     parts.push(section("Abell-Marktabgrenzung", catGrid(ABELL_CATS, state.abell)));
 
@@ -960,7 +1083,7 @@
   $("#btn-reset").addEventListener("click", () => {
     if (confirm("Wirklich alle Eingaben löschen?")) {
       state = defaultState(); save();
-      ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root"]
+      ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources"]
         .forEach((sel) => { const el = $(sel); if (el) el.innerHTML = ""; });
       initAll();
     }
@@ -993,6 +1116,9 @@
     initListTool("#szenario-root", state.szenario, SZENARIO_CATS);
     setSzenarioValues();
     setKennzahlenValues();
+    populateCompanySelect();
+    initListTool("#fs-sources", state.fallstudie, [{ key: "sources", label: "Quellenverzeichnis" }]);
+    setFallstudieValues();
     renderKnowledge();
     renderForcesChecklist();
     renderFlashcard();
@@ -1002,6 +1128,7 @@
   wireSwotForms();
   wireSzenario();
   wireKennzahlen();
+  wireFallstudie();
   wireFlashcards();
   wireQuiz();
   initAll();
