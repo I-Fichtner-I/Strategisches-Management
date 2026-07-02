@@ -26,6 +26,7 @@
         <button class="tab" data-view="bcg">BCG</button>
         <button class="tab" data-view="bmc">Canvas</button>
         <button class="tab" data-view="bsc">Scorecard</button>
+        <button class="tab" data-view="quiz">Selbsttest</button>
         <button class="tab" data-view="dossier">Dossier</button>
       </nav>
     </div>
@@ -325,6 +326,42 @@
       </div>
       <div class="kb-slot" data-kb="bsc"></div>
       <div class="bsc" id="bsc-root"></div>
+    </section>
+
+    <!-- SELBSTTEST -->
+    <section class="view" id="view-quiz">
+      <div class="view-head">
+        <h2>Selbsttest</h2>
+        <p class="lead">Wissen prüfen: <strong>Lernkarten</strong> zum Wiederholen der Begriffe und ein
+        <strong>Quiz</strong> mit Sofort-Feedback zur Klausurvorbereitung.</p>
+      </div>
+      <div class="mode-switch" id="quiz-mode">
+        <button class="mode-btn is-active" data-mode="cards">Lernkarten</button>
+        <button class="mode-btn" data-mode="quiz">Quiz</button>
+      </div>
+
+      <div class="mode-panel is-active" id="mode-cards">
+        <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Lernkarte umdrehen">
+          <div class="fc-inner">
+            <div class="fc-face fc-front"><span class="fc-hint">Begriff</span><p id="fc-front-text"></p></div>
+            <div class="fc-face fc-back"><span class="fc-hint">Erklärung</span><p id="fc-back-text"></p></div>
+          </div>
+        </div>
+        <div class="fc-controls">
+          <button id="fc-prev" class="ghost">‹ Zurück</button>
+          <span id="fc-count" class="fc-count"></span>
+          <button id="fc-next" class="ghost">Weiter ›</button>
+        </div>
+        <p class="fc-tip">Karte anklicken zum Umdrehen.</p>
+      </div>
+
+      <div class="mode-panel" id="mode-quiz">
+        <div class="quiz-head">
+          <span>Punkte: <strong id="quiz-score">0</strong> / <span id="quiz-total">0</span></span>
+          <button id="quiz-restart" class="ghost">Neu starten</button>
+        </div>
+        <div id="quiz-list"></div>
+      </div>
     </section>
 
     <!-- DOSSIER -->
