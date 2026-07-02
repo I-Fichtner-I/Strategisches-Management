@@ -6,11 +6,12 @@ und lässt sich direkt über **GitHub Pages** veröffentlichen.
 
 ## Werkzeuge
 
-Die Werkzeuge folgen dem strategischen Management-Prozess – von der Zielplanung
-über Analyse und Strategiewahl bis zur Umsetzung und Kontrolle. **Jedes Werkzeug
-enthält eine Wissens-Ebene „Theorie & Leitfragen"** (Definition, Vorgehen,
-Leitfragen), sodass das Tool die typischen Klausur- und Übungsfragen beantwortet
-und zugleich durch die Anwendung führt.
+Die Werkzeuge folgen dem strategischen Management-Prozess – 
+von der *Zielplanung über Analyse und Strategiewahl bis zur Umsetzung und Kontrolle**. 
+
+**Jedes Werkzeug enthält eine Wissens-Ebene „Theorie & Leitfragen"** 
+(Definition, Vorgehen,Leitfragen), sodass das Tool die typischen Klausur- und Übungsfragen beantwortet und zugleich durch die Anwendung führt.
+
 
 | Werkzeug | Prozessphase | Was es tut |
 |----------|--------------|-----------|
