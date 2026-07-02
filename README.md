@@ -1,6 +1,43 @@
-# Strategisches Management
+# Strategy Toolkit – Strategisches Management
 
-## Inhalte des Moduls
+Ein interaktives Web-Werkzeug, das zentrale Methoden des strategischen Managements
+anwendbar macht. Läuft vollständig im Browser – ohne Installation und ohne Server –
+und lässt sich direkt über **GitHub Pages** veröffentlichen.
+
+## Werkzeuge
+
+| Werkzeug | Was es tut |
+|----------|-----------|
+| **SWOT-Analyse** | Stärken, Schwächen, Chancen und Risiken erfassen; leitet automatisch die vier **TOWS-Normstrategien** (SO / ST / WO / WT) ab. |
+| **Porters Five Forces** | Die fünf Wettbewerbskräfte bewerten und daraus die **Branchenattraktivität** berechnen. |
+| **BCG-Portfolio** | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz), inkl. Stars / Question Marks / Cash Cows / Dogs. |
+
+Alle Eingaben werden automatisch im Browser gespeichert (localStorage) und lassen
+sich als PDF exportieren.
+
+## Nutzung
+
+Lokal: `index.html` im Browser öffnen.
+
+Online (GitHub Pages): In den Repository-Einstellungen unter **Settings → Pages**
+als Quelle den Branch mit diesem Stand und den Ordner `/root` wählen. Die Seite ist
+danach unter `https://<user>.github.io/Strategisches-Management/` erreichbar.
+
+## Projektstruktur
+
+```
+├── index.html          Oberfläche & Navigation
+├── assets/
+│   ├── style.css       Gestaltung (inkl. Dark Mode)
+│   └── app.js          Logik: SWOT, Five Forces, BCG-Portfolio
+└── README.md
+```
+
+---
+
+## Fachlicher Hintergrund – Inhalte des Moduls
+
+Die Werkzeuge orientieren sich an den Inhalten des Moduls *Strategisches Management*.
 
 ### 1 Einführung in das Strategische Management
 

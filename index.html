@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strategy Toolkit – Strategisches Management</title>
+  <meta name="description" content="Interaktives Werkzeug für strategisches Management: SWOT-Analyse, Porters Five Forces und BCG-Portfolio." />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <h1>Strategy&nbsp;Toolkit</h1>
+      <p class="tagline">Werkzeuge für das strategische Management</p>
+      <nav class="tabs" id="tabs">
+        <button class="tab is-active" data-view="prozess">Prozess</button>
+        <button class="tab" data-view="swot">SWOT</button>
+        <button class="tab" data-view="forces">Five&nbsp;Forces</button>
+        <button class="tab" data-view="bcg">BCG-Portfolio</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- PROZESS -->
+    <section class="view is-active" id="view-prozess">
+      <h2>Der strategische Management-Prozess</h2>
+      <p class="lead">Das Toolkit führt entlang des idealtypischen Prozesses. Jeder Schritt liefert
+      Bausteine für den nächsten – die Analyse-Ergebnisse fließen zusammen in die Strategiewahl.</p>
+      <ol class="process">
+        <li><span class="step-no">1</span><div><strong>Zielplanung</strong><br>Stakeholder &amp; Ziele festlegen</div></li>
+        <li><span class="step-no">2</span><div><strong>Umweltanalyse</strong><br>PESTEL &amp; <a href="#" data-goto="forces">Five&nbsp;Forces</a></div></li>
+        <li><span class="step-no">3</span><div><strong>Unternehmensanalyse</strong><br>Wertkette, Kernkompetenzen</div></li>
+        <li><span class="step-no">4</span><div><strong>Zusammenführung</strong><br><a href="#" data-goto="swot">SWOT</a> &amp; <a href="#" data-goto="bcg">Portfolio</a></div></li>
+        <li><span class="step-no">5</span><div><strong>Strategiewahl</strong><br>Normstrategien bewerten</div></li>
+        <li><span class="step-no">6</span><div><strong>Umsetzung &amp; Kontrolle</strong><br>Business Model Canvas, BSC</div></li>
+      </ol>
+      <div class="tool-cards">
+        <button class="tool-card" data-goto="swot">
+          <h3>SWOT-Analyse</h3>
+          <p>Stärken, Schwächen, Chancen und Risiken erfassen – inkl. automatisch abgeleiteter TOWS-Normstrategien.</p>
+        </button>
+        <button class="tool-card" data-goto="forces">
+          <h3>Porters Five Forces</h3>
+          <p>Branchenattraktivität über die fünf Wettbewerbskräfte bewerten.</p>
+        </button>
+        <button class="tool-card" data-goto="bcg">
+          <h3>BCG-Portfolio</h3>
+          <p>Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren.</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- SWOT -->
+    <section class="view" id="view-swot">
+      <div class="view-head">
+        <h2>SWOT-Analyse</h2>
+        <p class="lead">Erfassen Sie je Feld einzelne Punkte. Aus der Kombination entstehen unten die
+        vier <strong>TOWS-Normstrategien</strong>.</p>
+      </div>
+      <div class="swot-grid">
+        <div class="swot-cell cell-s">
+          <h3>Stärken <span>(intern, positiv)</span></h3>
+          <ul class="item-list" data-list="strengths"></ul>
+          <form class="add-form" data-add="strengths"><input type="text" placeholder="Stärke hinzufügen …" /><button>+</button></form>
+        </div>
+        <div class="swot-cell cell-w">
+          <h3>Schwächen <span>(intern, negativ)</span></h3>
+          <ul class="item-list" data-list="weaknesses"></ul>
+          <form class="add-form" data-add="weaknesses"><input type="text" placeholder="Schwäche hinzufügen …" /><button>+</button></form>
+        </div>
+        <div class="swot-cell cell-o">
+          <h3>Chancen <span>(extern, positiv)</span></h3>
+          <ul class="item-list" data-list="opportunities"></ul>
+          <form class="add-form" data-add="opportunities"><input type="text" placeholder="Chance hinzufügen …" /><button>+</button></form>
+        </div>
+        <div class="swot-cell cell-t">
+          <h3>Risiken <span>(extern, negativ)</span></h3>
+          <ul class="item-list" data-list="threats"></ul>
+          <form class="add-form" data-add="threats"><input type="text" placeholder="Risiko hinzufügen …" /><button>+</button></form>
+        </div>
+      </div>
+
+      <h3 class="tows-title">Abgeleitete Normstrategien (TOWS)</h3>
+      <div class="tows-grid">
+        <div class="tows-cell"><h4>SO – Ausbauen</h4><p>Stärken nutzen, um Chancen zu ergreifen.</p><ul id="tows-so" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>ST – Absichern</h4><p>Stärken nutzen, um Risiken abzuwehren.</p><ul id="tows-st" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>WO – Aufholen</h4><p>Schwächen abbauen, um Chancen zu nutzen.</p><ul id="tows-wo" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>WT – Vermeiden</h4><p>Schwächen &amp; Risiken zugleich begrenzen.</p><ul id="tows-wt" class="tows-list"></ul></div>
+      </div>
+    </section>
+
+    <!-- FIVE FORCES -->
+    <section class="view" id="view-forces">
+      <div class="view-head">
+        <h2>Porters Five Forces</h2>
+        <p class="lead">Bewerten Sie jede Wettbewerbskraft von 1 (schwach) bis 5 (stark). Je stärker die
+        Kräfte, desto <strong>geringer</strong> die Branchenattraktivität.</p>
+      </div>
+      <div class="forces" id="forces-list"></div>
+      <div class="forces-result">
+        <div class="gauge"><div class="gauge-fill" id="forces-gauge"></div></div>
+        <div class="forces-score">
+          <span class="score-num" id="forces-score">–</span>
+          <span class="score-label" id="forces-verdict">Branchenattraktivität</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- BCG -->
+    <section class="view" id="view-bcg">
+      <div class="view-head">
+        <h2>BCG-Portfolio</h2>
+        <p class="lead">Geschäftseinheiten anlegen; die Blasengröße entspricht dem Umsatz. Grenzen:
+        Marktwachstum 10&nbsp;%, relativer Marktanteil 1,0.</p>
+      </div>
+      <div class="bcg-layout">
+        <div class="bcg-chart-box">
+          <canvas id="bcg-canvas" width="640" height="520" role="img"
+            aria-label="BCG-Portfolio-Diagramm mit Geschäftseinheiten"></canvas>
+        </div>
+        <div class="bcg-side">
+          <form class="bcg-form" id="bcg-form">
+            <label>Geschäftseinheit<input type="text" name="name" required placeholder="z. B. Produkt A" /></label>
+            <label>Marktwachstum (%)<input type="number" name="growth" step="0.1" required placeholder="12" /></label>
+            <label>Rel. Marktanteil (×)<input type="number" name="share" step="0.01" min="0.01" required placeholder="1.5" /></label>
+            <label>Umsatz (Mio. €)<input type="number" name="revenue" step="0.1" min="0" required placeholder="20" /></label>
+            <button type="submit">Hinzufügen</button>
+          </form>
+          <table class="bcg-table">
+            <thead><tr><th>Einheit</th><th>Wachstum</th><th>Anteil</th><th>Umsatz</th><th></th></tr></thead>
+            <tbody id="bcg-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="bcg-legend"><span class="q star">Stars</span><span class="q qmark">Question&nbsp;Marks</span><span class="q cow">Cash&nbsp;Cows</span><span class="q dog">Dogs</span></p>
+    </section>
+
+  </main>
+
+  <footer class="app-footer wrap">
+    <button id="btn-export" class="ghost">Als PDF exportieren</button>
+    <button id="btn-reset" class="ghost danger">Alle Daten zurücksetzen</button>
+    <span class="save-hint">Eingaben werden automatisch im Browser gespeichert.</span>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
