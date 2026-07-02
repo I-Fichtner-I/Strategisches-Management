@@ -97,6 +97,7 @@
     $$(".view").forEach((v) => v.classList.toggle("is-active", v.id === "view-" + name));
     if (name === "bcg") drawBCG();
     if (name === "stakeholder") drawStakeholder();
+    if (name === "dossier") buildDossier();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   $("#tabs").addEventListener("click", (e) => {
@@ -504,8 +505,121 @@
     });
   }
 
+  /* ---------- Strategie-Dossier ---------- */
+  function stkQuadrant(s) {
+    const hp = s.power >= 3, hi = s.interest >= 3;
+    return hp && hi ? "Eng managen" : hp && !hi ? "Zufrieden halten"
+      : !hp && hi ? "Informiert halten" : "Beobachten";
+  }
+  function bcgQuadrant(u) {
+    const hg = u.growth >= 10, hs = u.share >= 1;
+    return hg && hs ? "Star" : hg && !hs ? "Question Mark" : !hg && hs ? "Cash Cow" : "Dog";
+  }
+  function forceLevel(v) { return v >= 4 ? "stark" : v <= 2 ? "schwach" : "mittel"; }
+
+  function buildDossier() {
+    const root = $("#dossier-root");
+    const esc = escapeHtml;
+    const parts = [];
+    const now = new Date().toLocaleDateString("de-DE", { year: "numeric", month: "long", day: "numeric" });
+    parts.push(`<header class="dossier-head"><h1>Strategie-Dossier</h1><p class="dossier-date">Erstellt am ${now}</p></header>`);
+
+    const section = (title, inner) => `<section class="dossier-sec"><h2>${title}</h2>${inner}</section>`;
+    const empty = '<p class="dossier-empty">— keine Einträge —</p>';
+    const ulOf = (arr) => arr.length ? `<ul>${arr.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : empty;
+    const sentimentUl = (items) => {
+      const rel = (items || []).filter((it) => it && typeof it === "object");
+      if (!rel.length) return empty;
+      const mark = (s) => s > 0 ? '<span class="mk pos">＋</span>' : s < 0 ? '<span class="mk neg">–</span>' : '<span class="mk neu">·</span>';
+      return `<ul>${rel.map((it) => `<li>${mark(it.sign)} ${esc(it.text)}</li>`).join("")}</ul>`;
+    };
+
+    // 1 Stakeholder
+    const stk = state.stakeholders.length
+      ? `<table class="dossier-table"><thead><tr><th>Stakeholder</th><th>Macht</th><th>Interesse</th><th>Strategie</th></tr></thead><tbody>${
+          state.stakeholders.map((s) => `<tr><td>${esc(s.name)}</td><td>${s.power}</td><td>${s.interest}</td><td>${stkQuadrant(s)}</td></tr>`).join("")
+        }</tbody></table>` + chartImg("#stk-canvas", drawStakeholder)
+      : empty;
+    parts.push(section("1 · Stakeholder-Matrix", stk));
+
+    // 2 PESTEL
+    parts.push(section("2 · PESTEL-Analyse",
+      `<div class="dossier-grid">${PESTEL_CATS.map((c) =>
+        `<div class="dossier-block"><h3>${c.label}</h3>${sentimentUl(state.pestel[c.key])}</div>`).join("")}</div>`));
+
+    // 3 Five Forces
+    const vals = FORCES.map((f) => state.forces[f.key].v);
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const attractiveness = Math.round(((5 - avg) / 4) * 100);
+    const forcesTbl = `<table class="dossier-table"><thead><tr><th>Wettbewerbskraft</th><th>Bewertung</th><th>Notiz</th></tr></thead><tbody>${
+      FORCES.map((f) => { const fx = state.forces[f.key]; return `<tr><td>${f.label}</td><td>${fx.v} · ${forceLevel(fx.v)}</td><td>${esc(fx.note || "")}</td></tr>`; }).join("")
+    }</tbody></table><p class="dossier-kpi">Branchenattraktivität: <strong>${attractiveness}/100</strong> · Ø Kräfte ${avg.toFixed(1)}</p>`;
+    parts.push(section("3 · Porters Five Forces", forcesTbl));
+
+    // 4 Wertkette
+    parts.push(section("4 · Wertkette",
+      `<h3 class="dossier-sub">Unterstützungsaktivitäten</h3><div class="dossier-grid">${
+        VC_SUPPORT.map((c) => `<div class="dossier-block"><h3>${c.label}</h3>${sentimentUl(state.valuechain[c.key])}</div>`).join("")
+      }</div><h3 class="dossier-sub">Primäraktivitäten</h3><div class="dossier-grid">${
+        VC_PRIMARY.map((c) => `<div class="dossier-block"><h3>${c.label}</h3>${sentimentUl(state.valuechain[c.key])}</div>`).join("")
+      }</div>`));
+
+    // 5 SWOT + TOWS
+    const d = derivedSwot();
+    const swotField = (manual, der) => ulOf(manual.concat(der));
+    const swotHtml = `<div class="dossier-grid cols2">
+      <div class="dossier-block"><h3>Stärken</h3>${swotField(state.swot.strengths, d.strengths)}</div>
+      <div class="dossier-block"><h3>Schwächen</h3>${swotField(state.swot.weaknesses, d.weaknesses)}</div>
+      <div class="dossier-block"><h3>Chancen</h3>${swotField(state.swot.opportunities, d.opportunities)}</div>
+      <div class="dossier-block"><h3>Risiken</h3>${swotField(state.swot.threats, d.threats)}</div>
+    </div>`;
+    const tow = (id) => Array.from($$("#" + id + " li")).map((li) => li.textContent);
+    const towsHtml = `<h3 class="dossier-sub">Normstrategien (TOWS)</h3><div class="dossier-grid cols2">
+      <div class="dossier-block"><h3>SO – Ausbauen</h3>${ulOf(tow("tows-so"))}</div>
+      <div class="dossier-block"><h3>ST – Absichern</h3>${ulOf(tow("tows-st"))}</div>
+      <div class="dossier-block"><h3>WO – Aufholen</h3>${ulOf(tow("tows-wo"))}</div>
+      <div class="dossier-block"><h3>WT – Vermeiden</h3>${ulOf(tow("tows-wt"))}</div>
+    </div>`;
+    parts.push(section("5 · SWOT & Normstrategien", swotHtml + towsHtml));
+
+    // 6 BCG
+    const bcg = state.bcg.length
+      ? `<table class="dossier-table"><thead><tr><th>Einheit</th><th>Wachstum</th><th>Rel. Anteil</th><th>Umsatz</th><th>Kategorie</th></tr></thead><tbody>${
+          state.bcg.map((u) => `<tr><td>${esc(u.name)}</td><td>${u.growth}%</td><td>${u.share}×</td><td>${u.revenue}</td><td>${bcgQuadrant(u)}</td></tr>`).join("")
+        }</tbody></table>` + chartImg("#bcg-canvas", drawBCG)
+      : empty;
+    parts.push(section("6 · BCG-Portfolio", bcg));
+
+    // 7 Business Model Canvas
+    parts.push(section("7 · Business Model Canvas",
+      `<div class="dossier-grid cols3">${BMC_BLOCKS.map((c) =>
+        `<div class="dossier-block"><h3>${c.label}</h3>${ulOf(state.bmc[c.key] || [])}</div>`).join("")}</div>`));
+
+    // 8 Balanced Scorecard
+    parts.push(section("8 · Balanced Scorecard",
+      BSC_VIEWS.map((p) => {
+        const rows = state.bsc[p.key] || [];
+        const body = rows.length
+          ? `<table class="dossier-table"><thead><tr><th>Ziel</th><th>Kennzahl</th><th>Zielwert</th><th>Maßnahme</th></tr></thead><tbody>${
+              rows.map((r) => `<tr><td>${esc(r.ziel)}</td><td>${esc(r.kennzahl)}</td><td>${esc(r.zielwert)}</td><td>${esc(r.massnahme)}</td></tr>`).join("")
+            }</tbody></table>` : empty;
+        return `<div class="dossier-bsc"><h3 class="dossier-sub">${p.label}</h3>${body}</div>`;
+      }).join("")));
+
+    root.innerHTML = parts.join("");
+  }
+
+  // Zeichnet ein Canvas und bindet es als statisches Bild in das Dossier ein.
+  function chartImg(sel, drawFn) {
+    const canvas = $(sel); if (!canvas) return "";
+    try { drawFn(); return `<img class="dossier-chart" alt="Diagramm" src="${canvas.toDataURL("image/png")}" />`; }
+    catch (e) { return ""; }
+  }
+
   /* ---------- Footer-Aktionen ---------- */
-  $("#btn-export").addEventListener("click", () => window.print());
+  function exportPdf() { showView("dossier"); window.print(); }
+  $("#btn-export").addEventListener("click", exportPdf);
+  $("#btn-dossier-pdf").addEventListener("click", exportPdf);
   $("#btn-reset").addEventListener("click", () => {
     if (confirm("Wirklich alle Eingaben löschen?")) {
       state = defaultState(); save();

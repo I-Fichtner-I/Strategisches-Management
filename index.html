@@ -22,6 +22,7 @@
         <button class="tab" data-view="bcg">BCG</button>
         <button class="tab" data-view="bmc">Canvas</button>
         <button class="tab" data-view="bsc">Scorecard</button>
+        <button class="tab" data-view="dossier">Dossier</button>
       </nav>
     </div>
   </header>
@@ -219,6 +220,17 @@
         Maßnahmen übersetzen.</p>
       </div>
       <div class="bsc" id="bsc-root"></div>
+    </section>
+
+    <!-- DOSSIER -->
+    <section class="view" id="view-dossier">
+      <div class="view-head no-print">
+        <h2>Strategie-Dossier</h2>
+        <p class="lead">Zusammenfassung aller Werkzeuge in einem Dokument. Über
+        <strong>„Als PDF exportieren"</strong> lässt sich das Dossier drucken oder als PDF sichern.</p>
+        <button id="btn-dossier-pdf" class="primary-btn">Als PDF exportieren</button>
+      </div>
+      <div id="dossier-root" class="dossier"></div>
     </section>
 
   </main>
