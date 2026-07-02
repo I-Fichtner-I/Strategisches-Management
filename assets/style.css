@@ -167,6 +167,52 @@ footer button.danger:hover { border-color: var(--critical); color: var(--critica
   .forces-score { text-align: left; }
 }
 
+/* Generisches Listen-Werkzeug (PESTEL, Wertkette, BMC) */
+.sub { margin: 26px 0 10px; color: var(--text-secondary); font-size: 1rem; text-transform: uppercase; letter-spacing: .04em; }
+.list-tool { display: grid; gap: 14px; }
+.list-tool.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.list-tool.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.list-tool.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.list-card { background: var(--surface-1); border: 1px solid var(--border);
+  border-top: 4px solid var(--series-1); border-radius: var(--radius); padding: 14px; }
+.list-card h3 { margin: 0 0 10px; font-size: .98rem; }
+
+/* Business Model Canvas – 9 Bausteine als Raster */
+.bmc { display: grid; gap: 12px;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-areas:
+    "partners activities value relationships segments"
+    "partners resources  value channels      segments"
+    "costs    costs      revenue revenue      revenue"; }
+.bmc .list-card { border-top-color: var(--series-1); }
+.bmc .list-card:nth-child(4) { border-top-color: var(--good); }   /* Wertangebote */
+
+/* Balanced Scorecard */
+.bsc { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bsc-card { background: var(--surface-1); border: 1px solid var(--border);
+  border-top: 4px solid var(--series-1); border-radius: var(--radius); padding: 16px; }
+.bsc-card h3 { margin: 0 0 10px; font-size: 1.02rem; }
+.bsc-table { width: 100%; border-collapse: collapse; font-size: .82rem; margin-bottom: 10px; }
+.bsc-table th, .bsc-table td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.bsc-table th { color: var(--muted); font-weight: 600; }
+.bsc-table button { appearance: none; border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.05rem; }
+.bsc-table button:hover { color: var(--critical); }
+.bsc-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
+.bsc-form input { min-width: 0; }
+.bsc-form button { grid-column: 3; grid-row: 1 / span 2; align-self: stretch; }
+
+@media (max-width: 860px) {
+  .list-tool.cols-3, .list-tool.cols-4, .list-tool.cols-5 { grid-template-columns: 1fr 1fr; }
+  .bmc { grid-template-columns: 1fr 1fr; grid-template-areas:
+    "partners activities" "resources value" "relationships channels"
+    "segments segments" "costs revenue"; }
+  .bsc { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .list-tool.cols-3, .list-tool.cols-4, .list-tool.cols-5, .bmc { grid-template-columns: 1fr; }
+  .bmc { grid-template-areas: "partners" "activities" "resources" "value" "relationships" "channels" "segments" "costs" "revenue"; }
+}
+
 /* Print / PDF */
 @media print {
   .app-header .tabs, .app-footer, .add-form, .bcg-form, .item-list li button, .bcg-table button { display: none !important; }

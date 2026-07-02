@@ -6,11 +6,19 @@ und lässt sich direkt über **GitHub Pages** veröffentlichen.
 
 ## Werkzeuge
 
-| Werkzeug | Was es tut |
-|----------|-----------|
-| **SWOT-Analyse** | Stärken, Schwächen, Chancen und Risiken erfassen; leitet automatisch die vier **TOWS-Normstrategien** (SO / ST / WO / WT) ab. |
-| **Porters Five Forces** | Die fünf Wettbewerbskräfte bewerten und daraus die **Branchenattraktivität** berechnen. |
-| **BCG-Portfolio** | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz), inkl. Stars / Question Marks / Cash Cows / Dogs. |
+Die Werkzeuge folgen dem strategischen Management-Prozess – von der Zielplanung
+über Analyse und Strategiewahl bis zur Umsetzung und Kontrolle.
+
+| Werkzeug | Prozessphase | Was es tut |
+|----------|--------------|-----------|
+| **Stakeholder-Matrix** | Zielplanung | Anspruchsgruppen nach Macht und Interesse positionieren und passende Steuerungsstrategie ableiten. |
+| **PESTEL-Analyse** | Umweltanalyse | Einflussfaktoren der globalen Umwelt in sechs Feldern erfassen. |
+| **Porters Five Forces** | Umweltanalyse | Die fünf Wettbewerbskräfte bewerten und daraus die **Branchenattraktivität** berechnen. |
+| **Wertkette** | Unternehmensanalyse | Primär- und Unterstützungsaktivitäten analysieren. |
+| **SWOT-Analyse** | Zusammenführung | Analyse-Ergebnisse bündeln; leitet automatisch die vier **TOWS-Normstrategien** (SO / ST / WO / WT) ab. |
+| **BCG-Portfolio** | Zusammenführung | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz): Stars / Question Marks / Cash Cows / Dogs. |
+| **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
+| **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
 
 Alle Eingaben werden automatisch im Browser gespeichert (localStorage) und lassen
 sich als PDF exportieren.
