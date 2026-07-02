@@ -363,9 +363,70 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .quiz-explain { margin: 12px 0 0; font-size: .9rem; color: var(--text-secondary);
   border-left: 3px solid var(--series-1); padding: 6px 0 6px 12px; }
 
+/* Fallstudien-Report */
+#fs-company-select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--page); color: var(--text-primary); font: inherit; margin-top: 6px; }
+.fs-profile { margin-bottom: 20px; }
+.fs-profile:empty { display: none; }
+.fs-profile { background: var(--surface-1); border: 1px solid var(--border); border-top: 4px solid var(--series-1);
+  border-radius: var(--radius); padding: 16px; }
+.fs-profile-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.fs-profile-head h3 { margin: 0; font-size: 1.1rem; }
+.fs-dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; margin: 0; }
+.fs-dl > div { display: grid; grid-template-columns: 130px 1fr; gap: 8px; font-size: .9rem; }
+.fs-dl dt { color: var(--muted); font-weight: 600; margin: 0; }
+.fs-dl dd { margin: 0; }
+.fs-fy { color: var(--muted); }
+.fs-note { margin: 12px 0 0; font-size: .8rem; color: var(--muted); font-style: italic; }
+.fs-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fs-section .field-label { display: block; margin-bottom: 14px; }
+.fs-en { color: var(--muted); font-weight: 400; font-size: .82rem; font-style: italic; }
+#fs-sections textarea, #fs-ki { width: 100%; min-height: 90px; resize: vertical; font: inherit; margin-top: 6px;
+  padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--page); color: var(--text-primary); }
+.fs-counter { margin: 8px 0 0; padding: 12px 14px; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: .95rem; }
+.fs-report-text { white-space: normal; font-size: .9rem; color: var(--text-secondary); margin: 0 0 10px; }
+
+@media (max-width: 720px) {
+  .fs-dl, .fs-dl > div, .fs-meta { grid-template-columns: 1fr; }
+}
+
+/* ---- Kapitel-Sidebar-Layout ---- */
+.app-shell { display: flex; align-items: flex-start; max-width: 1180px; margin: 0 auto; }
+.sidebar { width: 290px; flex: none; align-self: stretch; background: var(--surface-1);
+  border-right: 1px solid var(--border); position: sticky; top: 0; max-height: 100vh; overflow-y: auto; padding: 18px 12px; }
+.content { flex: 1; min-width: 0; padding: 24px 28px 44px; }
+
+.nav-group { margin-bottom: 16px; }
+.nav-group + .nav-group { border-top: 1px solid var(--border); padding-top: 14px; }
+.nav-head { font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 8px 8px; font-weight: 700; }
+.nav-item { display: block; width: 100%; text-align: left; background: transparent; border: none; cursor: pointer;
+  font: inherit; font-size: .88rem; color: var(--text-secondary); padding: 7px 10px; border-radius: 6px; line-height: 1.3; }
+.nav-item:hover { background: var(--page); color: var(--text-primary); }
+.nav-item.is-active { background: var(--series-1); color: #fff; font-weight: 600; }
+
+.nav-toggle { display: none; cursor: pointer; font: inherit; border: 1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary); border-radius: 6px; padding: 7px 14px; margin-top: 10px; }
+
+/* Wissens-Seiten (statische Kapitelinhalte) */
+.know { background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--series-1);
+  border-radius: 8px; padding: 16px 18px; margin-bottom: 14px; scroll-margin-top: 16px; }
+.know h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.know p { margin: 0; color: var(--text-secondary); }
+
+@media (max-width: 900px) {
+  .app-shell { display: block; }
+  .sidebar { display: none; width: auto; position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  .sidebar.open { display: block; }
+  .content { padding: 20px; }
+  .nav-toggle { display: inline-block; }
+}
+
 /* Print / PDF – nur das Dossier drucken */
 @media print {
-  .app-header, .app-footer, .no-print { display: none !important; }
+  .app-header, .app-footer, .sidebar, .nav-toggle, .no-print { display: none !important; }
+  .app-shell { display: block; }
+  .content { padding: 0; }
   .view { display: none !important; }
   #view-dossier { display: block !important; padding: 0; }
   .dossier { border: none; padding: 0; }

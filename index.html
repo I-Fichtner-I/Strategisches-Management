@@ -13,31 +13,65 @@
     <div class="wrap">
       <h1>Strategy&nbsp;Toolkit</h1>
       <p class="tagline">Werkzeuge &amp; Wissen für das strategische Management</p>
-      <nav class="tabs" id="tabs">
-        <button class="tab is-active" data-view="prozess">Prozess</button>
-        <button class="tab" data-view="abell">Abell</button>
-        <button class="tab" data-view="stakeholder">Stakeholder</button>
-        <button class="tab" data-view="ziele">Ziele</button>
-        <button class="tab" data-view="pestel">PESTEL</button>
-        <button class="tab" data-view="forces">Five&nbsp;Forces</button>
-        <button class="tab" data-view="wertkette">Wertkette</button>
-        <button class="tab" data-view="szenario">Szenario</button>
-        <button class="tab" data-view="kennzahlen">Kennzahlen</button>
-        <button class="tab" data-view="swot">SWOT</button>
-        <button class="tab" data-view="bcg">BCG</button>
-        <button class="tab" data-view="bmc">Canvas</button>
-        <button class="tab" data-view="bsc">Scorecard</button>
-        <button class="tab" data-view="quiz">Selbsttest</button>
-        <button class="tab" data-view="dossier">Dossier</button>
-      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Navigation ein-/ausblenden">☰ Kapitel</button>
     </div>
   </header>
 
-  <main class="wrap">
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <nav id="nav">
+        <div class="nav-group">
+          <button class="nav-item is-active" data-view="prozess">1 · Einführung in das Strategische Management</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">2 · Ansätze des Strategischen Managements</p>
+          <button class="nav-item" data-view="ansaetze" data-anchor="mbv">2.1 Marktorientierter Ansatz (MBV)</button>
+          <button class="nav-item" data-view="ansaetze" data-anchor="rbv">2.2 Ressourcenbasierter Ansatz (RBV)</button>
+          <button class="nav-item" data-view="ansaetze" data-anchor="kbv">2.3 Wissensbasierter Ansatz (KBV)</button>
+          <button class="nav-item" data-view="ansaetze" data-anchor="vbv">2.4 Wertorientierter Ansatz (VBV)</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">3 · Strategische Zielplanung</p>
+          <button class="nav-item" data-view="stakeholder">3.1 Stakeholder des Unternehmens</button>
+          <button class="nav-item" data-view="ziele">3.2 Zielhierarchie & Zielfunktionen</button>
+          <button class="nav-item" data-view="kennzahlen">3.3 Finanzielle Ziele</button>
+          <button class="nav-item" data-view="abell">3.4 Geschäftsfelder (Abell)</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">4 · Strategische Analyse und Prognose</p>
+          <button class="nav-item" data-view="pestel">4.1.1 Globale Umwelt (PESTEL)</button>
+          <button class="nav-item" data-view="forces">4.1.2 Branchenstruktur (Five Forces)</button>
+          <button class="nav-item" data-view="wettbewerb">4.1.3 Wettbewerbsumfeld</button>
+          <button class="nav-item" data-view="wertkette">4.2 Analyse des Unternehmens (Wertkette)</button>
+          <button class="nav-item" data-view="swot">4.3 Simultane Analyse (SWOT)</button>
+          <button class="nav-item" data-view="bcg">4.3 Portfolio (BCG)</button>
+          <button class="nav-item" data-view="szenario">Prognose (Szenario-Analyse)</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">5 · Strategieformulierung und -bewertung</p>
+          <button class="nav-item" data-view="strategietypen">5.1 Typen von Strategien</button>
+          <button class="nav-item" data-view="strategiewahl">5.2 Bewertung & Auswahl von Strategien</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">6 · Entwicklung, Implementierung & Kontrolle</p>
+          <button class="nav-item" data-view="bmc">6.1 Business Model Canvas</button>
+          <button class="nav-item" data-view="bsc">6.2 Umsetzung (Balanced Scorecard)</button>
+          <button class="nav-item" data-view="kontrolle">6.3 Kontrolle & Frühaufklärung</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">Prüfung & Export</p>
+          <button class="nav-item" data-view="fallstudie">Fallstudien-Report (Teil A)</button>
+          <button class="nav-item" data-view="quiz">Selbsttest</button>
+          <button class="nav-item" data-view="dossier">Strategie-Dossier</button>
+        </div>
+      </nav>
+    </aside>
 
-    <!-- PROZESS -->
+    <main class="content">
+
+    <!-- 1 EINFÜHRUNG / PROZESS -->
     <section class="view is-active" id="view-prozess">
-      <h2>Der strategische Management-Prozess</h2>
+      <h2>1 · Einführung in das Strategische Management</h2>
       <p class="lead">Jedes Werkzeug enthält oben einen Bereich <strong>„Theorie &amp; Leitfragen"</strong>
       mit Definition, Vorgehen und Leitfragen – so beantwortet das Tool die typischen Klausur- und
       Übungsfragen und führt zugleich durch die Anwendung.</p>
@@ -342,6 +376,38 @@
       <div class="bsc" id="bsc-root"></div>
     </section>
 
+    <!-- FALLSTUDIE (Teil A) -->
+    <section class="view" id="view-fallstudie">
+      <div class="view-head">
+        <h2>Fallstudien-Report (Teil A)</h2>
+        <p class="lead">Baustelle für die Fallstudie der Portfolioprüfung: Unternehmen wählen, den
+        Bericht nach wissenschaftlichen Standards gliedern, Quellen sammeln und die KI-Nutzung
+        dokumentieren. Der Seitenzähler hilft, das Limit von <strong>15 Seiten Text</strong> einzuhalten.
+        Prüfungssprache Teil A ist Englisch.</p>
+      </div>
+      <div class="kb-slot" data-kb="fallstudie"></div>
+
+      <label class="field-label">Unternehmen (Auswahl aus der Fallstudien-Liste)
+        <select id="fs-company-select"><option value="">– bitte wählen –</option></select>
+      </label>
+      <div id="fs-profile" class="fs-profile"></div>
+
+      <div class="fs-meta">
+        <label class="field-label">Titel der Fallstudie<input type="text" id="fs-titel" placeholder="z. B. Strategic Analysis of …" /></label>
+        <label class="field-label">Gruppe / Autor:innen<input type="text" id="fs-gruppe" placeholder="Namen der Gruppenmitglieder" /></label>
+      </div>
+
+      <div id="fs-sections"></div>
+
+      <div class="list-tool cols-1" id="fs-sources"></div>
+
+      <label class="field-label">Dokumentation der KI-Nutzung (verpflichtend)
+        <textarea id="fs-ki" placeholder="Welche KI-Tools wurden wofür genutzt? (z. B. Recherche, Strukturierung, Übersetzung) – Aussagen kritisch geprüft und belegt."></textarea>
+      </label>
+
+      <div class="fs-counter" id="fs-counter"></div>
+    </section>
+
     <!-- SELBSTTEST -->
     <section class="view" id="view-quiz">
       <div class="view-head">
@@ -378,6 +444,67 @@
       </div>
     </section>
 
+    <!-- 2 ANSÄTZE -->
+    <section class="view" id="view-ansaetze">
+      <div class="view-head">
+        <h2>2 · Ansätze des Strategischen Managements</h2>
+        <p class="lead">Vier grundlegende Perspektiven, aus denen sich Wettbewerbsvorteile erklären lassen.</p>
+      </div>
+      <article class="know" id="mbv"><h3>2.1 Marktorientierter Ansatz (Market-based View)</h3>
+        <p><strong>Outside-in.</strong> Wettbewerbsvorteile entstehen aus der Positionierung in einer attraktiven Branche. Zentrale Instrumente sind die Branchenstrukturanalyse (Five Forces) und die generischen Wettbewerbsstrategien nach Porter (Kostenführerschaft, Differenzierung, Fokus). Leitfrage: „In welcher Branche und Position sind überdurchschnittliche Renditen möglich?"</p></article>
+      <article class="know" id="rbv"><h3>2.2 Ressourcenbasierter Ansatz (Resource-based View)</h3>
+        <p><strong>Inside-out.</strong> Vorteile beruhen auf internen Ressourcen und Kernkompetenzen, die <strong>wertvoll, selten, schwer imitierbar und nicht substituierbar</strong> (VRIN) sind. Leitfrage: „Welche einzigartigen Ressourcen und Fähigkeiten besitzen wir?"</p></article>
+      <article class="know" id="kbv"><h3>2.3 Wissensbasierter Ansatz (Knowledge-based View)</h3>
+        <p>Erweiterung des RBV: <strong>Wissen</strong> gilt als wichtigste strategische Ressource. Im Fokus stehen organisationales Lernen sowie Aufbau, Transfer und Schutz von (implizitem) Wissen. Leitfrage: „Wie bauen wir Wissen auf und nutzen es besser als der Wettbewerb?"</p></article>
+      <article class="know" id="vbv"><h3>2.4 Wertorientierter Ansatz (Value-based View)</h3>
+        <p>Oberstes Ziel ist die nachhaltige Steigerung des <strong>Unternehmenswerts</strong> (Shareholder Value). Strategien werden danach beurteilt, ob sie Wert über den Kapitalkosten schaffen; Steuerung über wertorientierte Kennzahlen wie <strong>EVA</strong> und <strong>CFROI</strong>. Leitfrage: „Schafft die Strategie Wert oberhalb der Kapitalkosten?"</p></article>
+    </section>
+
+    <!-- 4.1.3 WETTBEWERBSUMFELD -->
+    <section class="view" id="view-wettbewerb">
+      <div class="view-head">
+        <h2>4.1.3 Wettbewerbsumfeld</h2>
+        <p class="lead">Die engere Betrachtung der direkten Konkurrenz innerhalb der Branche.</p>
+      </div>
+      <article class="know"><h3>Konkurrenzanalyse</h3><p>Identifikation der relevanten Wettbewerber und Erstellung von Konkurrentenprofilen (Ziele, Annahmen, Strategie, Fähigkeiten), um deren Verhalten zu antizipieren.</p></article>
+      <article class="know"><h3>Strategische Gruppen</h3><p>Unternehmen mit ähnlicher Strategie innerhalb einer Branche bilden eine strategische Gruppe. Mobilitätsbarrieren erschweren den Wechsel; die Rivalität ist innerhalb einer Gruppe meist am stärksten.</p></article>
+      <article class="know"><h3>Abgrenzung</h3><p>Das Wettbewerbsumfeld ist enger gefasst als die globale Umwelt (PESTEL) und die Branchenstruktur (Five Forces) – der Blick richtet sich auf konkrete Rivalen.</p></article>
+    </section>
+
+    <!-- 5.1 TYPEN VON STRATEGIEN -->
+    <section class="view" id="view-strategietypen">
+      <div class="view-head">
+        <h2>5.1 Typen von Strategien</h2>
+        <p class="lead">Strategien lassen sich nach Ebene und Stoßrichtung ordnen.</p>
+      </div>
+      <article class="know"><h3>Strategieebenen</h3><p>Gesamtunternehmensstrategie (Corporate: in welchen Geschäften tätig sein?), Geschäftsbereichsstrategie (Business: wie im Wettbewerb bestehen?) und Funktionalstrategien (z. B. Marketing, Produktion, F&E).</p></article>
+      <article class="know"><h3>Wettbewerbsstrategien (Porter)</h3><p>Kostenführerschaft, Differenzierung und Fokus (Nische). Die gleichzeitige Verfolgung ohne klare Ausrichtung („stuck in the middle") gilt als riskant.</p></article>
+      <article class="know"><h3>Wachstumsstrategien (Ansoff)</h3><p>Produkt-Markt-Matrix: Marktdurchdringung, Marktentwicklung, Produktentwicklung und Diversifikation.</p></article>
+      <article class="know"><h3>Entwicklungsrichtungen</h3><p>Internes vs. externes Wachstum (M&amp;A), Kooperationen/Allianzen sowie vertikale und horizontale Integration.</p></article>
+    </section>
+
+    <!-- 5.2 BEWERTUNG & AUSWAHL -->
+    <section class="view" id="view-strategiewahl">
+      <div class="view-head">
+        <h2>5.2 Bewertung und Auswahl von Strategien</h2>
+        <p class="lead">Systematische Beurteilung strategischer Optionen.</p>
+      </div>
+      <article class="know"><h3>Drei Kriterien (Johnson/Scholes)</h3><p><strong>Eignung (Suitability):</strong> Passt die Option zur Ausgangslage (SWOT)? <strong>Akzeptanz (Acceptability):</strong> Sind Rendite, Risiko und Stakeholder-Erwartungen vertretbar? <strong>Machbarkeit (Feasibility):</strong> Reichen Ressourcen und Fähigkeiten?</p></article>
+      <article class="know"><h3>Bewertungsmethoden</h3><p>Nutzwertanalyse (Scoring gewichteter Kriterien), Wirtschaftlichkeitsrechnungen (z. B. Kapitalwert) sowie Szenario- und Sensitivitätsanalysen zur Prüfung der Robustheit.</p></article>
+      <article class="know"><h3>Verknüpfung im Tool</h3><p>Die <em>TOWS-Normstrategien</em> aus der SWOT liefern die Optionen; <em>BCG-Portfolio</em> und <em>wertorientierte Kennzahlen</em> unterstützen die Auswahl.</p></article>
+    </section>
+
+    <!-- 6.3 KONTROLLE & FRÜHAUFKLÄRUNG -->
+    <section class="view" id="view-kontrolle">
+      <div class="view-head">
+        <h2>6.3 Strategische Kontrolle und Frühaufklärung</h2>
+        <p class="lead">Die Umsetzung begleiten und frühzeitig auf Veränderungen reagieren.</p>
+      </div>
+      <article class="know"><h3>Arten der strategischen Kontrolle</h3><p><strong>Prämissenkontrolle</strong> (Gelten die Planungsannahmen noch?), <strong>Durchführungskontrolle</strong> (Wird der Plan erreicht?) und <strong>strategische Überwachung</strong> (ungerichtetes Beobachten des Umfelds).</p></article>
+      <article class="know"><h3>Frühaufklärung</h3><p>Frühwarn- und Frühaufklärungssysteme erfassen <strong>schwache Signale</strong> (Ansoff), um Chancen und Risiken zu erkennen, bevor sie voll wirksam werden.</p></article>
+      <article class="know"><h3>Instrumente</h3><p>Die <em>Balanced Scorecard</em> dient zugleich als Kontrollinstrument (Soll-Ist-Vergleich der Kennzahlen); <em>Szenarien</em> liefern Referenzpunkte für die Prämissenkontrolle.</p></article>
+    </section>
+
     <!-- DOSSIER -->
     <section class="view" id="view-dossier">
       <div class="view-head no-print">
@@ -389,7 +516,8 @@
       <div id="dossier-root" class="dossier"></div>
     </section>
 
-  </main>
+    </main>
+  </div>
 
   <footer class="app-footer wrap">
     <button id="btn-export" class="ghost">Als PDF exportieren</button>
@@ -397,6 +525,7 @@
     <span class="save-hint">Eingaben werden automatisch im Browser gespeichert.</span>
   </footer>
 
+  <script src="assets/companies.js"></script>
   <script src="assets/app.js"></script>
 </body>
 </html>
