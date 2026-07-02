@@ -259,6 +259,69 @@ footer button.danger:hover { border-color: var(--critical); color: var(--critica
   .dossier { padding: 16px; }
 }
 
+/* Wissensbasis (Theorie & Leitfragen) */
+.kb-slot { margin-bottom: 18px; }
+details.kb { background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--series-1); border-radius: 8px; }
+details.kb > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; list-style: none; position: relative; }
+details.kb > summary::-webkit-details-marker { display: none; }
+details.kb > summary::before { content: "▸"; color: var(--series-1); margin-right: 8px; display: inline-block; transition: transform .15s; }
+details.kb[open] > summary::before { transform: rotate(90deg); }
+.kb-body { padding: 0 16px 16px; font-size: .92rem; color: var(--text-secondary); }
+.kb-body p { margin: 0 0 10px; }
+.kb-body h4 { margin: 14px 0 6px; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.kb-body ul, .kb-body ol { margin: 0; padding-left: 20px; }
+.kb-body li { margin-bottom: 4px; }
+.kb-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 6px 0; }
+.kb-cards > div { border: 1px solid var(--border); border-radius: 6px; padding: 10px; }
+.kb-cards h5 { margin: 0 0 4px; color: var(--text-primary); font-size: .9rem; }
+.kb-cards p { margin: 0; font-size: .85rem; }
+
+/* Five-Forces-Checkliste */
+.checklist { margin-top: 20px; }
+.cl-force { margin-bottom: 14px; }
+.cl-force h4 { margin: 0 0 2px; font-size: .95rem; color: var(--text-primary); }
+.cl-note { margin: 0 0 8px; font-size: .85rem; color: var(--muted); }
+.cl-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 16px; }
+.cl-list li { display: flex; justify-content: space-between; gap: 10px; font-size: .88rem; padding: 3px 0; border-bottom: 1px solid var(--border); }
+.cl-val { font-weight: 700; flex: none; }
+.cl-hoch { color: var(--good); } .cl-niedrig { color: var(--critical); }
+
+/* Badges */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+.badge.ok { background: var(--good); color: #fff; }
+.badge.warn { background: var(--warning); color: #1a1a19; }
+
+/* SMART-Ziele */
+.ziele-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.ziele-form > input[type=text] { flex: 1 1 320px; }
+.smart-checks { display: flex; gap: 10px; }
+.smart-checks label { display: flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-secondary); font-size: .9rem; }
+#ziele-table td:nth-child(n+2):nth-child(-n+6) { text-align: center; }
+
+/* Szenario */
+.field-label { display: block; font-size: .9rem; color: var(--text-secondary); margin-bottom: 16px; }
+.field-label input { margin-top: 6px; }
+.list-tool.cols-1 { grid-template-columns: 1fr; }
+.scenario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+.scenario-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; border-top: 4px solid var(--muted); }
+.scenario-card.pos { border-top-color: var(--good); }
+.scenario-card.neg { border-top-color: var(--critical); }
+.scenario-card h3 { margin: 0 0 10px; font-size: 1rem; }
+.scenario-card textarea { width: 100%; min-height: 140px; resize: vertical; font: inherit; padding: 8px 10px;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--page); color: var(--text-primary); }
+
+/* Kennzahlen-Rechner */
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.calc-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: grid; gap: 8px; }
+.calc-card h3 { margin: 0 0 4px; font-size: 1.02rem; }
+.calc-card label { display: grid; gap: 4px; font-size: .85rem; color: var(--text-secondary); }
+.calc-out { margin-top: 8px; padding: 12px; background: var(--page); border-radius: 8px; font-size: .95rem; line-height: 1.7; }
+
+@media (max-width: 720px) {
+  .scenario-grid, .calc-grid { grid-template-columns: 1fr; }
+}
+
 /* Print / PDF – nur das Dossier drucken */
 @media print {
   .app-header, .app-footer, .no-print { display: none !important; }

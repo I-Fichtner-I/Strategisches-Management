@@ -7,14 +7,21 @@ und lässt sich direkt über **GitHub Pages** veröffentlichen.
 ## Werkzeuge
 
 Die Werkzeuge folgen dem strategischen Management-Prozess – von der Zielplanung
-über Analyse und Strategiewahl bis zur Umsetzung und Kontrolle.
+über Analyse und Strategiewahl bis zur Umsetzung und Kontrolle. **Jedes Werkzeug
+enthält eine Wissens-Ebene „Theorie & Leitfragen"** (Definition, Vorgehen,
+Leitfragen), sodass das Tool die typischen Klausur- und Übungsfragen beantwortet
+und zugleich durch die Anwendung führt.
 
 | Werkzeug | Prozessphase | Was es tut |
 |----------|--------------|-----------|
+| **Abell-Marktabgrenzung** | Zielplanung | Den relevanten Markt über Kundengruppen, -funktionen und Technologien definieren. |
 | **Stakeholder-Matrix** | Zielplanung | Anspruchsgruppen nach Macht und Interesse positionieren und passende Steuerungsstrategie ableiten. |
+| **SMART-Ziele** | Zielplanung | Ziele formulieren und automatisch auf die fünf SMART-Kriterien prüfen. |
 | **PESTEL-Analyse** | Umweltanalyse | Einflussfaktoren der globalen Umwelt in sechs Feldern erfassen. |
-| **Porters Five Forces** | Umweltanalyse | Die fünf Wettbewerbskräfte bewerten und daraus die **Branchenattraktivität** berechnen. |
+| **Porters Five Forces** | Umweltanalyse | Die fünf Wettbewerbskräfte bewerten und die **Branchenattraktivität** berechnen – inkl. **Checkliste**, wann jede Kraft stark ist. |
 | **Wertkette** | Unternehmensanalyse | Primär- und Unterstützungsaktivitäten analysieren. |
+| **Szenario-Analyse** | Umweltanalyse | Problem, Einflussfaktoren und zwei kontrastierende Zukunftsszenarien entwickeln. |
+| **Strategische Kennzahlen** | Analyse & Steuerung | EBITDA/EBITDA-Marge und EVA berechnen; wert- vs. traditionell einordnen. |
 | **SWOT-Analyse** | Zusammenführung | Analyse-Ergebnisse bündeln; leitet automatisch die vier **TOWS-Normstrategien** (SO / ST / WO / WT) ab. |
 | **BCG-Portfolio** | Zusammenführung | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz): Stars / Question Marks / Cash Cows / Dogs. |
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
