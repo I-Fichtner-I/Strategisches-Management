@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strategy Toolkit – Strategisches Management</title>
+  <meta name="description" content="Interaktives Werkzeug für strategisches Management: Stakeholder-Matrix, PESTEL, Five Forces, Wertkette, SWOT, BCG-Portfolio, Business Model Canvas und Balanced Scorecard." />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <h1>Strategy&nbsp;Toolkit</h1>
+      <p class="tagline">Werkzeuge für das strategische Management</p>
+      <nav class="tabs" id="tabs">
+        <button class="tab is-active" data-view="prozess">Prozess</button>
+        <button class="tab" data-view="stakeholder">Stakeholder</button>
+        <button class="tab" data-view="pestel">PESTEL</button>
+        <button class="tab" data-view="forces">Five&nbsp;Forces</button>
+        <button class="tab" data-view="wertkette">Wertkette</button>
+        <button class="tab" data-view="swot">SWOT</button>
+        <button class="tab" data-view="bcg">BCG</button>
+        <button class="tab" data-view="bmc">Canvas</button>
+        <button class="tab" data-view="bsc">Scorecard</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- PROZESS -->
+    <section class="view is-active" id="view-prozess">
+      <h2>Der strategische Management-Prozess</h2>
+      <p class="lead">Das Toolkit führt entlang des idealtypischen Prozesses. Jeder Schritt liefert
+      Bausteine für den nächsten – die Analyse-Ergebnisse fließen zusammen in die Strategiewahl
+      und deren Umsetzung.</p>
+      <ol class="process">
+        <li><span class="step-no">1</span><div><strong>Zielplanung</strong><br><a href="#" data-goto="stakeholder">Stakeholder</a> &amp; Ziele</div></li>
+        <li><span class="step-no">2</span><div><strong>Umweltanalyse</strong><br><a href="#" data-goto="pestel">PESTEL</a> &amp; <a href="#" data-goto="forces">Five&nbsp;Forces</a></div></li>
+        <li><span class="step-no">3</span><div><strong>Unternehmensanalyse</strong><br><a href="#" data-goto="wertkette">Wertkette</a></div></li>
+        <li><span class="step-no">4</span><div><strong>Zusammenführung</strong><br><a href="#" data-goto="swot">SWOT</a> &amp; <a href="#" data-goto="bcg">Portfolio</a></div></li>
+        <li><span class="step-no">5</span><div><strong>Strategiewahl</strong><br>Normstrategien (TOWS)</div></li>
+        <li><span class="step-no">6</span><div><strong>Umsetzung &amp; Kontrolle</strong><br><a href="#" data-goto="bmc">Canvas</a> &amp; <a href="#" data-goto="bsc">Scorecard</a></div></li>
+      </ol>
+      <div class="tool-cards">
+        <button class="tool-card" data-goto="stakeholder"><h3>Stakeholder-Matrix</h3><p>Anspruchsgruppen nach Macht und Interesse positionieren und passend steuern.</p></button>
+        <button class="tool-card" data-goto="pestel"><h3>PESTEL-Analyse</h3><p>Die globale Umwelt in sechs Einflussfeldern systematisch erfassen.</p></button>
+        <button class="tool-card" data-goto="forces"><h3>Porters Five Forces</h3><p>Branchenattraktivität über die fünf Wettbewerbskräfte bewerten.</p></button>
+        <button class="tool-card" data-goto="wertkette"><h3>Wertkette</h3><p>Primär- und Unterstützungsaktivitäten des Unternehmens analysieren.</p></button>
+        <button class="tool-card" data-goto="swot"><h3>SWOT-Analyse</h3><p>Analyse-Ergebnisse bündeln – inkl. abgeleiteter TOWS-Normstrategien.</p></button>
+        <button class="tool-card" data-goto="bcg"><h3>BCG-Portfolio</h3><p>Geschäftseinheiten nach Wachstum und Marktanteil positionieren.</p></button>
+        <button class="tool-card" data-goto="bmc"><h3>Business Model Canvas</h3><p>Das Geschäftsmodell in neun Bausteinen entwickeln.</p></button>
+        <button class="tool-card" data-goto="bsc"><h3>Balanced Scorecard</h3><p>Strategie über vier Perspektiven in Ziele und Kennzahlen übersetzen.</p></button>
+      </div>
+    </section>
+
+    <!-- STAKEHOLDER -->
+    <section class="view" id="view-stakeholder">
+      <div class="view-head">
+        <h2>Stakeholder-Matrix</h2>
+        <p class="lead">Anspruchsgruppen nach <strong>Macht</strong> und <strong>Interesse</strong>
+        (je 1–5) einordnen. Die Position bestimmt die passende Steuerungsstrategie.</p>
+      </div>
+      <div class="bcg-layout">
+        <div class="bcg-chart-box">
+          <canvas id="stk-canvas" width="640" height="520" role="img"
+            aria-label="Stakeholder-Matrix nach Macht und Interesse"></canvas>
+        </div>
+        <div class="bcg-side">
+          <form class="bcg-form" id="stk-form">
+            <label>Stakeholder<input type="text" name="name" required placeholder="z. B. Investoren" /></label>
+            <label>Macht (1–5)<input type="number" name="power" min="1" max="5" step="1" required placeholder="4" /></label>
+            <label>Interesse (1–5)<input type="number" name="interest" min="1" max="5" step="1" required placeholder="3" /></label>
+            <button type="submit">Hinzufügen</button>
+          </form>
+          <table class="bcg-table">
+            <thead><tr><th>Stakeholder</th><th>Macht</th><th>Interesse</th><th></th></tr></thead>
+            <tbody id="stk-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="bcg-legend">
+        <span class="q star">Eng&nbsp;managen</span><span class="q cow">Zufrieden&nbsp;halten</span>
+        <span class="q qmark">Informiert&nbsp;halten</span><span class="q dog">Beobachten</span>
+      </p>
+    </section>
+
+    <!-- PESTEL -->
+    <section class="view" id="view-pestel">
+      <div class="view-head">
+        <h2>PESTEL-Analyse</h2>
+        <p class="lead">Einflussfaktoren der globalen (Makro-)Umwelt in sechs Feldern erfassen.</p>
+      </div>
+      <div class="list-tool cols-3" id="pestel-root"></div>
+    </section>
+
+    <!-- FIVE FORCES -->
+    <section class="view" id="view-forces">
+      <div class="view-head">
+        <h2>Porters Five Forces</h2>
+        <p class="lead">Jede Wettbewerbskraft von 1 (schwach) bis 5 (stark) bewerten. Je stärker die
+        Kräfte, desto <strong>geringer</strong> die Branchenattraktivität.</p>
+      </div>
+      <div class="forces" id="forces-list"></div>
+      <div class="forces-result">
+        <div class="gauge"><div class="gauge-fill" id="forces-gauge"></div></div>
+        <div class="forces-score">
+          <span class="score-num" id="forces-score">–</span>
+          <span class="score-label" id="forces-verdict">Branchenattraktivität</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- WERTKETTE -->
+    <section class="view" id="view-wertkette">
+      <div class="view-head">
+        <h2>Wertkette</h2>
+        <p class="lead">Aktivitäten identifizieren, die Wert schaffen – getrennt nach Primär- und
+        Unterstützungsaktivitäten.</p>
+      </div>
+      <h3 class="sub">Unterstützungsaktivitäten</h3>
+      <div class="list-tool cols-4" id="vc-support"></div>
+      <h3 class="sub">Primäraktivitäten</h3>
+      <div class="list-tool cols-5" id="vc-primary"></div>
+    </section>
+
+    <!-- SWOT -->
+    <section class="view" id="view-swot">
+      <div class="view-head">
+        <h2>SWOT-Analyse</h2>
+        <p class="lead">Erfassen Sie je Feld einzelne Punkte. Aus der Kombination entstehen unten die
+        vier <strong>TOWS-Normstrategien</strong>.</p>
+      </div>
+      <div class="swot-grid">
+        <div class="swot-cell cell-s">
+          <h3>Stärken <span>(intern, positiv)</span></h3>
+          <ul class="item-list" data-list="strengths"></ul>
+          <form class="add-form" data-add="strengths"><input type="text" placeholder="Stärke hinzufügen …" /><button>+</button></form>
+        </div>
+        <div class="swot-cell cell-w">
+          <h3>Schwächen <span>(intern, negativ)</span></h3>
+          <ul class="item-list" data-list="weaknesses"></ul>
+          <form class="add-form" data-add="weaknesses"><input type="text" placeholder="Schwäche hinzufügen …" /><button>+</button></form>
+        </div>
+        <div class="swot-cell cell-o">
+          <h3>Chancen <span>(extern, positiv)</span></h3>
+          <ul class="item-list" data-list="opportunities"></ul>
+          <form class="add-form" data-add="opportunities"><input type="text" placeholder="Chance hinzufügen …" /><button>+</button></form>
+        </div>
+        <div class="swot-cell cell-t">
+          <h3>Risiken <span>(extern, negativ)</span></h3>
+          <ul class="item-list" data-list="threats"></ul>
+          <form class="add-form" data-add="threats"><input type="text" placeholder="Risiko hinzufügen …" /><button>+</button></form>
+        </div>
+      </div>
+
+      <h3 class="tows-title">Abgeleitete Normstrategien (TOWS)</h3>
+      <div class="tows-grid">
+        <div class="tows-cell"><h4>SO – Ausbauen</h4><p>Stärken nutzen, um Chancen zu ergreifen.</p><ul id="tows-so" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>ST – Absichern</h4><p>Stärken nutzen, um Risiken abzuwehren.</p><ul id="tows-st" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>WO – Aufholen</h4><p>Schwächen abbauen, um Chancen zu nutzen.</p><ul id="tows-wo" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>WT – Vermeiden</h4><p>Schwächen &amp; Risiken zugleich begrenzen.</p><ul id="tows-wt" class="tows-list"></ul></div>
+      </div>
+    </section>
+
+    <!-- BCG -->
+    <section class="view" id="view-bcg">
+      <div class="view-head">
+        <h2>BCG-Portfolio</h2>
+        <p class="lead">Geschäftseinheiten anlegen; die Blasengröße entspricht dem Umsatz. Grenzen:
+        Marktwachstum 10&nbsp;%, relativer Marktanteil 1,0.</p>
+      </div>
+      <div class="bcg-layout">
+        <div class="bcg-chart-box">
+          <canvas id="bcg-canvas" width="640" height="520" role="img"
+            aria-label="BCG-Portfolio-Diagramm mit Geschäftseinheiten"></canvas>
+        </div>
+        <div class="bcg-side">
+          <form class="bcg-form" id="bcg-form">
+            <label>Geschäftseinheit<input type="text" name="name" required placeholder="z. B. Produkt A" /></label>
+            <label>Marktwachstum (%)<input type="number" name="growth" step="0.1" required placeholder="12" /></label>
+            <label>Rel. Marktanteil (×)<input type="number" name="share" step="0.01" min="0.01" required placeholder="1.5" /></label>
+            <label>Umsatz (Mio. €)<input type="number" name="revenue" step="0.1" min="0" required placeholder="20" /></label>
+            <button type="submit">Hinzufügen</button>
+          </form>
+          <table class="bcg-table">
+            <thead><tr><th>Einheit</th><th>Wachstum</th><th>Anteil</th><th>Umsatz</th><th></th></tr></thead>
+            <tbody id="bcg-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="bcg-legend"><span class="q star">Stars</span><span class="q qmark">Question&nbsp;Marks</span><span class="q cow">Cash&nbsp;Cows</span><span class="q dog">Dogs</span></p>
+    </section>
+
+    <!-- BUSINESS MODEL CANVAS -->
+    <section class="view" id="view-bmc">
+      <div class="view-head">
+        <h2>Business Model Canvas</h2>
+        <p class="lead">Das Geschäftsmodell in neun Bausteinen entwickeln – von den Schlüsselpartnern
+        bis zu den Einnahmequellen.</p>
+      </div>
+      <div class="bmc" id="bmc-root" data-grid="1"></div>
+    </section>
+
+    <!-- BALANCED SCORECARD -->
+    <section class="view" id="view-bsc">
+      <div class="view-head">
+        <h2>Balanced Scorecard</h2>
+        <p class="lead">Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und
+        Maßnahmen übersetzen.</p>
+      </div>
+      <div class="bsc" id="bsc-root"></div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer wrap">
+    <button id="btn-export" class="ghost">Als PDF exportieren</button>
+    <button id="btn-reset" class="ghost danger">Alle Daten zurücksetzen</button>
+    <span class="save-hint">Eingaben werden automatisch im Browser gespeichert.</span>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
