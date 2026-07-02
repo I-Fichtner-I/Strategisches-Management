@@ -1,0 +1,1 @@
+# Strategisches-Management
