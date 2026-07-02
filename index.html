@@ -89,7 +89,9 @@
     <section class="view" id="view-pestel">
       <div class="view-head">
         <h2>PESTEL-Analyse</h2>
-        <p class="lead">Einflussfaktoren der globalen (Makro-)Umwelt in sechs Feldern erfassen.</p>
+        <p class="lead">Einflussfaktoren der globalen (Makro-)Umwelt in sechs Feldern erfassen. Über das
+        Symbol als <strong>Chance&nbsp;(＋)</strong> oder <strong>Risiko&nbsp;(–)</strong> markieren –
+        markierte Faktoren fließen automatisch in die SWOT.</p>
       </div>
       <div class="list-tool cols-3" id="pestel-root"></div>
     </section>
@@ -116,7 +118,8 @@
       <div class="view-head">
         <h2>Wertkette</h2>
         <p class="lead">Aktivitäten identifizieren, die Wert schaffen – getrennt nach Primär- und
-        Unterstützungsaktivitäten.</p>
+        Unterstützungsaktivitäten. Über das Symbol als <strong>Stärke&nbsp;(＋)</strong> oder
+        <strong>Schwäche&nbsp;(–)</strong> markieren – markierte Aktivitäten fließen automatisch in die SWOT.</p>
       </div>
       <h3 class="sub">Unterstützungsaktivitäten</h3>
       <div class="list-tool cols-4" id="vc-support"></div>
@@ -128,29 +131,35 @@
     <section class="view" id="view-swot">
       <div class="view-head">
         <h2>SWOT-Analyse</h2>
-        <p class="lead">Erfassen Sie je Feld einzelne Punkte. Aus der Kombination entstehen unten die
-        vier <strong>TOWS-Normstrategien</strong>.</p>
+        <p class="lead">Erfassen Sie je Feld eigene Punkte. Ergebnisse aus <strong>Wertkette</strong>,
+        <strong>PESTEL</strong> und <strong>Five&nbsp;Forces</strong> werden zusätzlich automatisch
+        übernommen (Bereich „Aus Analyse"). Aus der Kombination entstehen unten die vier
+        <strong>TOWS-Normstrategien</strong>.</p>
       </div>
       <div class="swot-grid">
         <div class="swot-cell cell-s">
           <h3>Stärken <span>(intern, positiv)</span></h3>
           <ul class="item-list" data-list="strengths"></ul>
           <form class="add-form" data-add="strengths"><input type="text" placeholder="Stärke hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="strengths"></ul></div>
         </div>
         <div class="swot-cell cell-w">
           <h3>Schwächen <span>(intern, negativ)</span></h3>
           <ul class="item-list" data-list="weaknesses"></ul>
           <form class="add-form" data-add="weaknesses"><input type="text" placeholder="Schwäche hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="weaknesses"></ul></div>
         </div>
         <div class="swot-cell cell-o">
           <h3>Chancen <span>(extern, positiv)</span></h3>
           <ul class="item-list" data-list="opportunities"></ul>
           <form class="add-form" data-add="opportunities"><input type="text" placeholder="Chance hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="opportunities"></ul></div>
         </div>
         <div class="swot-cell cell-t">
           <h3>Risiken <span>(extern, negativ)</span></h3>
           <ul class="item-list" data-list="threats"></ul>
           <form class="add-form" data-add="threats"><input type="text" placeholder="Risiko hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="threats"></ul></div>
         </div>
       </div>
 

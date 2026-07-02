@@ -108,13 +108,21 @@
     if (g) { e.preventDefault(); showView(g.dataset.goto); }
   });
 
-  /* ---------- Generisches Listen-Werkzeug (PESTEL, Wertkette, BMC) ---------- */
-  function initListTool(rootSel, store, cats) {
+  /* ---------- Generisches Listen-Werkzeug (PESTEL, Wertkette, BMC) ----------
+     opts.sentiment = true → jedes Item erhält eine +/–-Bewertung; markierte Items
+     fließen über opts.onChange in die SWOT. */
+  function initListTool(rootSel, store, cats, opts) {
+    opts = opts || {};
     const root = $(rootSel);
     if (!root) return;
     const isGrid = root.dataset.grid === "1";
+    const sentiment = !!opts.sentiment;
     cats.forEach((cat) => {
       if (!store[cat.key]) store[cat.key] = [];
+      if (sentiment) {
+        store[cat.key] = store[cat.key].map((x) =>
+          typeof x === "string" ? { text: x, sign: 0 } : { text: x.text, sign: x.sign || 0 });
+      }
       const card = document.createElement("div");
       card.className = "list-card";
       if (isGrid) card.style.gridArea = cat.key;
@@ -128,13 +136,29 @@
 
       const render = () => {
         ul.innerHTML = "";
-        store[cat.key].forEach((text, i) => {
+        store[cat.key].forEach((item, i) => {
+          const text = sentiment ? item.text : item;
           const li = document.createElement("li");
+          if (sentiment) {
+            const sign = item.sign || 0;
+            const tog = document.createElement("button");
+            tog.type = "button";
+            tog.className = "sign-toggle sign-" + (sign > 0 ? "pos" : sign < 0 ? "neg" : "neu");
+            tog.textContent = sign > 0 ? "＋" : sign < 0 ? "–" : "±";
+            tog.title = `Bewertung wechseln (${opts.pos || "positiv"} / ${opts.neg || "negativ"})`;
+            tog.addEventListener("click", () => {
+              item.sign = sign > 0 ? -1 : sign < 0 ? 0 : 1;
+              save(); render(); if (opts.onChange) opts.onChange();
+            });
+            li.appendChild(tog);
+          }
           const span = document.createElement("span");
           span.textContent = text;
           const btn = document.createElement("button");
           btn.type = "button"; btn.textContent = "×"; btn.setAttribute("aria-label", "Entfernen");
-          btn.addEventListener("click", () => { store[cat.key].splice(i, 1); save(); render(); });
+          btn.addEventListener("click", () => {
+            store[cat.key].splice(i, 1); save(); render(); if (opts.onChange) opts.onChange();
+          });
           li.append(span, btn); ul.appendChild(li);
         });
       };
@@ -143,7 +167,8 @@
         const inp = form.querySelector("input");
         const v = inp.value.trim();
         if (!v) return;
-        store[cat.key].push(v); inp.value = ""; save(); render();
+        store[cat.key].push(sentiment ? { text: v, sign: 0 } : v);
+        inp.value = ""; save(); render(); if (opts.onChange) opts.onChange();
       });
       card.append(h, ul, form);
       root.appendChild(card);
@@ -178,9 +203,46 @@
       });
     });
   }
+  /* Aus den Analyse-Werkzeugen abgeleitete SWOT-Einträge:
+     Wertkette (+/–) → Stärken/Schwächen, PESTEL (+/–) → Chancen/Risiken,
+     Five Forces stark (≥4) → Risiko, schwach (≤2) → Chance. */
+  const VC_ALL = VC_SUPPORT.concat(VC_PRIMARY);
+  function derivedSwot() {
+    const S = [], W = [], O = [], T = [];
+    VC_ALL.forEach((c) => (state.valuechain[c.key] || []).forEach((it) => {
+      if (!it || typeof it !== "object") return;
+      if (it.sign > 0) S.push(it.text); else if (it.sign < 0) W.push(it.text);
+    }));
+    PESTEL_CATS.forEach((c) => (state.pestel[c.key] || []).forEach((it) => {
+      if (!it || typeof it !== "object") return;
+      if (it.sign > 0) O.push(it.text); else if (it.sign < 0) T.push(it.text);
+    }));
+    FORCES.forEach((f) => {
+      const v = state.forces[f.key].v;
+      if (v >= 4) T.push("Hohe " + f.short);
+      else if (v <= 2) O.push("Geringe " + f.short);
+    });
+    return { strengths: S, weaknesses: W, opportunities: O, threats: T };
+  }
+
+  function renderDerived() {
+    const d = derivedSwot();
+    Object.keys(d).forEach((k) => {
+      const ul = $(`[data-derived="${k}"]`); if (!ul) return;
+      ul.innerHTML = "";
+      d[k].forEach((t) => { const li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+      const wrap = ul.closest(".derived-wrap");
+      if (wrap) wrap.style.display = d[k].length ? "block" : "none";
+    });
+  }
+
   function renderTows() {
-    const { strengths: S, weaknesses: W, opportunities: O, threats: T } = state.swot;
-    const combine = (a, b) => a.flatMap((x) => b.map((y) => `${x} × ${y}`)).slice(0, 6);
+    const d = derivedSwot();
+    const S = state.swot.strengths.concat(d.strengths);
+    const W = state.swot.weaknesses.concat(d.weaknesses);
+    const O = state.swot.opportunities.concat(d.opportunities);
+    const T = state.swot.threats.concat(d.threats);
+    const combine = (a, b) => a.flatMap((x) => b.map((y) => `${x} × ${y}`)).slice(0, 8);
     const fill = (id, items) => {
       const ul = $("#" + id); ul.innerHTML = "";
       items.forEach((t) => { const li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
@@ -189,13 +251,15 @@
     fill("tows-wo", combine(W, O)); fill("tows-wt", combine(W, T));
   }
 
+  function refreshSwotDerived() { renderDerived(); renderTows(); }
+
   /* ---------- Five Forces ---------- */
   const FORCES = [
-    { key: "rivalry", label: "Rivalität unter Wettbewerbern" },
-    { key: "newEntrants", label: "Bedrohung durch neue Anbieter" },
-    { key: "suppliers", label: "Verhandlungsmacht der Lieferanten" },
-    { key: "buyers", label: "Verhandlungsmacht der Abnehmer" },
-    { key: "substitutes", label: "Bedrohung durch Ersatzprodukte" },
+    { key: "rivalry", label: "Rivalität unter Wettbewerbern", short: "Wettbewerbsrivalität" },
+    { key: "newEntrants", label: "Bedrohung durch neue Anbieter", short: "Bedrohung durch neue Anbieter" },
+    { key: "suppliers", label: "Verhandlungsmacht der Lieferanten", short: "Lieferantenmacht" },
+    { key: "buyers", label: "Verhandlungsmacht der Abnehmer", short: "Abnehmermacht" },
+    { key: "substitutes", label: "Bedrohung durch Ersatzprodukte", short: "Bedrohung durch Ersatzprodukte" },
   ];
   function buildForces() {
     const box = $("#forces-list"); box.innerHTML = "";
@@ -230,6 +294,7 @@
     gauge.style.background = color;
     $("#forces-score").textContent = Math.round(attractiveness);
     $("#forces-verdict").textContent = verdict + " · Ø Kräfte " + avg.toFixed(1);
+    refreshSwotDerived();
   }
 
   /* ---------- Stakeholder-Matrix ---------- */
@@ -464,11 +529,15 @@
     buildForces(); updateForcesResult();
     renderStkTable(); drawStakeholder();
     renderBcgTable(); drawBCG();
-    initListTool("#pestel-root", state.pestel, PESTEL_CATS);
-    initListTool("#vc-support", state.valuechain, VC_SUPPORT);
-    initListTool("#vc-primary", state.valuechain, VC_PRIMARY);
+    initListTool("#pestel-root", state.pestel, PESTEL_CATS,
+      { sentiment: true, pos: "Chance", neg: "Risiko", onChange: refreshSwotDerived });
+    initListTool("#vc-support", state.valuechain, VC_SUPPORT,
+      { sentiment: true, pos: "Stärke", neg: "Schwäche", onChange: refreshSwotDerived });
+    initListTool("#vc-primary", state.valuechain, VC_PRIMARY,
+      { sentiment: true, pos: "Stärke", neg: "Schwäche", onChange: refreshSwotDerived });
     initListTool("#bmc-root", state.bmc, BMC_BLOCKS);
     buildBSC();
+    refreshSwotDerived();
   }
   wireSwotForms();
   initAll();

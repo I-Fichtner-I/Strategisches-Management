@@ -23,6 +23,20 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der Zielplanun
 Alle Eingaben werden automatisch im Browser gespeichert (localStorage) und lassen
 sich als PDF exportieren.
 
+### Automatischer Datenfluss
+
+Die Analyse-Ergebnisse fließen zusammen: In **PESTEL** und **Wertkette** lässt sich
+jeder Eintrag per Symbol als positiv (＋) oder negativ (–) markieren. Diese Einträge
+– zusammen mit den **Five-Forces**-Bewertungen (starke Kraft → Risiko, schwache Kraft
+→ Chance) – erscheinen automatisch im Bereich „Aus Analyse" der **SWOT** und speisen
+die daraus abgeleiteten **TOWS-Normstrategien**.
+
+```
+Wertkette (＋/–) ─┐
+PESTEL   (＋/–) ─┼─▶  SWOT  ─▶  TOWS-Normstrategien (SO · ST · WO · WT)
+Five Forces     ─┘
+```
+
 ## Nutzung
 
 Lokal: `index.html` im Browser öffnen.

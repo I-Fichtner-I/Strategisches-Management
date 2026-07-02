@@ -117,6 +117,21 @@ input[type=text], input[type=number] {
 .tows-list li { background: var(--page); }
 .tows-list:empty::after { content: "Noch keine Kombinationen – füllen Sie die SWOT-Felder.";
   color: var(--muted); font-size: .85rem; font-style: italic; }
+.item-list li > span { flex: 1; }
+
+/* +/– Bewertung im Listen-Werkzeug */
+.sign-toggle { flex: none; width: 22px; height: 22px; border-radius: 5px; border: none; cursor: pointer;
+  font-weight: 700; line-height: 1; font-size: .85rem; display: grid; place-items: center; }
+.sign-neu { background: var(--grid); color: var(--muted); }
+.sign-pos { background: var(--good); color: #fff; }
+.sign-neg { background: var(--critical); color: #fff; }
+
+/* Automatisch aus der Analyse übernommene SWOT-Einträge */
+.derived-wrap { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); display: none; }
+.derived-label { margin: 0 0 6px; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.derived-list { list-style: none; margin: 0; padding: 0; }
+.derived-list li { font-size: .88rem; padding: 5px 8px; margin-bottom: 6px; border-radius: 6px;
+  background: transparent; border: 1px dashed var(--border); color: var(--text-secondary); }
 
 /* Five Forces */
 .forces { display: grid; gap: 14px; }
