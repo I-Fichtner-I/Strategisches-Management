@@ -494,11 +494,17 @@
     <section class="view" id="view-strategiewahl">
       <div class="view-head">
         <h2>5.2 Bewertung und Auswahl von Strategien</h2>
-        <p class="lead">Systematische Beurteilung strategischer Optionen.</p>
+        <p class="lead">Strategische Optionen mit einer <strong>Nutzwertanalyse</strong> nach gewichteten
+        Kriterien bewerten und eine Rangfolge bilden. Optionen lassen sich aus den
+        <strong>TOWS-Normstrategien</strong> übernehmen oder frei ergänzen.</p>
       </div>
-      <article class="know"><h3>Drei Kriterien (Johnson/Scholes)</h3><p><strong>Eignung (Suitability):</strong> Passt die Option zur Ausgangslage (SWOT)? <strong>Akzeptanz (Acceptability):</strong> Sind Rendite, Risiko und Stakeholder-Erwartungen vertretbar? <strong>Machbarkeit (Feasibility):</strong> Reichen Ressourcen und Fähigkeiten?</p></article>
-      <article class="know"><h3>Bewertungsmethoden</h3><p>Nutzwertanalyse (Scoring gewichteter Kriterien), Wirtschaftlichkeitsrechnungen (z. B. Kapitalwert) sowie Szenario- und Sensitivitätsanalysen zur Prüfung der Robustheit.</p></article>
-      <article class="know"><h3>Verknüpfung im Tool</h3><p>Die <em>TOWS-Normstrategien</em> aus der SWOT liefern die Optionen; <em>BCG-Portfolio</em> und <em>wertorientierte Kennzahlen</em> unterstützen die Auswahl.</p></article>
+      <div class="kb-slot" data-kb="strategiewahl"></div>
+      <div id="sw-suggest" class="sw-suggest"></div>
+      <form class="add-form" id="sw-add"><input type="text" placeholder="Eigene Strategieoption hinzufügen …" /><button type="submit">+</button></form>
+      <div class="sw-matrix-wrap"><table class="sw-matrix" id="sw-matrix"></table></div>
+      <div class="sw-foot">
+        <form class="add-form" id="sw-crit-add"><input type="text" placeholder="Kriterium hinzufügen …" /><button type="submit">+</button></form>
+      </div>
     </section>
 
     <!-- 6.3 KONTROLLE & FRÜHAUFKLÄRUNG -->
@@ -528,6 +534,9 @@
 
   <footer class="app-footer wrap">
     <button id="btn-export" class="ghost">Als PDF exportieren</button>
+    <button id="btn-export-json" class="ghost">Projekt exportieren</button>
+    <button id="btn-import-json" class="ghost">Projekt importieren</button>
+    <input type="file" id="import-file" accept="application/json,.json" hidden />
     <button id="btn-reset" class="ghost danger">Alle Daten zurücksetzen</button>
     <span class="save-hint">Eingaben werden automatisch im Browser gespeichert.</span>
   </footer>
