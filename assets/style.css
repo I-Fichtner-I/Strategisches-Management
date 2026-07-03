@@ -574,6 +574,31 @@ button:active { transform: translateY(1px); }
 .sw-foot { margin-top: 12px; }
 .sw-foot .add-form { max-width: 360px; }
 
+/* Ansoff- & Porter-Matrix (5.1) */
+.ansoff-block, .porter-block { max-width: 780px; }
+.ansoff-cols, .porter-cols { display: grid; grid-template-columns: 26px 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.ansoff-cols span, .porter-cols span, .ansoff-rowlabels span, .porter-rowlabels span {
+  text-align: center; font-size: .76rem; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
+.ansoff-main, .porter-main { display: grid; grid-template-columns: 26px 1fr; gap: 8px; }
+.ansoff-rowlabels, .porter-rowlabels { display: grid; grid-template-rows: 1fr 1fr; gap: 8px; }
+.ansoff-rowlabels span, .porter-rowlabels span { writing-mode: vertical-rl; transform: rotate(180deg); place-self: center; }
+.ansoff { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px;
+  grid-template-areas: "durchdringung marktentwicklung" "produktentwicklung diversifikation"; }
+.ansoff .list-card { min-height: 128px; }
+.ansoff-cell-0 { border-top-color: var(--good) !important; }
+.ansoff-cell-1, .ansoff-cell-2 { border-top-color: var(--warning) !important; }
+.ansoff-cell-3 { border-top-color: var(--critical) !important; }
+.porter-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; }
+.porter-cell { background: var(--surface-1); border: 1px solid var(--border); border-top: 4px solid var(--series-1);
+  border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow-sm); }
+.porter-cell h4 { margin: 0 0 4px; font-size: 1rem; }
+.porter-cell p { margin: 0; color: var(--text-secondary); font-size: .88rem; }
+@media (max-width: 600px) {
+  .ansoff-cols, .porter-cols, .ansoff-main, .porter-main { grid-template-columns: 1fr; }
+  .ansoff-rowlabels, .porter-rowlabels { display: none; }
+  .ansoff, .porter-grid { grid-template-columns: 1fr; grid-template-rows: none; grid-template-areas: none; }
+}
+
 /* Wettbewerbsumfeld – Strategische-Gruppen-Karte */
 .wb-axes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .wb-axes label { display: grid; gap: 4px; font-size: .82rem; color: var(--text-secondary); }

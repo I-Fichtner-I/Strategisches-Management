@@ -53,6 +53,12 @@
     { key: "technologies", label: "Technologien (Wie?)" },
   ];
   const SZENARIO_CATS = [{ key: "factors", label: "Einflussfaktoren" }];
+  const ANSOFF_CELLS = [
+    { key: "durchdringung", label: "Marktdurchdringung" },
+    { key: "marktentwicklung", label: "Marktentwicklung" },
+    { key: "produktentwicklung", label: "Produktentwicklung" },
+    { key: "diversifikation", label: "Diversifikation" },
+  ];
 
   const defaultState = () => ({
     swot: emptyLists(["strengths", "weaknesses", "opportunities", "threats"]),
@@ -83,6 +89,7 @@
       options: [],
     },
     wettbewerb: { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [] },
+    ansoff: emptyLists(["durchdringung", "marktentwicklung", "produktentwicklung", "diversifikation"]),
   });
 
   let state = load();
@@ -1449,6 +1456,13 @@
     </div>`;
     parts.push(section("SWOT & Normstrategien", swotHtml + towsHtml));
 
+    // Ansoff-Matrix (Wachstumsstrategien)
+    if (ANSOFF_CELLS.some((c) => (state.ansoff[c.key] || []).length)) {
+      parts.push(section("Ansoff-Matrix (Wachstumsstrategien)",
+        `<div class="dossier-grid cols2">${ANSOFF_CELLS.map((c) =>
+          `<div class="dossier-block"><h3>${c.label}</h3>${ulOf(state.ansoff[c.key] || [])}</div>`).join("")}</div>`));
+    }
+
     // Strategiewahl (Nutzwertanalyse)
     const sw = state.strategiewahl;
     if (sw.options.length) {
@@ -1509,6 +1523,7 @@
     { v: "szenario", label: "Szenario-Analyse", has: () => !!(state.szenario.frage || (state.szenario.factors || []).length || state.szenario.a || state.szenario.b) },
     { v: "swot", label: "SWOT", has: () => listHas(state.swot) },
     { v: "bcg", label: "BCG-Portfolio", has: () => state.bcg.length > 0 },
+    { v: "strategietypen", label: "Ansoff-Matrix", has: () => listHas(state.ansoff) },
     { v: "strategiewahl", label: "Strategiewahl", has: () => state.strategiewahl.options.length > 0 },
     { v: "bmc", label: "Business Model Canvas", has: () => listHas(state.bmc) },
     { v: "bsc", label: "Balanced Scorecard", has: () => listHas(state.bsc) },
@@ -1568,6 +1583,10 @@
       a: "Schnelle KI-Adoption und förderliche Regulierung treiben das Wachstum – früh investieren.",
       b: "Rezession und strenge Regulierung bremsen den Markt – Kosten sichern und flexibel bleiben.",
     };
+    s.ansoff.durchdringung = ["Bestandskunden mit Rabatten binden"];
+    s.ansoff.marktentwicklung = ["Expansion in neue Länder"];
+    s.ansoff.produktentwicklung = ["KI-Funktionen ergänzen"];
+    s.ansoff.diversifikation = ["Angrenzenden Servicemarkt erschließen"];
     s.strategiewahl = {
       criteria: [{ name: "Eignung", weight: 2 }, { name: "Akzeptanz", weight: 1 }, { name: "Machbarkeit", weight: 1 }],
       options: [
@@ -1595,7 +1614,7 @@
 
   // Nach Reset/Import: dynamische Container leeren und neu aufbauen.
   function fullRebuild() {
-    ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources"]
+    ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources", "#ansoff-root"]
       .forEach((sel) => { const el = $(sel); if (el) el.innerHTML = ""; });
     initAll();
   }
@@ -1661,6 +1680,8 @@
     initListTool("#vc-primary", state.valuechain, VC_PRIMARY,
       { sentiment: true, pos: "Stärke", neg: "Schwäche", onChange: refreshSwotDerived });
     initListTool("#bmc-root", state.bmc, BMC_BLOCKS);
+    initListTool("#ansoff-root", state.ansoff, ANSOFF_CELLS);
+    $$("#ansoff-root .list-card").forEach((el, i) => el.classList.add("ansoff-cell-" + i));
     buildBSC();
     initListTool("#abell-root", state.abell, ABELL_CATS);
     renderZiele();
