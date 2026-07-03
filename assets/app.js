@@ -74,6 +74,14 @@
       company: "", titel: "", gruppe: "", ki: "", sources: [],
       sections: { einleitung: "", ueberblick: "", extern: "", intern: "", swotopt: "", diskussion: "", fazit: "" },
     },
+    strategiewahl: {
+      criteria: [
+        { name: "Eignung", weight: 1 },
+        { name: "Akzeptanz", weight: 1 },
+        { name: "Machbarkeit", weight: 1 },
+      ],
+      options: [],
+    },
   });
 
   let state = load();
@@ -167,6 +175,11 @@
       def: "Die <strong>Balanced Scorecard</strong> übersetzt die Strategie ausgewogen in vier Perspektiven (Finanzen, Kunden, interne Prozesse, Lernen &amp; Entwicklung) und verknüpft je Perspektive Ziele, Kennzahlen, Zielwerte und Maßnahmen über Ursache-Wirkungs-Ketten.",
       leitfragen: ["Sind alle vier Perspektiven ausgewogen berücksichtigt?", "Bestehen plausible Ursache-Wirkungs-Beziehungen?", "Ist jedes Ziel mit Kennzahl und Zielwert hinterlegt?", "Sind konkrete Maßnahmen zugeordnet?"],
     },
+    strategiewahl: {
+      def: "Die <strong>Nutzwertanalyse</strong> bewertet strategische Optionen anhand gewichteter Kriterien und bildet eine nachvollziehbare Rangfolge. Bewährt sind die drei Kriterien nach Johnson/Scholes: <strong>Eignung</strong> (passt zur Ausgangslage/SWOT), <strong>Akzeptanz</strong> (Rendite, Risiko, Stakeholder) und <strong>Machbarkeit</strong> (Ressourcen &amp; Fähigkeiten).",
+      vorgehen: ["Optionen sammeln (z. B. aus den TOWS-Normstrategien)", "Kriterien festlegen und gewichten", "Jede Option je Kriterium bewerten (1–5)", "Gewichteten Nutzwert berechnen und Rangfolge ableiten", "Ergebnis kritisch prüfen (Robustheit, Szenarien)"],
+      leitfragen: ["Sind die Kriterien vollständig und überschneidungsfrei?", "Spiegeln die Gewichte die strategische Bedeutung?", "Ist die Bewertung nachvollziehbar begründet?", "Wie robust ist die Rangfolge gegenüber anderen Gewichten?"],
+    },
     fallstudie: {
       def: "Ein <strong>Fallstudien-Report</strong> analysiert die aktuelle Lage, das Umfeld und die Strategie eines gewählten Unternehmens und diskutiert diese kritisch – mit den passenden Methoden dieses Toolkits.",
       vorgehen: ["Unternehmen wählen und einen Überblick verschaffen", "Externe Analyse (PESTEL, Five Forces) und interne Analyse (Wertkette, Ressourcen)", "In SWOT/Portfolio bündeln und strategische Optionen ableiten", "Bestehende Strategie kritisch diskutieren", "Ergebnisse strukturiert dokumentieren"],
@@ -230,6 +243,7 @@
     $$(".view").forEach((v) => v.classList.toggle("is-active", v.id === "view-" + name));
     if (name === "bcg") drawBCG();
     if (name === "stakeholder") drawStakeholder();
+    if (name === "strategiewahl") renderStrategiewahl();
     if (name === "dossier") buildDossier();
     if (anchor) {
       const el = document.getElementById(anchor);
@@ -403,7 +417,7 @@
     fill("tows-wo", combine(W, O)); fill("tows-wt", combine(W, T));
   }
 
-  function refreshSwotDerived() { renderDerived(); renderTows(); }
+  function refreshSwotDerived() { renderDerived(); renderTows(); if (document.getElementById("sw-matrix")) renderStrategiewahl(); }
 
   /* ---------- Five Forces ---------- */
   const FORCES = [
@@ -729,6 +743,87 @@
     if (nopat != null && kk != null) eva = nopat - kk;
     const verdict = eva == null ? "" : (eva >= 0 ? ' <span class="badge ok">Wert geschaffen</span>' : ' <span class="badge warn">Wert vernichtet</span>');
     $("#out-eva").innerHTML = `Kapitalkosten: <strong>${fmtNum(kk)}</strong> Mio. €<br>EVA: <strong>${fmtNum(eva)}</strong> Mio. €${verdict}`;
+  }
+
+  /* ---------- Strategiewahl (Nutzwertanalyse) ---------- */
+  function computeTowsOptions() {
+    const d = derivedSwot();
+    const S = state.swot.strengths.concat(d.strengths);
+    const W = state.swot.weaknesses.concat(d.weaknesses);
+    const O = state.swot.opportunities.concat(d.opportunities);
+    const T = state.swot.threats.concat(d.threats);
+    const combine = (a, b) => a.flatMap((x) => b.map((y) => `${x} × ${y}`)).slice(0, 5);
+    return [].concat(
+      combine(S, O).map((t) => ({ g: "SO", t })),
+      combine(S, T).map((t) => ({ g: "ST", t })),
+      combine(W, O).map((t) => ({ g: "WO", t })),
+      combine(W, T).map((t) => ({ g: "WT", t }))
+    );
+  }
+  function swNormalize() {
+    const st = state.strategiewahl;
+    const n = st.criteria.length;
+    st.options.forEach((o) => {
+      if (!Array.isArray(o.scores)) o.scores = [];
+      while (o.scores.length < n) o.scores.push(3);
+      if (o.scores.length > n) o.scores.length = n;
+    });
+  }
+  function swTotals() {
+    const st = state.strategiewahl;
+    const wsum = st.criteria.reduce((s, c) => s + (Number(c.weight) || 0), 0);
+    return st.options.map((o) => wsum ? o.scores.reduce((s, v, i) => s + (Number(v) || 0) * (Number(st.criteria[i].weight) || 0), 0) / wsum : 0);
+  }
+  function renderStrategiewahl() {
+    const st = state.strategiewahl; swNormalize();
+    const sug = $("#sw-suggest");
+    const existing = new Set(st.options.map((o) => o.name));
+    const avail = computeTowsOptions().map((o) => `[${o.g}] ${o.t}`).filter((n) => !existing.has(n)).slice(0, 8);
+    sug.innerHTML = avail.length ? '<span class="sw-sug-label">Aus TOWS übernehmen:</span>'
+      + avail.map((n, i) => `<button type="button" class="sw-chip" data-i="${i}">+ ${escapeHtml(n)}</button>`).join("") : "";
+    $$(".sw-chip", sug).forEach((b) => b.addEventListener("click", () => {
+      st.options.push({ name: avail[+b.dataset.i], scores: st.criteria.map(() => 3) }); save(); renderStrategiewahl();
+    }));
+
+    const tbl = $("#sw-matrix");
+    if (!st.options.length) {
+      tbl.innerHTML = '<tbody><tr><td class="sw-empty">Noch keine Optionen – oben aus TOWS übernehmen oder eigene hinzufügen.</td></tr></tbody>';
+      return;
+    }
+    const totals = swTotals();
+    const best = Math.max.apply(null, totals);
+    const head = "<thead><tr><th>Option</th>" + st.criteria.map((c, ci) =>
+      `<th class="sw-crit"><span class="sw-cname">${escapeHtml(c.name)}</span>`
+      + `<span class="sw-w">Gew. <input type="number" min="0" step="1" value="${c.weight}" data-crit="${ci}" class="sw-weight" /></span>`
+      + `<button type="button" class="sw-critdel" data-crit="${ci}" aria-label="Kriterium entfernen">×</button></th>`).join("")
+      + "<th>Nutzwert</th><th></th></tr></thead>";
+    const body = "<tbody>" + st.options.map((o, oi) => {
+      const cells = st.criteria.map((c, ci) => `<td><select class="sw-score" data-opt="${oi}" data-crit="${ci}">`
+        + [1, 2, 3, 4, 5].map((v) => `<option value="${v}"${Number(o.scores[ci]) === v ? " selected" : ""}>${v}</option>`).join("")
+        + "</select></td>").join("");
+      const isBest = totals[oi] === best && best > 0;
+      return `<tr class="${isBest ? "sw-best" : ""}"><td class="sw-optname">${escapeHtml(o.name)}${isBest ? ' <span class="badge ok">Top</span>' : ""}</td>`
+        + `${cells}<td class="sw-total">${totals[oi].toFixed(2)}</td>`
+        + `<td><button type="button" class="sw-optdel" data-opt="${oi}" aria-label="Option entfernen">×</button></td></tr>`;
+    }).join("") + "</tbody>";
+    tbl.innerHTML = head + body;
+    $$(".sw-weight", tbl).forEach((inp) => inp.addEventListener("change", () => { st.criteria[+inp.dataset.crit].weight = Number(inp.value); save(); renderStrategiewahl(); }));
+    $$(".sw-critdel", tbl).forEach((b) => b.addEventListener("click", () => { st.criteria.splice(+b.dataset.crit, 1); st.options.forEach((o) => o.scores.splice(+b.dataset.crit, 1)); save(); renderStrategiewahl(); }));
+    $$(".sw-score", tbl).forEach((sel) => sel.addEventListener("change", () => { st.options[+sel.dataset.opt].scores[+sel.dataset.crit] = Number(sel.value); save(); renderStrategiewahl(); }));
+    $$(".sw-optdel", tbl).forEach((b) => b.addEventListener("click", () => { st.options.splice(+b.dataset.opt, 1); save(); renderStrategiewahl(); }));
+  }
+  function wireStrategiewahl() {
+    $("#sw-add").addEventListener("submit", (e) => {
+      e.preventDefault(); const inp = e.target.querySelector("input"); const v = inp.value.trim(); if (!v) return;
+      state.strategiewahl.options.push({ name: v, scores: state.strategiewahl.criteria.map(() => 3) });
+      inp.value = ""; save(); renderStrategiewahl();
+    });
+    $("#sw-crit-add").addEventListener("submit", (e) => {
+      e.preventDefault(); const inp = e.target.querySelector("input"); const v = inp.value.trim(); if (!v) return;
+      state.strategiewahl.criteria.push({ name: v, weight: 1 });
+      state.strategiewahl.options.forEach((o) => o.scores.push(3));
+      inp.value = ""; save(); renderStrategiewahl();
+    });
   }
 
   /* ---------- Fallstudien-Report ---------- */
@@ -1061,6 +1156,18 @@
     </div>`;
     parts.push(section("SWOT & Normstrategien", swotHtml + towsHtml));
 
+    // Strategiewahl (Nutzwertanalyse)
+    const sw = state.strategiewahl;
+    if (sw.options.length) {
+      swNormalize();
+      const totals = swTotals();
+      const order = sw.options.map((o, i) => ({ name: o.name, t: totals[i] })).sort((a, b) => b.t - a.t);
+      const critLabel = sw.criteria.map((c) => `${esc(c.name)} (×${c.weight})`).join(", ");
+      const rows = order.map((r, idx) => `<tr><td>${idx + 1}</td><td>${esc(r.name)}</td><td>${r.t.toFixed(2)}</td></tr>`).join("");
+      parts.push(section("Strategiewahl (Nutzwertanalyse)",
+        `<p class="dossier-kpi">Kriterien: ${critLabel}</p><table class="dossier-table"><thead><tr><th>Rang</th><th>Option</th><th>Nutzwert</th></tr></thead><tbody>${rows}</tbody></table>`));
+    }
+
     // 6 BCG
     const bcg = state.bcg.length
       ? `<table class="dossier-table"><thead><tr><th>Einheit</th><th>Wachstum</th><th>Rel. Anteil</th><th>Umsatz</th><th>Kategorie</th></tr></thead><tbody>${
@@ -1099,13 +1206,43 @@
   function exportPdf() { showView("dossier"); window.print(); }
   $("#btn-export").addEventListener("click", exportPdf);
   $("#btn-dossier-pdf").addEventListener("click", exportPdf);
+
+  // Nach Reset/Import: dynamische Container leeren und neu aufbauen.
+  function fullRebuild() {
+    ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources"]
+      .forEach((sel) => { const el = $(sel); if (el) el.innerHTML = ""; });
+    initAll();
+  }
   $("#btn-reset").addEventListener("click", () => {
-    if (confirm("Wirklich alle Eingaben löschen?")) {
-      state = defaultState(); save();
-      ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources"]
-        .forEach((sel) => { const el = $(sel); if (el) el.innerHTML = ""; });
-      initAll();
-    }
+    if (confirm("Wirklich alle Eingaben löschen?")) { state = defaultState(); save(); fullRebuild(); }
+  });
+
+  // Projekt als JSON exportieren / importieren
+  $("#btn-export-json").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "strategy-toolkit-projekt.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+  $("#btn-import-json").addEventListener("click", () => $("#import-file").click());
+  $("#import-file").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if (!data || typeof data !== "object") throw new Error("invalid");
+        state = deepMerge(defaultState(), data); save(); fullRebuild();
+        showView("prozess"); setNavActive($('#nav .nav-item[data-view="prozess"]'));
+      } catch (err) {
+        alert("Import fehlgeschlagen: Das ist keine gültige Projektdatei.");
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file);
   });
 
   if (window.matchMedia) {
@@ -1138,6 +1275,7 @@
     populateCompanySelect();
     initListTool("#fs-sources", state.fallstudie, [{ key: "sources", label: "Quellenverzeichnis" }]);
     setFallstudieValues();
+    renderStrategiewahl();
     renderKnowledge();
     renderForcesChecklist();
     renderFlashcard();
@@ -1148,6 +1286,7 @@
   wireSzenario();
   wireKennzahlen();
   wireFallstudie();
+  wireStrategiewahl();
   wireFlashcards();
   wireQuiz();
   initAll();
