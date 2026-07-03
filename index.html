@@ -167,25 +167,25 @@
     <section class="view" id="view-ziele">
       <div class="view-head">
         <h2>SMART-Ziele &amp; Zielhierarchie</h2>
-        <p class="lead">Ziele formulieren und markieren, welche <strong>SMART</strong>-Kriterien erfüllt
-        sind. Das Tool zeigt, ob ein Ziel vollständig SMART ist.</p>
+        <p class="lead">Ziele <strong>geführt</strong> formulieren: Für jedes der fünf SMART-Kriterien
+        eine Angabe machen. Das Tool prüft die Vollständigkeit, zeigt einen Qualitätsbalken und setzt aus
+        den Angaben einen ausformulierten Zielsatz zusammen.</p>
       </div>
       <div class="kb-slot" data-kb="ziele"></div>
-      <form class="ziele-form" id="ziele-form">
-        <input type="text" name="ziel" required placeholder="Ziel formulieren, z. B. „Marktanteil in DACH bis Ende 2027 auf 15 % steigern“" />
-        <div class="smart-checks">
-          <label title="Spezifisch"><input type="checkbox" name="s" /> S</label>
-          <label title="Messbar"><input type="checkbox" name="m" /> M</label>
-          <label title="Attraktiv / Akzeptiert"><input type="checkbox" name="a" /> A</label>
-          <label title="Realistisch"><input type="checkbox" name="r" /> R</label>
-          <label title="Terminiert"><input type="checkbox" name="t" /> T</label>
+      <form class="smart-form" id="ziele-form">
+        <label class="smart-title">Ziel (Kurzformulierung)
+          <input type="text" name="ziel" required placeholder="z. B. Marktanteil in der DACH-Region steigern" />
+        </label>
+        <div class="smart-fields">
+          <label><span class="smart-key">S</span> Spezifisch<input type="text" name="s" placeholder="Was genau soll erreicht werden?" /></label>
+          <label><span class="smart-key">M</span> Messbar<input type="text" name="m" placeholder="Woran messbar? (Kennzahl / Zielwert)" /></label>
+          <label><span class="smart-key">A</span> Attraktiv<input type="text" name="a" placeholder="Warum lohnend / akzeptiert?" /></label>
+          <label><span class="smart-key">R</span> Realistisch<input type="text" name="r" placeholder="Warum erreichbar? (Ressourcen)" /></label>
+          <label><span class="smart-key">T</span> Terminiert<input type="text" name="t" placeholder="Bis wann?" /></label>
         </div>
-        <button type="submit">Hinzufügen</button>
+        <button type="submit">Ziel hinzufügen</button>
       </form>
-      <table class="bcg-table" id="ziele-table">
-        <thead><tr><th>Ziel</th><th>S</th><th>M</th><th>A</th><th>R</th><th>T</th><th>Bewertung</th><th></th></tr></thead>
-        <tbody id="ziele-tbody"></tbody>
-      </table>
+      <div id="ziele-list" class="smart-list"></div>
     </section>
 
     <!-- PESTEL -->
@@ -528,6 +528,11 @@
       </div>
       <div id="dossier-root" class="dossier"></div>
     </section>
+
+    <nav class="pager no-print" id="pager" aria-label="Kapitel-Navigation">
+      <button type="button" class="pager-btn" id="pager-prev"></button>
+      <button type="button" class="pager-btn" id="pager-next"></button>
+    </nav>
 
     </main>
   </div>
