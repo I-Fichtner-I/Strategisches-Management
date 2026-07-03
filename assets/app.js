@@ -53,6 +53,12 @@
     { key: "technologies", label: "Technologien (Wie?)" },
   ];
   const SZENARIO_CATS = [{ key: "factors", label: "Einflussfaktoren" }];
+  const ANSOFF_CELLS = [
+    { key: "durchdringung", label: "Marktdurchdringung" },
+    { key: "marktentwicklung", label: "Marktentwicklung" },
+    { key: "produktentwicklung", label: "Produktentwicklung" },
+    { key: "diversifikation", label: "Diversifikation" },
+  ];
 
   const defaultState = () => ({
     swot: emptyLists(["strengths", "weaknesses", "opportunities", "threats"]),
@@ -82,6 +88,8 @@
       ],
       options: [],
     },
+    wettbewerb: { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [] },
+    ansoff: emptyLists(["durchdringung", "marktentwicklung", "produktentwicklung", "diversifikation"]),
   });
 
   let state = load();
@@ -154,6 +162,9 @@
         "<div><h5>EBIT</h5><p>Earnings before Interest and Taxes – operatives Ergebnis vor Zinsen und Steuern.</p></div>" +
         "<div><h5>EBITDA</h5><p>EBIT + Abschreibungen &amp; Amortisation. Zeigt die operative Ertragskraft unabhängig von Investitions-/Abschreibungspolitik.</p></div>" +
         "<div><h5>EBITDA-Marge</h5><p>EBITDA ÷ Umsatz. Relative Kennzahl der operativen Profitabilität; erlaubt Vergleiche zwischen Unternehmen.</p></div>" +
+        "<div><h5>NOPAT</h5><p>Net Operating Profit After Taxes – operatives Ergebnis nach Steuern, aber vor Finanzierungskosten (≈ EBIT × (1 − Steuersatz)). Grundlage für wertorientierte Kennzahlen.</p></div>" +
+        "<div><h5>WACC</h5><p>Weighted Average Cost of Capital – gewichteter Mischsatz aus Eigen- und Fremdkapitalkosten; die Mindestrendite, die das eingesetzte Kapital erwirtschaften muss.</p></div>" +
+        "<div><h5>ROCE</h5><p>Return on Capital Employed = NOPAT ÷ investiertes Kapital. Liegt ROCE über dem WACC, entsteht Wert (positiver Spread).</p></div>" +
         "<div><h5>EVA</h5><p>Economic Value Added = NOPAT − (investiertes Kapital × WACC). Positiver EVA = Wertschaffung über den Kapitalkosten.</p></div>" +
         "<div><h5>CFROI</h5><p>Cash Flow Return on Investment – wertorientierte Rendite auf Basis von Brutto-Cashflow und Bruttoinvestitionsbasis; mit den Kapitalkosten zu vergleichen.</p></div>" +
         "</div>",
@@ -283,6 +294,7 @@
     if (name === "bcg") drawBCG();
     if (name === "stakeholder") drawStakeholder();
     if (name === "forces") drawForcesRadar();
+    if (name === "wettbewerb") drawWettbewerb();
     if (name === "kennzahlen") { drawWaterfall(); renderKzCompare(); }
     if (name === "strategiewahl") renderStrategiewahl();
     if (name === "prozess") renderDashboard();
@@ -939,6 +951,86 @@
     </div>`;
   }
 
+  /* ---------- Wettbewerbsumfeld: Strategische-Gruppen-Karte ---------- */
+  const WB_COLORS = ["#2a78d6", "#1baf7a", "#eda100", "#7248d4", "#e34948", "#e87ba4", "#eb6834", "#008300"];
+  function groupColorMap() {
+    const map = {}; let i = 0;
+    state.wettbewerb.competitors.forEach((c) => {
+      const g = (c.group || "").trim();
+      if (g && !(g in map)) { map[g] = WB_COLORS[i % WB_COLORS.length]; i++; }
+    });
+    return map;
+  }
+  function renderWbTable() {
+    const tb = $("#wb-tbody"); if (!tb) return; tb.innerHTML = "";
+    state.wettbewerb.competitors.forEach((c, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${escapeHtml(c.name)}</td><td>${c.x}</td><td>${c.y}</td><td>${escapeHtml(c.group || "")}</td>`;
+      const td = document.createElement("td");
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.textContent = "×"; btn.setAttribute("aria-label", "Entfernen");
+      btn.addEventListener("click", () => { state.wettbewerb.competitors.splice(i, 1); save(); renderWbTable(); drawWettbewerb(); renderWbLegend(); });
+      td.appendChild(btn); tr.appendChild(td); tb.appendChild(tr);
+    });
+  }
+  function renderWbLegend() {
+    const box = $("#wb-legend"); if (!box) return;
+    const cmap = groupColorMap();
+    const parts = Object.keys(cmap).map((g) => `<span class="wb-leg"><span class="wb-dot" style="background:${cmap[g]}"></span>${escapeHtml(g)}</span>`);
+    if (state.wettbewerb.competitors.some((c) => !(c.group || "").trim())) parts.push('<span class="wb-leg"><span class="wb-dot" style="background:var(--muted)"></span>ohne Gruppe</span>');
+    box.innerHTML = parts.join("");
+  }
+  function drawWettbewerb() {
+    const canvas = $("#wb-canvas"); if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width, H = canvas.height;
+    const pad = { l: 60, r: 24, t: 24, b: 58 }, plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+    const ink = cssVar("--text-primary"), muted = cssVar("--muted"), grid = cssVar("--grid"), surface = cssVar("--surface-1");
+    ctx.clearRect(0, 0, W, H);
+    const xToPx = (v) => pad.l + (clamp(v, 1, 10) - 1) / 9 * plotW;
+    const yToPx = (v) => pad.t + (1 - (clamp(v, 1, 10) - 1) / 9) * plotH;
+    ctx.strokeStyle = grid; ctx.lineWidth = 1; ctx.strokeRect(pad.l, pad.t, plotW, plotH);
+    for (let g = 2; g < 10; g++) {
+      ctx.globalAlpha = 0.5; ctx.beginPath();
+      ctx.moveTo(xToPx(g), pad.t); ctx.lineTo(xToPx(g), pad.t + plotH);
+      ctx.moveTo(pad.l, yToPx(g)); ctx.lineTo(pad.l + plotW, yToPx(g)); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    ctx.fillStyle = muted; ctx.font = "12px system-ui, sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText((state.wettbewerb.xLabel || "X") + " →", pad.l + plotW / 2, H - 26);
+    ctx.save(); ctx.translate(16, pad.t + plotH / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = "middle";
+    ctx.fillText((state.wettbewerb.yLabel || "Y") + " →", 0, 0); ctx.restore();
+    const cmap = groupColorMap(), seen = {};
+    state.wettbewerb.competitors.forEach((c) => {
+      const key = c.x + ":" + c.y, nn = (seen[key] = (seen[key] || 0) + 1), off = (nn - 1) * 10;
+      const cx = xToPx(c.x) + off, cy = yToPx(c.y) + off;
+      ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+      ctx.fillStyle = cmap[(c.group || "").trim()] || muted; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = surface; ctx.stroke();
+      ctx.fillStyle = ink; ctx.font = "600 12px system-ui, sans-serif"; ctx.textBaseline = "middle";
+      const nearRight = cx > pad.l + plotW * 0.8; ctx.textAlign = nearRight ? "right" : "left";
+      ctx.fillText(c.name, cx + (nearRight ? -12 : 12), cy);
+    });
+    if (!state.wettbewerb.competitors.length) {
+      ctx.fillStyle = muted; ctx.font = "14px system-ui, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("Noch keine Wettbewerber – rechts hinzufügen.", pad.l + plotW / 2, pad.t + plotH / 2);
+    }
+  }
+  function wireWettbewerb() {
+    const xl = $("#wb-xlabel"), yl = $("#wb-ylabel");
+    xl.addEventListener("input", () => { state.wettbewerb.xLabel = xl.value; save(); drawWettbewerb(); });
+    yl.addEventListener("input", () => { state.wettbewerb.yLabel = yl.value; save(); drawWettbewerb(); });
+    $("#wb-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const c = { name: String(fd.get("name")).trim(), x: clamp(Number(fd.get("x")), 1, 10), y: clamp(Number(fd.get("y")), 1, 10), group: String(fd.get("group") || "").trim() };
+      if (!c.name || !isFinite(c.x) || !isFinite(c.y)) return;
+      state.wettbewerb.competitors.push(c); save(); e.target.reset(); renderWbTable(); drawWettbewerb(); renderWbLegend();
+    });
+  }
+  function setWbValues() { $("#wb-xlabel").value = state.wettbewerb.xLabel || ""; $("#wb-ylabel").value = state.wettbewerb.yLabel || ""; }
+
   /* ---------- Strategiewahl (Nutzwertanalyse) ---------- */
   function computeTowsOptions() {
     const d = derivedSwot();
@@ -1296,6 +1388,16 @@
     }</tbody></table><p class="dossier-kpi">Branchenattraktivität: <strong>${attractiveness}/100</strong> · Ø Kräfte ${avg.toFixed(1)}</p>`;
     parts.push(section("Porters Five Forces", forcesTbl + chartImg("#forces-radar", drawForcesRadar)));
 
+    // Wettbewerbsumfeld (strategische Gruppen)
+    const wb = state.wettbewerb;
+    if (wb.competitors.length) {
+      const wbRows = wb.competitors.map((c) => `<tr><td>${esc(c.name)}</td><td>${c.x}</td><td>${c.y}</td><td>${esc(c.group || "")}</td></tr>`).join("");
+      parts.push(section("Wettbewerbsumfeld (strategische Gruppen)",
+        `<p class="dossier-kpi">Achsen: ${esc(wb.xLabel)} (X) · ${esc(wb.yLabel)} (Y)</p>`
+        + `<table class="dossier-table"><thead><tr><th>Wettbewerber</th><th>X</th><th>Y</th><th>Gruppe</th></tr></thead><tbody>${wbRows}</tbody></table>`
+        + chartImg("#wb-canvas", drawWettbewerb)));
+    }
+
     // Wertkette
     parts.push(section("Wertkette",
       `<h3 class="dossier-sub">Unterstützungsaktivitäten</h3><div class="dossier-grid">${
@@ -1354,6 +1456,13 @@
     </div>`;
     parts.push(section("SWOT & Normstrategien", swotHtml + towsHtml));
 
+    // Ansoff-Matrix (Wachstumsstrategien)
+    if (ANSOFF_CELLS.some((c) => (state.ansoff[c.key] || []).length)) {
+      parts.push(section("Ansoff-Matrix (Wachstumsstrategien)",
+        `<div class="dossier-grid cols2">${ANSOFF_CELLS.map((c) =>
+          `<div class="dossier-block"><h3>${c.label}</h3>${ulOf(state.ansoff[c.key] || [])}</div>`).join("")}</div>`));
+    }
+
     // Strategiewahl (Nutzwertanalyse)
     const sw = state.strategiewahl;
     if (sw.options.length) {
@@ -1409,10 +1518,12 @@
     { v: "kennzahlen", label: "Kennzahlen", has: () => Object.values(state.kennzahlen).some((x) => String(x).trim() !== "") },
     { v: "pestel", label: "PESTEL", has: () => listHas(state.pestel) },
     { v: "forces", label: "Five Forces", has: () => FORCES.some((f) => state.forces[f.key].v !== 3 || (state.forces[f.key].note || "").trim()) },
+    { v: "wettbewerb", label: "Wettbewerbsumfeld", has: () => state.wettbewerb.competitors.length > 0 },
     { v: "wertkette", label: "Wertkette", has: () => listHas(state.valuechain) },
     { v: "szenario", label: "Szenario-Analyse", has: () => !!(state.szenario.frage || (state.szenario.factors || []).length || state.szenario.a || state.szenario.b) },
     { v: "swot", label: "SWOT", has: () => listHas(state.swot) },
     { v: "bcg", label: "BCG-Portfolio", has: () => state.bcg.length > 0 },
+    { v: "strategietypen", label: "Ansoff-Matrix", has: () => listHas(state.ansoff) },
     { v: "strategiewahl", label: "Strategiewahl", has: () => state.strategiewahl.options.length > 0 },
     { v: "bmc", label: "Business Model Canvas", has: () => listHas(state.bmc) },
     { v: "bsc", label: "Balanced Scorecard", has: () => listHas(state.bsc) },
@@ -1452,6 +1563,10 @@
     s.forces.suppliers = { v: 2, note: "Standardkomponenten, viele Bezugsquellen" };
     s.forces.buyers = { v: 4, note: "Preissensible Großkunden" };
     s.forces.substitutes = { v: 3, note: "" };
+    s.wettbewerb = { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [
+      { name: "Wir", x: 6, y: 8, group: "Premium" }, { name: "Anbieter A", x: 7, y: 8, group: "Premium" },
+      { name: "Anbieter B", x: 3, y: 4, group: "Discount" }, { name: "Anbieter C", x: 4, y: 3, group: "Discount" },
+      { name: "Nischenanbieter", x: 9, y: 9, group: "Spezialist" }] };
     s.valuechain.operations = [{ text: "Skalierbare, effiziente Produktion", sign: 1 }];
     s.valuechain.marketing = [{ text: "Starke Marke", sign: 1 }];
     s.valuechain.service = [{ text: "Überlasteter Kundensupport", sign: -1 }];
@@ -1468,6 +1583,10 @@
       a: "Schnelle KI-Adoption und förderliche Regulierung treiben das Wachstum – früh investieren.",
       b: "Rezession und strenge Regulierung bremsen den Markt – Kosten sichern und flexibel bleiben.",
     };
+    s.ansoff.durchdringung = ["Bestandskunden mit Rabatten binden"];
+    s.ansoff.marktentwicklung = ["Expansion in neue Länder"];
+    s.ansoff.produktentwicklung = ["KI-Funktionen ergänzen"];
+    s.ansoff.diversifikation = ["Angrenzenden Servicemarkt erschließen"];
     s.strategiewahl = {
       criteria: [{ name: "Eignung", weight: 2 }, { name: "Akzeptanz", weight: 1 }, { name: "Machbarkeit", weight: 1 }],
       options: [
@@ -1495,7 +1614,7 @@
 
   // Nach Reset/Import: dynamische Container leeren und neu aufbauen.
   function fullRebuild() {
-    ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources"]
+    ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources", "#ansoff-root"]
       .forEach((sel) => { const el = $(sel); if (el) el.innerHTML = ""; });
     initAll();
   }
@@ -1537,13 +1656,14 @@
   });
 
   if (window.matchMedia) {
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawBCG(); drawStakeholder(); drawForcesRadar(); drawWaterfall(); });
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawBCG(); drawStakeholder(); drawForcesRadar(); drawWaterfall(); drawWettbewerb(); });
   }
   window.addEventListener("resize", () => {
     if ($("#view-bcg").classList.contains("is-active")) drawBCG();
     if ($("#view-stakeholder").classList.contains("is-active")) drawStakeholder();
     if ($("#view-forces").classList.contains("is-active")) drawForcesRadar();
     if ($("#view-kennzahlen").classList.contains("is-active")) drawWaterfall();
+    if ($("#view-wettbewerb").classList.contains("is-active")) drawWettbewerb();
   });
 
   function initAll() {
@@ -1552,6 +1672,7 @@
     buildForces(); updateForcesResult();
     renderStkTable(); drawStakeholder();
     renderBcgTable(); drawBCG();
+    setWbValues(); renderWbTable(); drawWettbewerb(); renderWbLegend();
     initListTool("#pestel-root", state.pestel, PESTEL_CATS,
       { sentiment: true, pos: "Chance", neg: "Risiko", onChange: refreshSwotDerived });
     initListTool("#vc-support", state.valuechain, VC_SUPPORT,
@@ -1559,6 +1680,8 @@
     initListTool("#vc-primary", state.valuechain, VC_PRIMARY,
       { sentiment: true, pos: "Stärke", neg: "Schwäche", onChange: refreshSwotDerived });
     initListTool("#bmc-root", state.bmc, BMC_BLOCKS);
+    initListTool("#ansoff-root", state.ansoff, ANSOFF_CELLS);
+    $$("#ansoff-root .list-card").forEach((el, i) => el.classList.add("ansoff-cell-" + i));
     buildBSC();
     initListTool("#abell-root", state.abell, ABELL_CATS);
     renderZiele();
@@ -1577,6 +1700,7 @@
     refreshSwotDerived();
   }
   wireSwotForms();
+  wireWettbewerb();
   wireSzenario();
   wireKennzahlen();
   wireFallstudie();

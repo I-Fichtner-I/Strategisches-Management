@@ -84,14 +84,14 @@
         so beantwortet das Tool die typischen Fragestellungen und führt zugleich durch die Anwendung.</p>
       </div>
 
-      <div class="dash" id="dash">
-        <div class="dash-head">
-          <div><strong id="dash-count">0 / 14</strong> Werkzeugen befüllt</div>
-          <button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button>
+      <details class="dash" id="dash" open>
+        <summary class="dash-summary"><strong id="dash-count">0 / 16</strong>&nbsp;Werkzeugen befüllt</summary>
+        <div class="dash-body">
+          <div class="dash-actions"><button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button></div>
+          <div class="dash-bar"><span id="dash-bar-fill"></span></div>
+          <div class="dash-grid" id="dash-grid"></div>
         </div>
-        <div class="dash-bar"><span id="dash-bar-fill"></span></div>
-        <div class="dash-grid" id="dash-grid"></div>
-      </div>
+      </details>
       <details class="kb" id="help-panel">
         <summary>So nutzt du das Toolkit</summary>
         <div class="kb-body">
@@ -292,9 +292,9 @@
         </form>
         <form class="calc-card" id="calc-eva">
           <h3>EVA (Economic Value Added)</h3>
-          <label>NOPAT (Mio. €)<input type="number" step="any" name="nopat" placeholder="90" /></label>
+          <label>NOPAT (Mio. €) <span class="field-hint">operatives Ergebnis nach Steuern, vor Zinsen (≈ EBIT × (1 − Steuersatz))</span><input type="number" step="any" name="nopat" placeholder="90" /></label>
           <label>Investiertes Kapital (Mio. €)<input type="number" step="any" name="kapital" placeholder="600" /></label>
-          <label>WACC (%)<input type="number" step="any" name="wacc" placeholder="8" /></label>
+          <label>WACC (%) <span class="field-hint">gewichtete Kapitalkosten (Eigen- &amp; Fremdkapital)</span><input type="number" step="any" name="wacc" placeholder="8" /></label>
           <div class="calc-out" id="out-eva">Kapitalkosten: –<br>EVA: –</div>
         </form>
       </div>
@@ -503,6 +503,34 @@
       <article class="know"><h3>Konkurrenzanalyse</h3><p>Identifikation der relevanten Wettbewerber und Erstellung von Konkurrentenprofilen (Ziele, Annahmen, Strategie, Fähigkeiten), um deren Verhalten zu antizipieren.</p></article>
       <article class="know"><h3>Strategische Gruppen</h3><p>Unternehmen mit ähnlicher Strategie innerhalb einer Branche bilden eine strategische Gruppe. Mobilitätsbarrieren erschweren den Wechsel; die Rivalität ist innerhalb einer Gruppe meist am stärksten.</p></article>
       <article class="know"><h3>Abgrenzung</h3><p>Das Wettbewerbsumfeld ist enger gefasst als die globale Umwelt (PESTEL) und die Branchenstruktur (Five Forces) – der Blick richtet sich auf konkrete Rivalen.</p></article>
+
+      <h3 class="sub">Strategische-Gruppen-Karte</h3>
+      <p class="lead">Wettbewerber (inkl. des eigenen Unternehmens) auf zwei zentralen Wettbewerbsdimensionen
+      positionieren. Unternehmen, die nah beieinander liegen, bilden eine <strong>strategische Gruppe</strong>.
+      Achsenbeschriftungen sind frei wählbar.</p>
+      <div class="bcg-layout">
+        <div class="bcg-chart-box">
+          <canvas id="wb-canvas" width="640" height="560" role="img" aria-label="Strategische-Gruppen-Karte der Wettbewerber"></canvas>
+        </div>
+        <div class="bcg-side">
+          <div class="wb-axes">
+            <label>X-Achse<input type="text" id="wb-xlabel" placeholder="z. B. Preisniveau" /></label>
+            <label>Y-Achse<input type="text" id="wb-ylabel" placeholder="z. B. Qualität / Leistung" /></label>
+          </div>
+          <form class="bcg-form" id="wb-form">
+            <label>Wettbewerber<input type="text" name="name" required placeholder="z. B. Anbieter A" /></label>
+            <label>X (1–10)<input type="number" name="x" min="1" max="10" step="1" required placeholder="7" /></label>
+            <label>Y (1–10)<input type="number" name="y" min="1" max="10" step="1" required placeholder="8" /></label>
+            <label>Strategische Gruppe<input type="text" name="group" placeholder="z. B. Premium" /></label>
+            <button type="submit">Hinzufügen</button>
+          </form>
+          <table class="bcg-table">
+            <thead><tr><th>Wettbewerber</th><th>X</th><th>Y</th><th>Gruppe</th><th></th></tr></thead>
+            <tbody id="wb-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="wb-legend" class="wb-legend"></div>
     </section>
 
     <!-- 5.1 TYPEN VON STRATEGIEN -->
@@ -515,6 +543,33 @@
       <article class="know"><h3>Wettbewerbsstrategien (Porter)</h3><p>Kostenführerschaft, Differenzierung und Fokus (Nische). Die gleichzeitige Verfolgung ohne klare Ausrichtung („stuck in the middle") gilt als riskant.</p></article>
       <article class="know"><h3>Wachstumsstrategien (Ansoff)</h3><p>Produkt-Markt-Matrix: Marktdurchdringung, Marktentwicklung, Produktentwicklung und Diversifikation.</p></article>
       <article class="know"><h3>Entwicklungsrichtungen</h3><p>Internes vs. externes Wachstum (M&amp;A), Kooperationen/Allianzen sowie vertikale und horizontale Integration.</p></article>
+
+      <h3 class="sub">Ansoff-Matrix (Produkt-Markt-Matrix)</h3>
+      <p class="lead">Wachstumsstrategien nach Produkten und Märkten. Tragen Sie je Feld konkrete Ideen ein –
+      das Risiko steigt von der Marktdurchdringung bis zur Diversifikation.</p>
+      <div class="ansoff-block">
+        <div class="ansoff-cols"><span class="corner"></span><span>bestehende Märkte</span><span>neue Märkte</span></div>
+        <div class="ansoff-main">
+          <div class="ansoff-rowlabels"><span>bestehende Produkte</span><span>neue Produkte</span></div>
+          <div class="ansoff" id="ansoff-root" data-grid="1"></div>
+        </div>
+      </div>
+
+      <h3 class="sub">Wettbewerbsstrategien nach Porter</h3>
+      <p class="lead">Generische Strategien nach Wettbewerbsvorteil und -feld. „Stuck in the middle"
+      (keine klare Ausrichtung) gilt als riskant.</p>
+      <div class="porter-block">
+        <div class="porter-cols"><span class="corner"></span><span>Kostenvorsprung</span><span>Differenzierung</span></div>
+        <div class="porter-main">
+          <div class="porter-rowlabels"><span>breites Feld</span><span>enges Feld / Nische</span></div>
+          <div class="porter-grid">
+            <div class="porter-cell"><h4>Kostenführerschaft</h4><p>Niedrigste Kosten in der gesamten Branche.</p></div>
+            <div class="porter-cell"><h4>Differenzierung</h4><p>Einzigartiges, für Kunden wertvolles Leistungsangebot.</p></div>
+            <div class="porter-cell"><h4>Kostenfokus</h4><p>Kostenvorteil in einem eng abgegrenzten Segment.</p></div>
+            <div class="porter-cell"><h4>Differenzierungsfokus</h4><p>Differenzierung in einer klar umrissenen Nische.</p></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- 5.2 BEWERTUNG & AUSWAHL -->
