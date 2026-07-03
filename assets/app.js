@@ -168,9 +168,9 @@
       leitfragen: ["Sind alle vier Perspektiven ausgewogen berücksichtigt?", "Bestehen plausible Ursache-Wirkungs-Beziehungen?", "Ist jedes Ziel mit Kennzahl und Zielwert hinterlegt?", "Sind konkrete Maßnahmen zugeordnet?"],
     },
     fallstudie: {
-      def: "<strong>Prüfungsleistung Teil A</strong> ist eine Fallstudie in der Gruppe (3–4 Personen): Recherche, Analyse und kritische Diskussion der aktuellen Lage, des Umfelds und der Strategie eines gewählten Unternehmens – mit den passenden Methoden dieses Toolkits.",
-      vorgehen: ["Unternehmen aus der Liste wählen und Überblick verschaffen", "Externe Analyse (PESTEL, Five Forces) und interne Analyse (Wertkette, Ressourcen)", "In SWOT/Portfolio bündeln und strategische Optionen ableiten", "Bestehende Strategie kritisch diskutieren", "Bericht (max. 15 Seiten Text) und Präsentation (20 + 10 Min.) erstellen"],
-      leitfragen: ["Sind Fachbegriffe präzise definiert?", "Sind alle Quellen korrekt zitiert (wörtlich & sinngemäß)?", "Liegt der Text unter 15 Seiten (ohne Abbildungen/Quellen)?", "Ist die KI-Nutzung dokumentiert und sind Aussagen belegt?", "Ist die eidesstattliche Erklärung beigefügt?"],
+      def: "Ein <strong>Fallstudien-Report</strong> analysiert die aktuelle Lage, das Umfeld und die Strategie eines gewählten Unternehmens und diskutiert diese kritisch – mit den passenden Methoden dieses Toolkits.",
+      vorgehen: ["Unternehmen wählen und einen Überblick verschaffen", "Externe Analyse (PESTEL, Five Forces) und interne Analyse (Wertkette, Ressourcen)", "In SWOT/Portfolio bündeln und strategische Optionen ableiten", "Bestehende Strategie kritisch diskutieren", "Ergebnisse strukturiert dokumentieren"],
+      leitfragen: ["Sind Fachbegriffe präzise definiert?", "Sind alle Quellen korrekt zitiert (wörtlich & sinngemäß)?", "Ist der Text klar strukturiert und aufs Wesentliche fokussiert?", "Ist die KI-Nutzung dokumentiert und sind Aussagen belegt?"],
     },
   };
 
@@ -731,7 +731,7 @@
     $("#out-eva").innerHTML = `Kapitalkosten: <strong>${fmtNum(kk)}</strong> Mio. €<br>EVA: <strong>${fmtNum(eva)}</strong> Mio. €${verdict}`;
   }
 
-  /* ---------- Fallstudien-Report (Teil A) ---------- */
+  /* ---------- Fallstudien-Report ---------- */
   const COMPANIES = window.TOOLKIT_COMPANIES || [];
   const FS_SECTIONS = [
     { key: "einleitung", label: "1 · Einleitung & Zielsetzung", en: "Introduction & objectives" },
@@ -805,9 +805,7 @@
   function updateFsCounter() {
     const words = FS_SECTIONS.reduce((sum, s) => sum + countWords(state.fallstudie.sections[s.key]), 0);
     const pages = words === 0 ? 0 : Math.max(1, Math.round(words / WORDS_PER_PAGE));
-    const over = pages > 15;
-    $("#fs-counter").innerHTML = `≈ <strong>${pages}</strong> Seiten Text · ${words} Wörter · Limit 15 Seiten`
-      + (over ? ' <span class="badge warn">Limit überschritten</span>' : (pages ? ' <span class="badge ok">im Limit</span>' : ""));
+    $("#fs-counter").innerHTML = `≈ <strong>${pages}</strong> Seiten · ${words} Wörter`;
   }
 
   function wireFallstudie() {
@@ -961,7 +959,7 @@
     const catGrid = (cats, store) => `<div class="dossier-grid">${cats.map((c) =>
       `<div class="dossier-block"><h3>${c.label}</h3>${ulOf(store[c.key] || [])}</div>`).join("")}</div>`;
 
-    // Fallstudien-Report (Teil A)
+    // Fallstudien-Report
     const fs = state.fallstudie;
     const fsWords = FS_SECTIONS.reduce((sum, s) => sum + countWords(fs.sections[s.key]), 0);
     const fsHasContent = fs.company || fs.titel || fsWords > 0;
@@ -973,8 +971,8 @@
         ? `<h3 class="dossier-sub">${s.label}</h3><p class="fs-report-text">${esc(fs.sections[s.key]).replace(/\n/g, "<br>")}</p>` : "").join("");
       const src = (fs.sources && fs.sources.length) ? `<h3 class="dossier-sub">Quellenverzeichnis</h3>${ulOf(fs.sources)}` : "";
       const ki = fs.ki ? `<h3 class="dossier-sub">Dokumentation der KI-Nutzung</h3><p class="fs-report-text">${esc(fs.ki).replace(/\n/g, "<br>")}</p>` : "";
-      const cnt = `<p class="dossier-kpi">Umfang: ≈ ${fsWords === 0 ? 0 : Math.max(1, Math.round(fsWords / WORDS_PER_PAGE))} Seiten Text · ${fsWords} Wörter (Limit 15 Seiten)</p>`;
-      parts.push(section("Fallstudien-Report (Teil A)", meta + cnt + body + src + ki));
+      const cnt = `<p class="dossier-kpi">Umfang: ≈ ${fsWords === 0 ? 0 : Math.max(1, Math.round(fsWords / WORDS_PER_PAGE))} Seiten · ${fsWords} Wörter</p>`;
+      parts.push(section("Fallstudien-Report", meta + cnt + body + src + ki));
     }
 
     // Abell

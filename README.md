@@ -11,7 +11,7 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 **Zielplanung über Analyse und Strategiewahl bis zur Umsetzung und Kontrolle**. 
 
 *Jedes Werkzeug enthält eine Wissens-Ebene „Theorie & Leitfragen"**
---> Definition, Vorgehen, Leitfrage, sodass das Tool die typischen Klausur- und Übungsfragen beantwortet und zugleich durch die Anwendung führt.
+--> Definition, Vorgehen, Leitfrage, sodass das Tool die typischen Fragestellungen beantwortet und zugleich durch die Anwendung führt.
 
 
 | Werkzeug | Prozessphase | Was es tut |
@@ -28,8 +28,8 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 | **BCG-Portfolio** | Zusammenführung | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz): Stars / Question Marks / Cash Cows / Dogs. |
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
 | **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
-| **Fallstudien-Report (Teil A)** | Prüfungsleistung | Bericht für die Fallstudie: Firmenauswahl aus einer Bibliothek mit **20 Unternehmensprofilen** (echte Eckdaten), gegliederte Struktur nach wissenschaftlichen Standards, Quellenverzeichnis, KI-Nutzungs-Doku und **Seitenzähler** gegen das 15-Seiten-Limit. |
-| **Selbsttest** | Klausurvorbereitung | Lernkarten und ein Multiple-Choice-Quiz mit Sofort-Feedback. |
+| **Fallstudien-Report** | Analyse & Anwendung | Bericht für eine Fallstudie: Firmenauswahl aus einer Bibliothek mit **20 Unternehmensprofilen** (echte Eckdaten), gegliederte Struktur nach wissenschaftlichen Standards, Quellenverzeichnis, KI-Nutzungs-Doku und **Umfangszähler** (Seiten/Wörter). |
+| **Selbsttest** | Wiederholung | Lernkarten und ein Multiple-Choice-Quiz mit Sofort-Feedback. |
 | **Strategie-Dossier** | Gesamt­dokument | Fasst alle Werkzeuge in einem druckfertigen Bericht zusammen – inkl. eingebetteter Diagramme und automatischer Einordnung (Stakeholder-Strategie, BCG-Kategorie, Branchenattraktivität). Per „Als PDF exportieren" als PDF sicherbar. |
 
 Alle Eingaben werden automatisch im Browser gespeichert (localStorage) und lassen
@@ -69,9 +69,9 @@ danach unter `https://<user>.github.io/Strategisches-Management/` erreichbar.
 
 ---
 
-## Fachlicher Hintergrund – Inhalte des Moduls
+## Fachlicher Hintergrund – Themen
 
-Die Werkzeuge orientieren sich an den Inhalten des Moduls *Strategisches Management*.
+Die Werkzeuge orientieren sich an zentralen Themen des strategischen Managements.
 
 ### 1 Einführung in das Strategische Management
 
