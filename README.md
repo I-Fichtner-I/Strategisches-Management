@@ -1,5 +1,7 @@
 # Strategy Toolkit – Strategisches Management
 
+🔗 **Zur Webseite: https://i-fichtner-i.github.io/Strategisches-Management/**
+
 Ein interaktives Web-Werkzeug, das zentrale Methoden des strategischen Managements
 anwendbar macht. Läuft vollständig im Browser – ohne Installation und ohne Server –
 und lässt sich direkt über **GitHub Pages** veröffentlichen.
