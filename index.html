@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strategy Toolkit – Strategisches Management</title>
+  <meta name="description" content="Interaktives Werkzeug mit Wissensbasis für strategisches Management: Abell, Stakeholder, SMART-Ziele, PESTEL, Five Forces, Wertkette, Szenario-Analyse, Kennzahlen, SWOT, BCG, Business Model Canvas und Balanced Scorecard." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%9F%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <h1>Strategy&nbsp;Toolkit</h1>
+      <p class="tagline">Werkzeuge &amp; Wissen für das strategische Management</p>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Navigation ein-/ausblenden">☰ Kapitel</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <nav id="nav">
+        <div class="nav-group">
+          <button class="nav-item is-active" data-view="prozess">1 · Einführung in das Strategische Management</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">2 · Ansätze des Strategischen Managements</p>
+          <button class="nav-item" data-view="ansaetze" data-anchor="mbv">2.1 Marktorientierter Ansatz (MBV)</button>
+          <button class="nav-item" data-view="ansaetze" data-anchor="rbv">2.2 Ressourcenbasierter Ansatz (RBV)</button>
+          <button class="nav-item" data-view="ansaetze" data-anchor="kbv">2.3 Wissensbasierter Ansatz (KBV)</button>
+          <button class="nav-item" data-view="ansaetze" data-anchor="vbv">2.4 Wertorientierter Ansatz (VBV)</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">3 · Strategische Zielplanung</p>
+          <button class="nav-item" data-view="stakeholder">3.1 Stakeholder des Unternehmens</button>
+          <button class="nav-item" data-view="ziele">3.2 Zielhierarchie & Zielfunktionen</button>
+          <button class="nav-item" data-view="kennzahlen">3.3 Finanzielle Ziele</button>
+          <button class="nav-item" data-view="abell">3.4 Geschäftsfelder (Abell)</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">4 · Strategische Analyse und Prognose</p>
+          <button class="nav-item" data-view="pestel">4.1.1 Globale Umwelt (PESTEL)</button>
+          <button class="nav-item" data-view="forces">4.1.2 Branchenstruktur (Five Forces)</button>
+          <button class="nav-item" data-view="wettbewerb">4.1.3 Wettbewerbsumfeld</button>
+          <button class="nav-item" data-view="wertkette">4.2 Analyse des Unternehmens (Wertkette)</button>
+          <button class="nav-item" data-view="swot">4.3 Simultane Analyse (SWOT)</button>
+          <button class="nav-item" data-view="bcg">4.3 Portfolio (BCG)</button>
+          <button class="nav-item" data-view="szenario">Prognose (Szenario-Analyse)</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">5 · Strategieformulierung und -bewertung</p>
+          <button class="nav-item" data-view="strategietypen">5.1 Typen von Strategien</button>
+          <button class="nav-item" data-view="strategiewahl">5.2 Bewertung & Auswahl von Strategien</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">6 · Entwicklung, Implementierung & Kontrolle</p>
+          <button class="nav-item" data-view="bmc">6.1 Business Model Canvas</button>
+          <button class="nav-item" data-view="bsc">6.2 Umsetzung (Balanced Scorecard)</button>
+          <button class="nav-item" data-view="kontrolle">6.3 Kontrolle & Frühaufklärung</button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-head">Werkzeuge & Export</p>
+          <button class="nav-item" data-view="fallstudie">Fallstudien-Report</button>
+          <button class="nav-item" data-view="quiz">Selbsttest</button>
+          <button class="nav-item" data-view="dossier">Strategie-Dossier</button>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="content">
+
+    <!-- 1 EINFÜHRUNG / PROZESS -->
+    <section class="view is-active" id="view-prozess">
+      <h2>1 · Einführung in das Strategische Management</h2>
+      <p class="lead">Jedes Werkzeug enthält oben einen Bereich <strong>„Theorie &amp; Leitfragen"</strong>
+      mit Definition, Vorgehen und Leitfragen – so beantwortet das Tool die typischen Fragestellungen
+      und führt zugleich durch die Anwendung.</p>
+      <details class="kb" id="help-panel">
+        <summary>So nutzt du das Toolkit</summary>
+        <div class="kb-body">
+          <ul>
+            <li>Oben über die <strong>Reiter</strong> zwischen den Werkzeugen wechseln – geordnet nach dem Management-Prozess.</li>
+            <li>In jedem Werkzeug <strong>„Theorie &amp; Leitfragen"</strong> aufklappen; bei <em>Five&nbsp;Forces</em> zusätzlich die <strong>Checkliste</strong> (wann eine Kraft stark ist).</li>
+            <li>Eingaben werden <strong>automatisch im Browser gespeichert</strong> – beim nächsten Öffnen sind sie wieder da (gerätegebunden).</li>
+            <li>In <em>PESTEL</em> und <em>Wertkette</em> Einträge per Symbol als ＋/– markieren – sie fließen automatisch in die <em>SWOT</em> und die TOWS-Normstrategien.</li>
+            <li><strong>Selbsttest</strong>: Lernkarten und Quiz zum Wiederholen.</li>
+            <li><strong>Dossier → „Als PDF exportieren"</strong>: alle Ergebnisse als ein Dokument sichern.</li>
+          </ul>
+        </div>
+      </details>
+      <ol class="process">
+        <li><span class="step-no">1</span><div><strong>Zielplanung</strong><br><a href="#" data-goto="abell">Abell</a>, <a href="#" data-goto="stakeholder">Stakeholder</a> &amp; <a href="#" data-goto="ziele">Ziele</a></div></li>
+        <li><span class="step-no">2</span><div><strong>Umweltanalyse</strong><br><a href="#" data-goto="pestel">PESTEL</a>, <a href="#" data-goto="forces">Five&nbsp;Forces</a> &amp; <a href="#" data-goto="szenario">Szenario</a></div></li>
+        <li><span class="step-no">3</span><div><strong>Unternehmensanalyse</strong><br><a href="#" data-goto="wertkette">Wertkette</a> &amp; <a href="#" data-goto="kennzahlen">Kennzahlen</a></div></li>
+        <li><span class="step-no">4</span><div><strong>Zusammenführung</strong><br><a href="#" data-goto="swot">SWOT</a> &amp; <a href="#" data-goto="bcg">Portfolio</a></div></li>
+        <li><span class="step-no">5</span><div><strong>Strategiewahl</strong><br>Normstrategien (TOWS)</div></li>
+        <li><span class="step-no">6</span><div><strong>Umsetzung &amp; Kontrolle</strong><br><a href="#" data-goto="bmc">Canvas</a> &amp; <a href="#" data-goto="bsc">Scorecard</a></div></li>
+      </ol>
+      <div class="tool-cards">
+        <button class="tool-card" data-goto="abell"><h3>Abell-Marktabgrenzung</h3><p>Den relevanten Markt über Kundengruppen, -funktionen und Technologien definieren.</p></button>
+        <button class="tool-card" data-goto="stakeholder"><h3>Stakeholder-Matrix</h3><p>Anspruchsgruppen nach Macht und Interesse positionieren und passend steuern.</p></button>
+        <button class="tool-card" data-goto="ziele"><h3>SMART-Ziele</h3><p>Ziele formulieren und automatisch auf die SMART-Kriterien prüfen.</p></button>
+        <button class="tool-card" data-goto="pestel"><h3>PESTEL-Analyse</h3><p>Die globale Umwelt in sechs Einflussfeldern systematisch erfassen.</p></button>
+        <button class="tool-card" data-goto="forces"><h3>Porters Five Forces</h3><p>Branchenattraktivität bewerten – mit Checkliste je Wettbewerbskraft.</p></button>
+        <button class="tool-card" data-goto="wertkette"><h3>Wertkette</h3><p>Primär- und Unterstützungsaktivitäten des Unternehmens analysieren.</p></button>
+        <button class="tool-card" data-goto="szenario"><h3>Szenario-Analyse</h3><p>Alternative Zukunftsszenarien strukturiert entwickeln.</p></button>
+        <button class="tool-card" data-goto="kennzahlen"><h3>Strategische Kennzahlen</h3><p>EBITDA-Marge und EVA berechnen; wert- vs. traditionell einordnen.</p></button>
+        <button class="tool-card" data-goto="swot"><h3>SWOT-Analyse</h3><p>Analyse-Ergebnisse bündeln – inkl. abgeleiteter TOWS-Normstrategien.</p></button>
+        <button class="tool-card" data-goto="bcg"><h3>BCG-Portfolio</h3><p>Geschäftseinheiten nach Wachstum und Marktanteil positionieren.</p></button>
+        <button class="tool-card" data-goto="bmc"><h3>Business Model Canvas</h3><p>Das Geschäftsmodell in neun Bausteinen entwickeln.</p></button>
+        <button class="tool-card" data-goto="bsc"><h3>Balanced Scorecard</h3><p>Strategie über vier Perspektiven in Ziele und Kennzahlen übersetzen.</p></button>
+      </div>
+    </section>
+
+    <!-- ABELL -->
+    <section class="view" id="view-abell">
+      <div class="view-head">
+        <h2>Abell-Marktabgrenzung</h2>
+        <p class="lead">Den relevanten Markt dreidimensional definieren: <strong>Wer</strong> (Kundengruppen),
+        <strong>Was</strong> (Kundenfunktionen/Bedürfnisse) und <strong>Wie</strong> (Technologien).</p>
+      </div>
+      <div class="kb-slot" data-kb="abell"></div>
+      <div class="list-tool cols-3" id="abell-root"></div>
+    </section>
+
+    <!-- STAKEHOLDER -->
+    <section class="view" id="view-stakeholder">
+      <div class="view-head">
+        <h2>Stakeholder-Matrix</h2>
+        <p class="lead">Anspruchsgruppen nach <strong>Macht</strong> und <strong>Interesse</strong>
+        (je 1–5) einordnen. Die Position bestimmt die passende Steuerungsstrategie.</p>
+      </div>
+      <div class="kb-slot" data-kb="stakeholder"></div>
+      <div class="bcg-layout">
+        <div class="bcg-chart-box">
+          <canvas id="stk-canvas" width="640" height="520" role="img"
+            aria-label="Stakeholder-Matrix nach Macht und Interesse"></canvas>
+        </div>
+        <div class="bcg-side">
+          <form class="bcg-form" id="stk-form">
+            <label>Stakeholder<input type="text" name="name" required placeholder="z. B. Investoren" /></label>
+            <label>Macht (1–5)<input type="number" name="power" min="1" max="5" step="1" required placeholder="4" /></label>
+            <label>Interesse (1–5)<input type="number" name="interest" min="1" max="5" step="1" required placeholder="3" /></label>
+            <button type="submit">Hinzufügen</button>
+          </form>
+          <table class="bcg-table">
+            <thead><tr><th>Stakeholder</th><th>Macht</th><th>Interesse</th><th></th></tr></thead>
+            <tbody id="stk-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="bcg-legend">
+        <span class="q star">Eng&nbsp;managen</span><span class="q cow">Zufrieden&nbsp;halten</span>
+        <span class="q qmark">Informiert&nbsp;halten</span><span class="q dog">Beobachten</span>
+      </p>
+    </section>
+
+    <!-- ZIELE (SMART) -->
+    <section class="view" id="view-ziele">
+      <div class="view-head">
+        <h2>SMART-Ziele &amp; Zielhierarchie</h2>
+        <p class="lead">Ziele formulieren und markieren, welche <strong>SMART</strong>-Kriterien erfüllt
+        sind. Das Tool zeigt, ob ein Ziel vollständig SMART ist.</p>
+      </div>
+      <div class="kb-slot" data-kb="ziele"></div>
+      <form class="ziele-form" id="ziele-form">
+        <input type="text" name="ziel" required placeholder="Ziel formulieren, z. B. „Marktanteil in DACH bis Ende 2027 auf 15 % steigern“" />
+        <div class="smart-checks">
+          <label title="Spezifisch"><input type="checkbox" name="s" /> S</label>
+          <label title="Messbar"><input type="checkbox" name="m" /> M</label>
+          <label title="Attraktiv / Akzeptiert"><input type="checkbox" name="a" /> A</label>
+          <label title="Realistisch"><input type="checkbox" name="r" /> R</label>
+          <label title="Terminiert"><input type="checkbox" name="t" /> T</label>
+        </div>
+        <button type="submit">Hinzufügen</button>
+      </form>
+      <table class="bcg-table" id="ziele-table">
+        <thead><tr><th>Ziel</th><th>S</th><th>M</th><th>A</th><th>R</th><th>T</th><th>Bewertung</th><th></th></tr></thead>
+        <tbody id="ziele-tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- PESTEL -->
+    <section class="view" id="view-pestel">
+      <div class="view-head">
+        <h2>PESTEL-Analyse</h2>
+        <p class="lead">Einflussfaktoren der globalen (Makro-)Umwelt in sechs Feldern erfassen. Über das
+        Symbol als <strong>Chance&nbsp;(＋)</strong> oder <strong>Risiko&nbsp;(–)</strong> markieren –
+        markierte Faktoren fließen automatisch in die SWOT.</p>
+      </div>
+      <div class="kb-slot" data-kb="pestel"></div>
+      <div class="list-tool cols-3" id="pestel-root"></div>
+    </section>
+
+    <!-- FIVE FORCES -->
+    <section class="view" id="view-forces">
+      <div class="view-head">
+        <h2>Porters Five Forces</h2>
+        <p class="lead">Jede Wettbewerbskraft von 1 (schwach) bis 5 (stark) bewerten. Je stärker die
+        Kräfte, desto <strong>geringer</strong> die Branchenattraktivität. Die Checkliste unten zeigt,
+        <em>wann</em> eine Kraft stark ist.</p>
+      </div>
+      <div class="kb-slot" data-kb="forces"></div>
+      <div class="forces" id="forces-list"></div>
+      <div class="forces-result">
+        <div class="gauge"><div class="gauge-fill" id="forces-gauge"></div></div>
+        <div class="forces-score">
+          <span class="score-num" id="forces-score">–</span>
+          <span class="score-label" id="forces-verdict">Branchenattraktivität</span>
+        </div>
+      </div>
+      <div class="checklist" id="forces-checklist"></div>
+    </section>
+
+    <!-- WERTKETTE -->
+    <section class="view" id="view-wertkette">
+      <div class="view-head">
+        <h2>Wertkette</h2>
+        <p class="lead">Aktivitäten identifizieren, die Wert schaffen – getrennt nach Primär- und
+        Unterstützungsaktivitäten. Über das Symbol als <strong>Stärke&nbsp;(＋)</strong> oder
+        <strong>Schwäche&nbsp;(–)</strong> markieren – markierte Aktivitäten fließen automatisch in die SWOT.</p>
+      </div>
+      <div class="kb-slot" data-kb="wertkette"></div>
+      <h3 class="sub">Unterstützungsaktivitäten</h3>
+      <div class="list-tool cols-4" id="vc-support"></div>
+      <h3 class="sub">Primäraktivitäten</h3>
+      <div class="list-tool cols-5" id="vc-primary"></div>
+    </section>
+
+    <!-- SZENARIO -->
+    <section class="view" id="view-szenario">
+      <div class="view-head">
+        <h2>Szenario-Analyse</h2>
+        <p class="lead">Alternative Zukunftsbilder strukturiert entwickeln: Problem &amp; Zeithorizont
+        festlegen, Einflussfaktoren sammeln und zwei kontrastierende Szenarien beschreiben.</p>
+      </div>
+      <div class="kb-slot" data-kb="szenario"></div>
+      <label class="field-label">Problemstellung &amp; Zeithorizont
+        <input type="text" id="szenario-frage" placeholder="z. B. Markt für autonomes Fahren bis 2035" />
+      </label>
+      <h3 class="sub">Einflussfaktoren (Deskriptoren)</h3>
+      <div class="list-tool cols-1" id="szenario-root"></div>
+      <div class="scenario-grid">
+        <div class="scenario-card pos">
+          <h3>Positives Szenario (Best Case)</h3>
+          <textarea id="szenario-a" placeholder="Ausprägungen der Einflussfaktoren, Entwicklungspfad und Konsequenzen …"></textarea>
+        </div>
+        <div class="scenario-card neg">
+          <h3>Negatives Szenario (Worst Case)</h3>
+          <textarea id="szenario-b" placeholder="Ausprägungen der Einflussfaktoren, Entwicklungspfad und Konsequenzen …"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- KENNZAHLEN -->
+    <section class="view" id="view-kennzahlen">
+      <div class="view-head">
+        <h2>Strategische Kennzahlen</h2>
+        <p class="lead">Traditionelle (buchhalterische) und wertorientierte (kapitalkostenbasierte)
+        Steuerungsgrößen berechnen und einordnen.</p>
+      </div>
+      <div class="kb-slot" data-kb="kennzahlen"></div>
+      <div class="calc-grid">
+        <form class="calc-card" id="calc-ebitda">
+          <h3>EBITDA &amp; EBITDA-Marge</h3>
+          <label>EBIT (Mio. €)<input type="number" step="any" name="ebit" placeholder="120" /></label>
+          <label>Abschreibungen &amp; Amortisation (Mio. €)<input type="number" step="any" name="da" placeholder="40" /></label>
+          <label>Umsatz (Mio. €)<input type="number" step="any" name="umsatz" placeholder="800" /></label>
+          <div class="calc-out" id="out-ebitda">EBITDA: –<br>EBITDA-Marge: –</div>
+        </form>
+        <form class="calc-card" id="calc-eva">
+          <h3>EVA (Economic Value Added)</h3>
+          <label>NOPAT (Mio. €)<input type="number" step="any" name="nopat" placeholder="90" /></label>
+          <label>Investiertes Kapital (Mio. €)<input type="number" step="any" name="kapital" placeholder="600" /></label>
+          <label>WACC (%)<input type="number" step="any" name="wacc" placeholder="8" /></label>
+          <div class="calc-out" id="out-eva">Kapitalkosten: –<br>EVA: –</div>
+        </form>
+      </div>
+    </section>
+
+    <!-- SWOT -->
+    <section class="view" id="view-swot">
+      <div class="view-head">
+        <h2>SWOT-Analyse</h2>
+        <p class="lead">Erfassen Sie je Feld eigene Punkte. Ergebnisse aus <strong>Wertkette</strong>,
+        <strong>PESTEL</strong> und <strong>Five&nbsp;Forces</strong> werden zusätzlich automatisch
+        übernommen (Bereich „Aus Analyse"). Aus der Kombination entstehen unten die vier
+        <strong>TOWS-Normstrategien</strong>.</p>
+      </div>
+      <div class="kb-slot" data-kb="swot"></div>
+      <div class="swot-grid">
+        <div class="swot-cell cell-s">
+          <h3>Stärken <span>(intern, positiv)</span></h3>
+          <ul class="item-list" data-list="strengths"></ul>
+          <form class="add-form" data-add="strengths"><input type="text" placeholder="Stärke hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="strengths"></ul></div>
+        </div>
+        <div class="swot-cell cell-w">
+          <h3>Schwächen <span>(intern, negativ)</span></h3>
+          <ul class="item-list" data-list="weaknesses"></ul>
+          <form class="add-form" data-add="weaknesses"><input type="text" placeholder="Schwäche hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="weaknesses"></ul></div>
+        </div>
+        <div class="swot-cell cell-o">
+          <h3>Chancen <span>(extern, positiv)</span></h3>
+          <ul class="item-list" data-list="opportunities"></ul>
+          <form class="add-form" data-add="opportunities"><input type="text" placeholder="Chance hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="opportunities"></ul></div>
+        </div>
+        <div class="swot-cell cell-t">
+          <h3>Risiken <span>(extern, negativ)</span></h3>
+          <ul class="item-list" data-list="threats"></ul>
+          <form class="add-form" data-add="threats"><input type="text" placeholder="Risiko hinzufügen …" /><button>+</button></form>
+          <div class="derived-wrap"><p class="derived-label">Aus Analyse</p><ul class="derived-list" data-derived="threats"></ul></div>
+        </div>
+      </div>
+
+      <h3 class="tows-title">Abgeleitete Normstrategien (TOWS)</h3>
+      <div class="tows-grid">
+        <div class="tows-cell"><h4>SO – Ausbauen</h4><p>Stärken nutzen, um Chancen zu ergreifen.</p><ul id="tows-so" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>ST – Absichern</h4><p>Stärken nutzen, um Risiken abzuwehren.</p><ul id="tows-st" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>WO – Aufholen</h4><p>Schwächen abbauen, um Chancen zu nutzen.</p><ul id="tows-wo" class="tows-list"></ul></div>
+        <div class="tows-cell"><h4>WT – Vermeiden</h4><p>Schwächen &amp; Risiken zugleich begrenzen.</p><ul id="tows-wt" class="tows-list"></ul></div>
+      </div>
+    </section>
+
+    <!-- BCG -->
+    <section class="view" id="view-bcg">
+      <div class="view-head">
+        <h2>BCG-Portfolio</h2>
+        <p class="lead">Geschäftseinheiten anlegen; die Blasengröße entspricht dem Umsatz. Grenzen:
+        Marktwachstum 10&nbsp;%, relativer Marktanteil 1,0.</p>
+      </div>
+      <div class="kb-slot" data-kb="bcg"></div>
+      <div class="bcg-layout">
+        <div class="bcg-chart-box">
+          <canvas id="bcg-canvas" width="640" height="520" role="img"
+            aria-label="BCG-Portfolio-Diagramm mit Geschäftseinheiten"></canvas>
+        </div>
+        <div class="bcg-side">
+          <form class="bcg-form" id="bcg-form">
+            <label>Geschäftseinheit<input type="text" name="name" required placeholder="z. B. Produkt A" /></label>
+            <label>Marktwachstum (%)<input type="number" name="growth" step="0.1" required placeholder="12" /></label>
+            <label>Rel. Marktanteil (×)<input type="number" name="share" step="0.01" min="0.01" required placeholder="1.5" /></label>
+            <label>Umsatz (Mio. €)<input type="number" name="revenue" step="0.1" min="0" required placeholder="20" /></label>
+            <button type="submit">Hinzufügen</button>
+          </form>
+          <table class="bcg-table">
+            <thead><tr><th>Einheit</th><th>Wachstum</th><th>Anteil</th><th>Umsatz</th><th></th></tr></thead>
+            <tbody id="bcg-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="bcg-legend"><span class="q star">Stars</span><span class="q qmark">Question&nbsp;Marks</span><span class="q cow">Cash&nbsp;Cows</span><span class="q dog">Dogs</span></p>
+    </section>
+
+    <!-- BUSINESS MODEL CANVAS -->
+    <section class="view" id="view-bmc">
+      <div class="view-head">
+        <h2>Business Model Canvas</h2>
+        <p class="lead">Das Geschäftsmodell in neun Bausteinen entwickeln – von den Schlüsselpartnern
+        bis zu den Einnahmequellen.</p>
+      </div>
+      <div class="kb-slot" data-kb="bmc"></div>
+      <div class="bmc" id="bmc-root" data-grid="1"></div>
+    </section>
+
+    <!-- BALANCED SCORECARD -->
+    <section class="view" id="view-bsc">
+      <div class="view-head">
+        <h2>Balanced Scorecard</h2>
+        <p class="lead">Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und
+        Maßnahmen übersetzen.</p>
+      </div>
+      <div class="kb-slot" data-kb="bsc"></div>
+      <div class="bsc" id="bsc-root"></div>
+    </section>
+
+    <!-- FALLSTUDIE -->
+    <section class="view" id="view-fallstudie">
+      <div class="view-head">
+        <h2>Fallstudien-Report</h2>
+        <p class="lead">Arbeitsbereich für eine Fallstudie: Unternehmen wählen, den Bericht nach
+        wissenschaftlichen Standards gliedern, Quellen sammeln und die KI-Nutzung dokumentieren.
+        Der Zähler zeigt den ungefähren Umfang. Die Abschnitte sind zweisprachig (DE/EN) angelegt.</p>
+      </div>
+      <div class="kb-slot" data-kb="fallstudie"></div>
+
+      <label class="field-label">Unternehmen (Auswahl aus der Fallstudien-Liste)
+        <select id="fs-company-select"><option value="">– bitte wählen –</option></select>
+      </label>
+      <div id="fs-profile" class="fs-profile"></div>
+
+      <div class="fs-meta">
+        <label class="field-label">Titel der Fallstudie<input type="text" id="fs-titel" placeholder="z. B. Strategic Analysis of …" /></label>
+        <label class="field-label">Gruppe / Autor:innen<input type="text" id="fs-gruppe" placeholder="Namen der Gruppenmitglieder" /></label>
+      </div>
+
+      <div id="fs-sections"></div>
+
+      <div class="list-tool cols-1" id="fs-sources"></div>
+
+      <label class="field-label">Dokumentation der KI-Nutzung
+        <textarea id="fs-ki" placeholder="Welche KI-Tools wurden wofür genutzt? (z. B. Recherche, Strukturierung, Übersetzung) – Aussagen kritisch geprüft und belegt."></textarea>
+      </label>
+
+      <div class="fs-counter" id="fs-counter"></div>
+    </section>
+
+    <!-- SELBSTTEST -->
+    <section class="view" id="view-quiz">
+      <div class="view-head">
+        <h2>Selbsttest</h2>
+        <p class="lead">Wissen prüfen: <strong>Lernkarten</strong> zum Wiederholen der Begriffe und ein
+        <strong>Quiz</strong> mit Sofort-Feedback zum Wiederholen und Selbsttesten.</p>
+      </div>
+      <div class="mode-switch" id="quiz-mode">
+        <button class="mode-btn is-active" data-mode="cards">Lernkarten</button>
+        <button class="mode-btn" data-mode="quiz">Quiz</button>
+      </div>
+
+      <div class="mode-panel is-active" id="mode-cards">
+        <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Lernkarte umdrehen">
+          <div class="fc-inner">
+            <div class="fc-face fc-front"><span class="fc-hint">Begriff</span><p id="fc-front-text"></p></div>
+            <div class="fc-face fc-back"><span class="fc-hint">Erklärung</span><p id="fc-back-text"></p></div>
+          </div>
+        </div>
+        <div class="fc-controls">
+          <button id="fc-prev" class="ghost">‹ Zurück</button>
+          <span id="fc-count" class="fc-count"></span>
+          <button id="fc-next" class="ghost">Weiter ›</button>
+        </div>
+        <p class="fc-tip">Karte anklicken zum Umdrehen.</p>
+      </div>
+
+      <div class="mode-panel" id="mode-quiz">
+        <div class="quiz-head">
+          <span>Punkte: <strong id="quiz-score">0</strong> / <span id="quiz-total">0</span></span>
+          <button id="quiz-restart" class="ghost">Neu starten</button>
+        </div>
+        <div id="quiz-list"></div>
+      </div>
+    </section>
+
+    <!-- 2 ANSÄTZE -->
+    <section class="view" id="view-ansaetze">
+      <div class="view-head">
+        <h2>2 · Ansätze des Strategischen Managements</h2>
+        <p class="lead">Vier grundlegende Perspektiven, aus denen sich Wettbewerbsvorteile erklären lassen.</p>
+      </div>
+      <article class="know" id="mbv"><h3>2.1 Marktorientierter Ansatz (Market-based View)</h3>
+        <p><strong>Outside-in.</strong> Wettbewerbsvorteile entstehen aus der Positionierung in einer attraktiven Branche. Zentrale Instrumente sind die Branchenstrukturanalyse (Five Forces) und die generischen Wettbewerbsstrategien nach Porter (Kostenführerschaft, Differenzierung, Fokus). Leitfrage: „In welcher Branche und Position sind überdurchschnittliche Renditen möglich?"</p></article>
+      <article class="know" id="rbv"><h3>2.2 Ressourcenbasierter Ansatz (Resource-based View)</h3>
+        <p><strong>Inside-out.</strong> Vorteile beruhen auf internen Ressourcen und Kernkompetenzen, die <strong>wertvoll, selten, schwer imitierbar und nicht substituierbar</strong> (VRIN) sind. Leitfrage: „Welche einzigartigen Ressourcen und Fähigkeiten besitzen wir?"</p></article>
+      <article class="know" id="kbv"><h3>2.3 Wissensbasierter Ansatz (Knowledge-based View)</h3>
+        <p>Erweiterung des RBV: <strong>Wissen</strong> gilt als wichtigste strategische Ressource. Im Fokus stehen organisationales Lernen sowie Aufbau, Transfer und Schutz von (implizitem) Wissen. Leitfrage: „Wie bauen wir Wissen auf und nutzen es besser als der Wettbewerb?"</p></article>
+      <article class="know" id="vbv"><h3>2.4 Wertorientierter Ansatz (Value-based View)</h3>
+        <p>Oberstes Ziel ist die nachhaltige Steigerung des <strong>Unternehmenswerts</strong> (Shareholder Value). Strategien werden danach beurteilt, ob sie Wert über den Kapitalkosten schaffen; Steuerung über wertorientierte Kennzahlen wie <strong>EVA</strong> und <strong>CFROI</strong>. Leitfrage: „Schafft die Strategie Wert oberhalb der Kapitalkosten?"</p></article>
+    </section>
+
+    <!-- 4.1.3 WETTBEWERBSUMFELD -->
+    <section class="view" id="view-wettbewerb">
+      <div class="view-head">
+        <h2>4.1.3 Wettbewerbsumfeld</h2>
+        <p class="lead">Die engere Betrachtung der direkten Konkurrenz innerhalb der Branche.</p>
+      </div>
+      <article class="know"><h3>Konkurrenzanalyse</h3><p>Identifikation der relevanten Wettbewerber und Erstellung von Konkurrentenprofilen (Ziele, Annahmen, Strategie, Fähigkeiten), um deren Verhalten zu antizipieren.</p></article>
+      <article class="know"><h3>Strategische Gruppen</h3><p>Unternehmen mit ähnlicher Strategie innerhalb einer Branche bilden eine strategische Gruppe. Mobilitätsbarrieren erschweren den Wechsel; die Rivalität ist innerhalb einer Gruppe meist am stärksten.</p></article>
+      <article class="know"><h3>Abgrenzung</h3><p>Das Wettbewerbsumfeld ist enger gefasst als die globale Umwelt (PESTEL) und die Branchenstruktur (Five Forces) – der Blick richtet sich auf konkrete Rivalen.</p></article>
+    </section>
+
+    <!-- 5.1 TYPEN VON STRATEGIEN -->
+    <section class="view" id="view-strategietypen">
+      <div class="view-head">
+        <h2>5.1 Typen von Strategien</h2>
+        <p class="lead">Strategien lassen sich nach Ebene und Stoßrichtung ordnen.</p>
+      </div>
+      <article class="know"><h3>Strategieebenen</h3><p>Gesamtunternehmensstrategie (Corporate: in welchen Geschäften tätig sein?), Geschäftsbereichsstrategie (Business: wie im Wettbewerb bestehen?) und Funktionalstrategien (z. B. Marketing, Produktion, F&E).</p></article>
+      <article class="know"><h3>Wettbewerbsstrategien (Porter)</h3><p>Kostenführerschaft, Differenzierung und Fokus (Nische). Die gleichzeitige Verfolgung ohne klare Ausrichtung („stuck in the middle") gilt als riskant.</p></article>
+      <article class="know"><h3>Wachstumsstrategien (Ansoff)</h3><p>Produkt-Markt-Matrix: Marktdurchdringung, Marktentwicklung, Produktentwicklung und Diversifikation.</p></article>
+      <article class="know"><h3>Entwicklungsrichtungen</h3><p>Internes vs. externes Wachstum (M&amp;A), Kooperationen/Allianzen sowie vertikale und horizontale Integration.</p></article>
+    </section>
+
+    <!-- 5.2 BEWERTUNG & AUSWAHL -->
+    <section class="view" id="view-strategiewahl">
+      <div class="view-head">
+        <h2>5.2 Bewertung und Auswahl von Strategien</h2>
+        <p class="lead">Systematische Beurteilung strategischer Optionen.</p>
+      </div>
+      <article class="know"><h3>Drei Kriterien (Johnson/Scholes)</h3><p><strong>Eignung (Suitability):</strong> Passt die Option zur Ausgangslage (SWOT)? <strong>Akzeptanz (Acceptability):</strong> Sind Rendite, Risiko und Stakeholder-Erwartungen vertretbar? <strong>Machbarkeit (Feasibility):</strong> Reichen Ressourcen und Fähigkeiten?</p></article>
+      <article class="know"><h3>Bewertungsmethoden</h3><p>Nutzwertanalyse (Scoring gewichteter Kriterien), Wirtschaftlichkeitsrechnungen (z. B. Kapitalwert) sowie Szenario- und Sensitivitätsanalysen zur Prüfung der Robustheit.</p></article>
+      <article class="know"><h3>Verknüpfung im Tool</h3><p>Die <em>TOWS-Normstrategien</em> aus der SWOT liefern die Optionen; <em>BCG-Portfolio</em> und <em>wertorientierte Kennzahlen</em> unterstützen die Auswahl.</p></article>
+    </section>
+
+    <!-- 6.3 KONTROLLE & FRÜHAUFKLÄRUNG -->
+    <section class="view" id="view-kontrolle">
+      <div class="view-head">
+        <h2>6.3 Strategische Kontrolle und Frühaufklärung</h2>
+        <p class="lead">Die Umsetzung begleiten und frühzeitig auf Veränderungen reagieren.</p>
+      </div>
+      <article class="know"><h3>Arten der strategischen Kontrolle</h3><p><strong>Prämissenkontrolle</strong> (Gelten die Planungsannahmen noch?), <strong>Durchführungskontrolle</strong> (Wird der Plan erreicht?) und <strong>strategische Überwachung</strong> (ungerichtetes Beobachten des Umfelds).</p></article>
+      <article class="know"><h3>Frühaufklärung</h3><p>Frühwarn- und Frühaufklärungssysteme erfassen <strong>schwache Signale</strong> (Ansoff), um Chancen und Risiken zu erkennen, bevor sie voll wirksam werden.</p></article>
+      <article class="know"><h3>Instrumente</h3><p>Die <em>Balanced Scorecard</em> dient zugleich als Kontrollinstrument (Soll-Ist-Vergleich der Kennzahlen); <em>Szenarien</em> liefern Referenzpunkte für die Prämissenkontrolle.</p></article>
+    </section>
+
+    <!-- DOSSIER -->
+    <section class="view" id="view-dossier">
+      <div class="view-head no-print">
+        <h2>Strategie-Dossier</h2>
+        <p class="lead">Zusammenfassung aller Werkzeuge in einem Dokument. Über
+        <strong>„Als PDF exportieren"</strong> lässt sich das Dossier drucken oder als PDF sichern.</p>
+        <button id="btn-dossier-pdf" class="primary-btn">Als PDF exportieren</button>
+      </div>
+      <div id="dossier-root" class="dossier"></div>
+    </section>
+
+    </main>
+  </div>
+
+  <footer class="app-footer wrap">
+    <button id="btn-export" class="ghost">Als PDF exportieren</button>
+    <button id="btn-reset" class="ghost danger">Alle Daten zurücksetzen</button>
+    <span class="save-hint">Eingaben werden automatisch im Browser gespeichert.</span>
+  </footer>
+
+  <script src="assets/companies.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
