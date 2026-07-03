@@ -573,6 +573,34 @@ button:active { transform: translateY(1px); }
 .sw-foot { margin-top: 12px; }
 .sw-foot .add-form { max-width: 360px; }
 
+/* Kennzahlen – Wertbeitrag & Vergleich */
+.kz-intro { color: var(--text-secondary); max-width: 70ch; margin: 0 0 16px; }
+.kz-analysis { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.kz-viz { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px; }
+.kz-viz h4 { margin: 0 0 8px; font-size: 1rem; }
+#kz-waterfall { width: 100%; height: auto; display: block; }
+.kz-compare { display: grid; gap: 12px; }
+.kz-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.kz-col { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow-sm); }
+.kz-col.kz-value { border: 1px solid transparent; box-shadow: var(--shadow-md); position: relative; }
+.kz-col.kz-value::before { content: ""; position: absolute; inset: 0; border-radius: var(--radius); padding: 1px;
+  background: var(--accent); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.kz-col h4 { margin: 0 0 10px; font-size: .98rem; }
+.kz-col h4 span { display: block; font-weight: 400; font-size: .74rem; color: var(--muted); margin-top: 2px; }
+.kz-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: .9rem; }
+.kz-row span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.kz-bars { margin-top: 12px; }
+.kz-bar-row { display: grid; grid-template-columns: 52px 1fr 64px; gap: 8px; align-items: center; margin-bottom: 6px; font-size: .85rem; }
+.kz-bar-lab { color: var(--text-secondary); }
+.kz-bar { height: 12px; border-radius: 6px; background: var(--grid); overflow: hidden; }
+.kz-bar > span { display: block; height: 100%; border-radius: 6px; }
+.kz-bar-val { text-align: right; font-variant-numeric: tabular-nums; }
+.kz-spread { margin: 8px 0 0; font-size: .85rem; }
+.kz-spread.pos { color: var(--good); } .kz-spread.neg { color: var(--critical); }
+.kz-empty { color: var(--muted); font-style: italic; font-size: .85rem; margin: 4px 0 0; }
+@media (max-width: 860px) { .kz-analysis, .kz-cols { grid-template-columns: 1fr; } }
+
 /* Five-Forces-Layout mit Radar */
 .forces-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 440px); gap: 20px; align-items: start; }
 .forces-radar-box { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
