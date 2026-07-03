@@ -34,13 +34,20 @@
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   background: var(--page);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
 }
 .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
 h1,h2,h3,h4 { line-height: 1.25; }
@@ -424,6 +431,46 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
   .content { padding: 20px; }
   .nav-toggle { display: inline-block; }
 }
+
+/* ---- UI-Politur ---- */
+/* Sichtbarer Tastatur-Fokus (Barrierefreiheit) */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible,
+select:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--series-1); outline-offset: 2px; border-radius: 4px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* Eingabefelder: einheitlicher Fokus-Ring */
+input[type=text], input[type=number], textarea, select {
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+input[type=text]:focus, input[type=number]:focus, textarea:focus, #fs-company-select:focus {
+  outline: none; border-color: var(--series-1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--series-1) 22%, transparent);
+}
+
+/* Weichere Übergänge auf Karten & Buttons */
+.list-card, .swot-cell, .tows-cell, .bsc-card, .scenario-card, .calc-card, .know,
+.force, .quiz-card, details.kb { transition: border-color .12s ease, box-shadow .12s ease; }
+.list-card:hover, .know:hover, .force:hover, .quiz-card:hover {
+  box-shadow: 0 1px 3px rgba(0,0,0,.05); border-color: color-mix(in srgb, var(--series-1) 35%, var(--border));
+}
+button { transition: background-color .12s ease, border-color .12s ease, transform .05s ease; }
+button:active { transform: translateY(1px); }
+
+/* Sidebar: aktives Element mit Akzentleiste, dezenter Scrollbalken */
+.nav-item { transition: background-color .12s ease, color .12s ease; position: relative; }
+.nav-item.is-active { box-shadow: inset 3px 0 0 color-mix(in srgb, #fff 55%, var(--series-1)); }
+.sidebar { scrollbar-width: thin; scrollbar-color: var(--baseline) transparent; }
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--baseline); border-radius: 8px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+/* Kopfzeile: dezenter Schatten, damit sie beim Scrollen abhebt */
+.app-header { box-shadow: 0 1px 0 var(--border), 0 4px 12px -8px rgba(0,0,0,.18); }
+
+/* Lesekomfort: Fließtext-Absätze etwas schmaler halten */
+.view-head .lead, .know p { max-width: 70ch; }
 
 /* Print / PDF – nur das Dossier drucken */
 @media print {
