@@ -283,6 +283,7 @@
     if (name === "bcg") drawBCG();
     if (name === "stakeholder") drawStakeholder();
     if (name === "forces") drawForcesRadar();
+    if (name === "kennzahlen") { drawWaterfall(); renderKzCompare(); }
     if (name === "strategiewahl") renderStrategiewahl();
     if (name === "prozess") renderDashboard();
     if (name === "dossier") buildDossier();
@@ -844,6 +845,98 @@
     if (nopat != null && kk != null) eva = nopat - kk;
     const verdict = eva == null ? "" : (eva >= 0 ? ' <span class="badge ok">Wert geschaffen</span>' : ' <span class="badge warn">Wert vernichtet</span>');
     $("#out-eva").innerHTML = `Kapitalkosten: <strong>${fmtNum(kk)}</strong> Mio. €<br>EVA: <strong>${fmtNum(eva)}</strong> Mio. €${verdict}`;
+    drawWaterfall();
+    renderKzCompare();
+  }
+  function kzMetrics() {
+    const k = state.kennzahlen;
+    const ebit = numOf(k.ebit), da = numOf(k.da), um = numOf(k.umsatz), nopat = numOf(k.nopat), kap = numOf(k.kapital), wacc = numOf(k.wacc);
+    const ebitda = (ebit != null && da != null) ? ebit + da : null;
+    const ebitdaMarge = (ebitda != null && um) ? ebitda / um * 100 : null;
+    const ebitMarge = (ebit != null && um) ? ebit / um * 100 : null;
+    const kk = (kap != null && wacc != null) ? kap * wacc / 100 : null;
+    const eva = (nopat != null && kk != null) ? nopat - kk : null;
+    const roce = (nopat != null && kap) ? nopat / kap * 100 : null;
+    const spread = (roce != null && wacc != null) ? roce - wacc : null;
+    return { ebit, da, um, nopat, kap, wacc, ebitda, ebitdaMarge, ebitMarge, kk, eva, roce, spread };
+  }
+  function drawWaterfall() {
+    const c = $("#kz-waterfall"); if (!c) return;
+    const ctx = c.getContext("2d"); const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    const m = kzMetrics();
+    const muted = cssVar("--muted"), ink = cssVar("--text-primary"), grid = cssVar("--grid"),
+      series = cssVar("--series-1"), good = cssVar("--good"), crit = cssVar("--critical"), surface = cssVar("--surface-1");
+    ctx.font = "12px system-ui, sans-serif";
+    if (m.nopat == null || m.kk == null) {
+      ctx.fillStyle = muted; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("NOPAT, investiertes Kapital und WACC eingeben,", W / 2, H / 2 - 9);
+      ctx.fillText("um den Wertbeitrag (EVA) zu sehen.", W / 2, H / 2 + 9);
+      return;
+    }
+    const nopat = m.nopat, kk = m.kk, eva = m.eva;
+    const pad = { l: 24, r: 24, t: 34, b: 48 };
+    const hi = Math.max(nopat, eva, 0), lo = Math.min(eva, 0);
+    const span = (hi - lo) || 1;
+    const plotH = H - pad.t - pad.b;
+    const yOf = (v) => pad.t + (hi - v) / span * plotH;
+    const y0 = yOf(0);
+    const cols = [
+      { label: "NOPAT", top: yOf(nopat), bot: y0, color: series, val: nopat },
+      { label: "− Kapitalkosten", top: yOf(nopat), bot: yOf(eva), color: crit, val: -kk },
+      { label: eva >= 0 ? "= EVA" : "= EVA (negativ)", top: yOf(Math.max(eva, 0)), bot: yOf(Math.min(eva, 0)), color: eva >= 0 ? good : crit, val: eva },
+    ];
+    const gap = 26, n = cols.length, colW = (W - pad.l - pad.r - gap * (n - 1)) / n;
+    ctx.strokeStyle = grid; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y0); ctx.lineTo(W - pad.r, y0); ctx.stroke();
+    cols.forEach((it, i) => {
+      const x = pad.l + i * (colW + gap);
+      const h = Math.max(2, it.bot - it.top);
+      ctx.fillStyle = it.color; ctx.fillRect(x, it.top, colW, h);
+      if (i < n - 1) {
+        const y = (i === 0) ? yOf(nopat) : yOf(eva);
+        ctx.strokeStyle = cssVar("--baseline"); ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(x + colW, y); ctx.lineTo(x + colW + gap, y); ctx.stroke(); ctx.setLineDash([]);
+      }
+      ctx.fillStyle = ink; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.fillText(fmtNum(it.val) + " Mio. €", x + colW / 2, it.top - 5);
+      ctx.fillStyle = muted; ctx.textBaseline = "top";
+      ctx.fillText(it.label, x + colW / 2, H - pad.b + 10);
+    });
+  }
+  function renderKzCompare() {
+    const box = $("#kz-compare"); if (!box) return;
+    const m = kzMetrics();
+    const val = (x, unit) => x == null ? "–" : fmtNum(x) + (unit || "");
+    const evaBadge = m.eva == null ? "" : (m.eva >= 0 ? '<span class="badge ok">Wert geschaffen</span>' : '<span class="badge warn">Wert vernichtet</span>');
+    // ROCE vs WACC Balken
+    let bars = '<p class="kz-empty">NOPAT, Kapital und WACC eingeben für ROCE vs. WACC.</p>';
+    if (m.roce != null && m.wacc != null) {
+      const mx = Math.max(m.roce, m.wacc, 1);
+      const w = (v) => Math.max(2, v / mx * 100);
+      const spreadPos = m.spread >= 0;
+      bars = `<div class="kz-bars">
+        <div class="kz-bar-row"><span class="kz-bar-lab">ROCE</span><span class="kz-bar"><span style="width:${w(m.roce)}%;background:var(--series-1)"></span></span><span class="kz-bar-val">${fmtNum(m.roce)} %</span></div>
+        <div class="kz-bar-row"><span class="kz-bar-lab">WACC</span><span class="kz-bar"><span style="width:${w(m.wacc)}%;background:var(--muted)"></span></span><span class="kz-bar-val">${fmtNum(m.wacc)} %</span></div>
+        <p class="kz-spread ${spreadPos ? "pos" : "neg"}">Spread (ROCE − WACC): <strong>${fmtNum(m.spread)} %-Punkte</strong> – ${spreadPos ? "Rendite über den Kapitalkosten → Wert entsteht" : "Rendite unter den Kapitalkosten → Wert wird vernichtet"}</p>
+      </div>`;
+    }
+    box.innerHTML = `<div class="kz-cols">
+      <div class="kz-col">
+        <h4>Traditionell <span>buchhalterisch, ohne Kapitalkosten</span></h4>
+        <div class="kz-row"><span>EBITDA</span><span>${val(m.ebitda, " Mio. €")}</span></div>
+        <div class="kz-row"><span>EBITDA-Marge</span><span>${val(m.ebitdaMarge, " %")}</span></div>
+        <div class="kz-row"><span>EBIT</span><span>${val(m.ebit, " Mio. €")}</span></div>
+        <div class="kz-row"><span>EBIT-Marge</span><span>${val(m.ebitMarge, " %")}</span></div>
+      </div>
+      <div class="kz-col kz-value">
+        <h4>Wertorientiert <span>berücksichtigt die Kapitalkosten</span></h4>
+        <div class="kz-row"><span>ROCE (NOPAT ÷ Kapital)</span><span>${val(m.roce, " %")}</span></div>
+        <div class="kz-row"><span>WACC (Kapitalkosten)</span><span>${val(m.wacc, " %")}</span></div>
+        <div class="kz-row"><span>EVA</span><span>${val(m.eva, " Mio. €")} ${evaBadge}</span></div>
+        ${bars}
+      </div>
+    </div>`;
   }
 
   /* ---------- Strategiewahl (Nutzwertanalyse) ---------- */
@@ -1231,12 +1324,16 @@
     const kKk = (kKap != null && kWacc != null) ? kKap * kWacc / 100 : null;
     const kEva = (kNopat != null && kKk != null) ? kNopat - kKk : null;
     const anyK = [kEbit, kDa, kUm, kNopat, kKap, kWacc].some((x) => x != null);
+    const kRoce = (kNopat != null && kKap) ? kNopat / kKap * 100 : null;
+    const kSpread = (kRoce != null && kWacc != null) ? kRoce - kWacc : null;
     const kInner = anyK ? `<table class="dossier-table"><tbody>
-        <tr><td>EBITDA</td><td>${fmtNum(kEbitda)} Mio. €</td></tr>
+        <tr><td>EBITDA (traditionell)</td><td>${fmtNum(kEbitda)} Mio. €</td></tr>
         <tr><td>EBITDA-Marge</td><td>${kMarge == null ? "–" : fmtNum(kMarge) + " %"}</td></tr>
-        <tr><td>Kapitalkosten</td><td>${fmtNum(kKk)} Mio. €</td></tr>
+        <tr><td>ROCE (wertorientiert)</td><td>${kRoce == null ? "–" : fmtNum(kRoce) + " %"}</td></tr>
+        <tr><td>WACC</td><td>${kWacc == null ? "–" : fmtNum(kWacc) + " %"}</td></tr>
+        <tr><td>Spread (ROCE − WACC)</td><td>${kSpread == null ? "–" : fmtNum(kSpread) + " %-Punkte"}</td></tr>
         <tr><td>EVA</td><td>${fmtNum(kEva)} Mio. €${kEva == null ? "" : (kEva >= 0 ? " (Wert geschaffen)" : " (Wert vernichtet)")}</td></tr>
-      </tbody></table>` : empty;
+      </tbody></table>` + chartImg("#kz-waterfall", drawWaterfall) : empty;
     parts.push(section("Strategische Kennzahlen", kInner));
 
     // SWOT + TOWS
@@ -1440,12 +1537,13 @@
   });
 
   if (window.matchMedia) {
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawBCG(); drawStakeholder(); drawForcesRadar(); });
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawBCG(); drawStakeholder(); drawForcesRadar(); drawWaterfall(); });
   }
   window.addEventListener("resize", () => {
     if ($("#view-bcg").classList.contains("is-active")) drawBCG();
     if ($("#view-stakeholder").classList.contains("is-active")) drawStakeholder();
     if ($("#view-forces").classList.contains("is-active")) drawForcesRadar();
+    if ($("#view-kennzahlen").classList.contains("is-active")) drawWaterfall();
   });
 
   function initAll() {
