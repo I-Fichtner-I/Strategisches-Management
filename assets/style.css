@@ -574,6 +574,14 @@ button:active { transform: translateY(1px); }
 .sw-foot { margin-top: 12px; }
 .sw-foot .add-form { max-width: 360px; }
 
+/* Wettbewerbsumfeld – Strategische-Gruppen-Karte */
+.wb-axes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.wb-axes label { display: grid; gap: 4px; font-size: .82rem; color: var(--text-secondary); }
+.wb-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; font-size: .85rem; color: var(--text-secondary); }
+.wb-leg { display: inline-flex; align-items: center; gap: 6px; }
+.wb-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+@media (max-width: 720px) { .wb-axes { grid-template-columns: 1fr; } }
+
 /* Kennzahlen – Wertbeitrag & Vergleich */
 .kz-intro { color: var(--text-secondary); max-width: 70ch; margin: 0 0 16px; }
 .kz-analysis { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
@@ -611,7 +619,14 @@ button:active { transform: translateY(1px); }
 
 /* Fortschritts-Dashboard */
 .dash { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
-  box-shadow: var(--shadow-sm); padding: 18px; margin-bottom: 24px; }
+  box-shadow: var(--shadow-sm); padding: 6px 18px; margin-bottom: 24px; }
+.dash-summary { cursor: pointer; padding: 12px 0; list-style: none; font-size: .98rem; }
+.dash-summary::-webkit-details-marker { display: none; }
+.dash-summary::before { content: "▸"; color: var(--series-1); margin-right: 8px; display: inline-block; transition: transform .15s; }
+.dash[open] .dash-summary::before { transform: rotate(90deg); }
+.dash-summary strong { color: var(--series-1); }
+.dash-body { padding: 0 0 14px; }
+.dash-actions { display: flex; justify-content: flex-end; margin-bottom: 10px; }
 .dash-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .dash-head strong { color: var(--series-1); }
 .dash-bar { height: 8px; border-radius: 6px; background: var(--grid); overflow: hidden; margin: 12px 0 16px; }

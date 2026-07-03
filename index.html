@@ -84,14 +84,14 @@
         so beantwortet das Tool die typischen Fragestellungen und führt zugleich durch die Anwendung.</p>
       </div>
 
-      <div class="dash" id="dash">
-        <div class="dash-head">
-          <div><strong id="dash-count">0 / 14</strong> Werkzeugen befüllt</div>
-          <button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button>
+      <details class="dash" id="dash" open>
+        <summary class="dash-summary"><strong id="dash-count">0 / 15</strong>&nbsp;Werkzeugen befüllt</summary>
+        <div class="dash-body">
+          <div class="dash-actions"><button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button></div>
+          <div class="dash-bar"><span id="dash-bar-fill"></span></div>
+          <div class="dash-grid" id="dash-grid"></div>
         </div>
-        <div class="dash-bar"><span id="dash-bar-fill"></span></div>
-        <div class="dash-grid" id="dash-grid"></div>
-      </div>
+      </details>
       <details class="kb" id="help-panel">
         <summary>So nutzt du das Toolkit</summary>
         <div class="kb-body">
@@ -503,6 +503,34 @@
       <article class="know"><h3>Konkurrenzanalyse</h3><p>Identifikation der relevanten Wettbewerber und Erstellung von Konkurrentenprofilen (Ziele, Annahmen, Strategie, Fähigkeiten), um deren Verhalten zu antizipieren.</p></article>
       <article class="know"><h3>Strategische Gruppen</h3><p>Unternehmen mit ähnlicher Strategie innerhalb einer Branche bilden eine strategische Gruppe. Mobilitätsbarrieren erschweren den Wechsel; die Rivalität ist innerhalb einer Gruppe meist am stärksten.</p></article>
       <article class="know"><h3>Abgrenzung</h3><p>Das Wettbewerbsumfeld ist enger gefasst als die globale Umwelt (PESTEL) und die Branchenstruktur (Five Forces) – der Blick richtet sich auf konkrete Rivalen.</p></article>
+
+      <h3 class="sub">Strategische-Gruppen-Karte</h3>
+      <p class="lead">Wettbewerber (inkl. des eigenen Unternehmens) auf zwei zentralen Wettbewerbsdimensionen
+      positionieren. Unternehmen, die nah beieinander liegen, bilden eine <strong>strategische Gruppe</strong>.
+      Achsenbeschriftungen sind frei wählbar.</p>
+      <div class="bcg-layout">
+        <div class="bcg-chart-box">
+          <canvas id="wb-canvas" width="640" height="560" role="img" aria-label="Strategische-Gruppen-Karte der Wettbewerber"></canvas>
+        </div>
+        <div class="bcg-side">
+          <div class="wb-axes">
+            <label>X-Achse<input type="text" id="wb-xlabel" placeholder="z. B. Preisniveau" /></label>
+            <label>Y-Achse<input type="text" id="wb-ylabel" placeholder="z. B. Qualität / Leistung" /></label>
+          </div>
+          <form class="bcg-form" id="wb-form">
+            <label>Wettbewerber<input type="text" name="name" required placeholder="z. B. Anbieter A" /></label>
+            <label>X (1–10)<input type="number" name="x" min="1" max="10" step="1" required placeholder="7" /></label>
+            <label>Y (1–10)<input type="number" name="y" min="1" max="10" step="1" required placeholder="8" /></label>
+            <label>Strategische Gruppe<input type="text" name="group" placeholder="z. B. Premium" /></label>
+            <button type="submit">Hinzufügen</button>
+          </form>
+          <table class="bcg-table">
+            <thead><tr><th>Wettbewerber</th><th>X</th><th>Y</th><th>Gruppe</th><th></th></tr></thead>
+            <tbody id="wb-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="wb-legend" class="wb-legend"></div>
     </section>
 
     <!-- 5.1 TYPEN VON STRATEGIEN -->
