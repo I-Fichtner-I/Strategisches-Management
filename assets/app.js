@@ -282,7 +282,9 @@
     $$(".view").forEach((v) => v.classList.toggle("is-active", v.id === "view-" + name));
     if (name === "bcg") drawBCG();
     if (name === "stakeholder") drawStakeholder();
+    if (name === "forces") drawForcesRadar();
     if (name === "strategiewahl") renderStrategiewahl();
+    if (name === "prozess") renderDashboard();
     if (name === "dossier") buildDossier();
     updatePager(name);
     if (anchor) {
@@ -504,7 +506,43 @@
     gauge.style.background = color;
     $("#forces-score").textContent = Math.round(attractiveness);
     $("#forces-verdict").textContent = verdict + " · Ø Kräfte " + avg.toFixed(1);
+    drawForcesRadar();
     refreshSwotDerived();
+  }
+  const RADAR_LABEL = { rivalry: "Rivalität", newEntrants: "Neue Anbieter", suppliers: "Lieferanten", buyers: "Abnehmer", substitutes: "Substitute" };
+  function drawForcesRadar() {
+    const canvas = $("#forces-radar"); if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2 + 4, R = Math.min(W, H) / 2 - 78;
+    const muted = cssVar("--muted"), grid = cssVar("--grid"), series = cssVar("--series-1"), surface = cssVar("--surface-1");
+    const n = FORCES.length;
+    const ang = (i) => -Math.PI / 2 + i * 2 * Math.PI / n;
+    ctx.strokeStyle = grid; ctx.lineWidth = 1;
+    for (let r = 1; r <= 5; r++) {
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) { const a = ang(i), rr = R * r / 5, x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.closePath(); ctx.stroke();
+    }
+    ctx.fillStyle = muted; ctx.font = "11px system-ui, sans-serif";
+    FORCES.forEach((f, i) => {
+      const a = ang(i), x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
+      ctx.strokeStyle = grid; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+      const lx = cx + Math.cos(a) * (R + 14), ly = cy + Math.sin(a) * (R + 12);
+      ctx.textAlign = Math.abs(Math.cos(a)) < 0.3 ? "center" : (Math.cos(a) > 0 ? "left" : "right");
+      ctx.textBaseline = Math.abs(Math.sin(a)) < 0.3 ? "middle" : (Math.sin(a) > 0 ? "top" : "bottom");
+      ctx.fillText(RADAR_LABEL[f.key], lx, ly);
+    });
+    ctx.beginPath();
+    FORCES.forEach((f, i) => { const v = state.forces[f.key].v, a = ang(i), rr = R * v / 5, x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.closePath();
+    ctx.globalAlpha = 0.22; ctx.fillStyle = series; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = series; ctx.lineWidth = 2; ctx.stroke();
+    FORCES.forEach((f, i) => {
+      const v = state.forces[f.key].v, a = ang(i), rr = R * v / 5, x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+      ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fillStyle = series; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = surface; ctx.stroke();
+    });
   }
 
   /* ---------- Stakeholder-Matrix ---------- */
@@ -1163,7 +1201,7 @@
     const forcesTbl = `<table class="dossier-table"><thead><tr><th>Wettbewerbskraft</th><th>Bewertung</th><th>Notiz</th></tr></thead><tbody>${
       FORCES.map((f) => { const fx = state.forces[f.key]; return `<tr><td>${f.label}</td><td>${fx.v} · ${forceLevel(fx.v)}</td><td>${esc(fx.note || "")}</td></tr>`; }).join("")
     }</tbody></table><p class="dossier-kpi">Branchenattraktivität: <strong>${attractiveness}/100</strong> · Ø Kräfte ${avg.toFixed(1)}</p>`;
-    parts.push(section("Porters Five Forces", forcesTbl));
+    parts.push(section("Porters Five Forces", forcesTbl + chartImg("#forces-radar", drawForcesRadar)));
 
     // Wertkette
     parts.push(section("Wertkette",
@@ -1265,6 +1303,94 @@
     catch (e) { return ""; }
   }
 
+  /* ---------- Fortschritts-Dashboard & Beispiel-Datensatz ---------- */
+  const listHas = (obj) => Object.keys(obj || {}).some((k) => Array.isArray(obj[k]) && obj[k].length);
+  const DASH = [
+    { v: "abell", label: "Abell-Marktabgrenzung", has: () => listHas(state.abell) },
+    { v: "stakeholder", label: "Stakeholder-Matrix", has: () => state.stakeholders.length > 0 },
+    { v: "ziele", label: "SMART-Ziele", has: () => state.ziele.length > 0 },
+    { v: "kennzahlen", label: "Kennzahlen", has: () => Object.values(state.kennzahlen).some((x) => String(x).trim() !== "") },
+    { v: "pestel", label: "PESTEL", has: () => listHas(state.pestel) },
+    { v: "forces", label: "Five Forces", has: () => FORCES.some((f) => state.forces[f.key].v !== 3 || (state.forces[f.key].note || "").trim()) },
+    { v: "wertkette", label: "Wertkette", has: () => listHas(state.valuechain) },
+    { v: "szenario", label: "Szenario-Analyse", has: () => !!(state.szenario.frage || (state.szenario.factors || []).length || state.szenario.a || state.szenario.b) },
+    { v: "swot", label: "SWOT", has: () => listHas(state.swot) },
+    { v: "bcg", label: "BCG-Portfolio", has: () => state.bcg.length > 0 },
+    { v: "strategiewahl", label: "Strategiewahl", has: () => state.strategiewahl.options.length > 0 },
+    { v: "bmc", label: "Business Model Canvas", has: () => listHas(state.bmc) },
+    { v: "bsc", label: "Balanced Scorecard", has: () => listHas(state.bsc) },
+    { v: "fallstudie", label: "Fallstudien-Report", has: () => { const f = state.fallstudie; return !!(f.company || f.titel || (f.sources || []).length || f.ki || Object.values(f.sections).some((x) => String(x).trim() !== "")); } },
+  ];
+  function renderDashboard() {
+    const grid = $("#dash-grid"); if (!grid) return;
+    const done = DASH.filter((d) => { try { return d.has(); } catch (e) { return false; } });
+    $("#dash-count").textContent = `${done.length} / ${DASH.length}`;
+    $("#dash-bar-fill").style.width = (done.length / DASH.length * 100) + "%";
+    grid.innerHTML = "";
+    DASH.forEach((d) => {
+      let ok = false; try { ok = !!d.has(); } catch (e) {}
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "dash-chip" + (ok ? " done" : "");
+      b.innerHTML = `<span class="dot">${ok ? "✓" : ""}</span><span>${d.label}</span>`;
+      b.addEventListener("click", () => navTo(d.v));
+      grid.appendChild(b);
+    });
+  }
+  function sampleState() {
+    const s = defaultState();
+    s.abell.groups = ["Geschäftskunden (B2B)", "Privatkunden (B2C)"];
+    s.abell.functions = ["Prozesse automatisieren", "Kosten senken"];
+    s.abell.technologies = ["Cloud-Software", "Künstliche Intelligenz"];
+    s.stakeholders = [
+      { name: "Investor:innen", power: 5, interest: 3 }, { name: "Mitarbeitende", power: 3, interest: 5 },
+      { name: "Kund:innen", power: 4, interest: 5 }, { name: "Regulierung", power: 4, interest: 2 }];
+    s.ziele = [{ ziel: "Marktanteil steigern", s: "Marktanteil DACH auf 15 %", m: "Marktanteil in %", a: "sichert nachhaltiges Wachstum", r: "durch Ausbau des Vertriebs", t: "bis Ende 2027" }];
+    s.kennzahlen = { ebit: "120", da: "40", umsatz: "800", nopat: "90", kapital: "600", wacc: "8" };
+    s.pestel.political = [{ text: "Förderprogramme für Digitalisierung", sign: 1 }];
+    s.pestel.economic = [{ text: "Möglicher Konjunkturabschwung", sign: -1 }];
+    s.pestel.technological = [{ text: "Schnelle KI-Entwicklung", sign: 1 }];
+    s.pestel.legal = [{ text: "Strengere Datenschutzauflagen", sign: -1 }];
+    s.forces.rivalry = { v: 4, note: "Viele Anbieter, geringes Marktwachstum" };
+    s.forces.newEntrants = { v: 3, note: "" };
+    s.forces.suppliers = { v: 2, note: "Standardkomponenten, viele Bezugsquellen" };
+    s.forces.buyers = { v: 4, note: "Preissensible Großkunden" };
+    s.forces.substitutes = { v: 3, note: "" };
+    s.valuechain.operations = [{ text: "Skalierbare, effiziente Produktion", sign: 1 }];
+    s.valuechain.marketing = [{ text: "Starke Marke", sign: 1 }];
+    s.valuechain.service = [{ text: "Überlasteter Kundensupport", sign: -1 }];
+    s.valuechain.technology = [{ text: "Hohe F&E-Kompetenz", sign: 1 }];
+    s.swot.strengths = ["Innovationskraft"];
+    s.swot.weaknesses = ["Abhängigkeit von Schlüsselkunden"];
+    s.bcg = [
+      { name: "Produkt A", growth: 15, share: 2, revenue: 30 },
+      { name: "Produkt B", growth: 4, share: 0.5, revenue: 12 },
+      { name: "Produkt C", growth: 12, share: 0.6, revenue: 8 }];
+    s.szenario = {
+      frage: "Entwicklung des Kernmarkts bis 2030",
+      factors: ["Regulierung", "KI-Adoption", "Konjunktur"],
+      a: "Schnelle KI-Adoption und förderliche Regulierung treiben das Wachstum – früh investieren.",
+      b: "Rezession und strenge Regulierung bremsen den Markt – Kosten sichern und flexibel bleiben.",
+    };
+    s.strategiewahl = {
+      criteria: [{ name: "Eignung", weight: 2 }, { name: "Akzeptanz", weight: 1 }, { name: "Machbarkeit", weight: 1 }],
+      options: [
+        { name: "Differenzierung durch KI-Funktionen", scores: [5, 4, 3] },
+        { name: "Kostenführerschaft", scores: [3, 4, 4] },
+        { name: "Expansion in neue Märkte", scores: [4, 3, 2] }],
+    };
+    s.bmc.partners = ["Cloud-Anbieter"]; s.bmc.activities = ["Softwareentwicklung"];
+    s.bmc.resources = ["Entwicklungsteam", "Plattform"]; s.bmc.value = ["Zeitersparnis durch Automatisierung"];
+    s.bmc.relationships = ["Self-Service", "Persönlicher Support"]; s.bmc.channels = ["Direktvertrieb", "Website"];
+    s.bmc.segments = ["KMU", "Großunternehmen"]; s.bmc.costs = ["Personal", "Cloud-Infrastruktur"]; s.bmc.revenue = ["Software-Abonnement"];
+    s.bsc.financial = [{ ziel: "Umsatz steigern", kennzahl: "Umsatzwachstum", zielwert: "+10 %", massnahme: "Vertrieb ausbauen" }];
+    s.bsc.customer = [{ ziel: "Zufriedenheit erhöhen", kennzahl: "NPS", zielwert: "> 40", massnahme: "Support verbessern" }];
+    s.bsc.process = [{ ziel: "Time-to-Market senken", kennzahl: "Releasezyklus", zielwert: "−20 %", massnahme: "CI/CD einführen" }];
+    s.bsc.learning = [{ ziel: "Kompetenzen aufbauen", kennzahl: "Schulungstage/Jahr", zielwert: "5", massnahme: "Weiterbildungsprogramm" }];
+    s.fallstudie = { company: "SAP SE", titel: "Strategische Analyse eines Unternehmens", gruppe: "", ki: "", sources: ["Geschäftsbericht 2024"],
+      sections: { einleitung: "Diese Fallstudie analysiert Lage, Umfeld und Strategie des gewählten Unternehmens.", ueberblick: "", extern: "", intern: "", swotopt: "", diskussion: "", fazit: "" } };
+    return s;
+  }
+
   /* ---------- Footer-Aktionen ---------- */
   function exportPdf() { showView("dossier"); window.print(); }
   $("#btn-export").addEventListener("click", exportPdf);
@@ -1289,6 +1415,11 @@
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   });
+  $("#btn-example").addEventListener("click", () => {
+    const filled = DASH.filter((d) => { try { return d.has(); } catch (e) { return false; } }).length;
+    if (filled > 0 && !confirm("Aktuelle Eingaben durch den Beispiel-Datensatz ersetzen?")) return;
+    state = sampleState(); save(); fullRebuild(); navTo("prozess");
+  });
   $("#btn-import-json").addEventListener("click", () => $("#import-file").click());
   $("#import-file").addEventListener("change", (e) => {
     const file = e.target.files && e.target.files[0];
@@ -1309,11 +1440,12 @@
   });
 
   if (window.matchMedia) {
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawBCG(); drawStakeholder(); });
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawBCG(); drawStakeholder(); drawForcesRadar(); });
   }
   window.addEventListener("resize", () => {
     if ($("#view-bcg").classList.contains("is-active")) drawBCG();
     if ($("#view-stakeholder").classList.contains("is-active")) drawStakeholder();
+    if ($("#view-forces").classList.contains("is-active")) drawForcesRadar();
   });
 
   function initAll() {
@@ -1343,6 +1475,7 @@
     renderForcesChecklist();
     renderFlashcard();
     renderQuiz();
+    renderDashboard();
     refreshSwotDerived();
   }
   wireSwotForms();

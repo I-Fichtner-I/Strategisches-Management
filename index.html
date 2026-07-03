@@ -83,6 +83,15 @@
         enthält oben <strong>„Theorie &amp; Leitfragen"</strong> mit Definition, Vorgehen und Leitfragen –
         so beantwortet das Tool die typischen Fragestellungen und führt zugleich durch die Anwendung.</p>
       </div>
+
+      <div class="dash" id="dash">
+        <div class="dash-head">
+          <div><strong id="dash-count">0 / 14</strong> Werkzeugen befüllt</div>
+          <button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button>
+        </div>
+        <div class="dash-bar"><span id="dash-bar-fill"></span></div>
+        <div class="dash-grid" id="dash-grid"></div>
+      </div>
       <details class="kb" id="help-panel">
         <summary>So nutzt du das Toolkit</summary>
         <div class="kb-body">
@@ -209,7 +218,12 @@
         <em>wann</em> eine Kraft stark ist.</p>
       </div>
       <div class="kb-slot" data-kb="forces"></div>
-      <div class="forces" id="forces-list"></div>
+      <div class="forces-layout">
+        <div class="forces" id="forces-list"></div>
+        <div class="forces-radar-box">
+          <canvas id="forces-radar" width="460" height="400" role="img" aria-label="Radar der fünf Wettbewerbskräfte"></canvas>
+        </div>
+      </div>
       <div class="forces-result">
         <div class="gauge"><div class="gauge-fill" id="forces-gauge"></div></div>
         <div class="forces-score">
