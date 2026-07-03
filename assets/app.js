@@ -235,9 +235,48 @@
   }
 
   /* ---------- Navigation (Kapitelstruktur) ---------- */
+  // Reihenfolge der Seiten (entspricht der Sidebar) für die Zurück/Weiter-Navigation
+  const PAGES = [
+    { v: "prozess", t: "1 · Einführung" },
+    { v: "ansaetze", t: "2 · Ansätze" },
+    { v: "stakeholder", t: "3.1 Stakeholder" },
+    { v: "ziele", t: "3.2 Ziele" },
+    { v: "kennzahlen", t: "3.3 Kennzahlen" },
+    { v: "abell", t: "3.4 Abell" },
+    { v: "pestel", t: "4.1.1 PESTEL" },
+    { v: "forces", t: "4.1.2 Five Forces" },
+    { v: "wettbewerb", t: "4.1.3 Wettbewerbsumfeld" },
+    { v: "wertkette", t: "4.2 Wertkette" },
+    { v: "swot", t: "4.3 SWOT" },
+    { v: "bcg", t: "4.3 BCG-Portfolio" },
+    { v: "szenario", t: "Szenario-Analyse" },
+    { v: "strategietypen", t: "5.1 Typen von Strategien" },
+    { v: "strategiewahl", t: "5.2 Bewertung & Auswahl" },
+    { v: "bmc", t: "6.1 Business Model Canvas" },
+    { v: "bsc", t: "6.2 Balanced Scorecard" },
+    { v: "kontrolle", t: "6.3 Kontrolle & Frühaufklärung" },
+    { v: "fallstudie", t: "Fallstudien-Report" },
+    { v: "quiz", t: "Selbsttest" },
+    { v: "dossier", t: "Strategie-Dossier" },
+  ];
   function setNavActive(el) {
     $$("#nav .nav-item").forEach((i) => i.classList.remove("is-active"));
     if (el) el.classList.add("is-active");
+  }
+  function navTo(view) {
+    showView(view);
+    setNavActive($(`#nav .nav-item[data-view="${view}"]`));
+  }
+  function updatePager(name) {
+    const idx = PAGES.findIndex((p) => p.v === name);
+    const prev = $("#pager-prev"), next = $("#pager-next");
+    if (!prev || !next) return;
+    if (idx < 0) { prev.style.visibility = next.style.visibility = "hidden"; return; }
+    const p = PAGES[idx - 1], n = PAGES[idx + 1];
+    if (p) { prev.style.visibility = "visible"; prev.innerHTML = `<span class="pager-dir">‹ Zurück</span><span class="pager-name">${p.t}</span>`; prev.dataset.view = p.v; }
+    else { prev.style.visibility = "hidden"; }
+    if (n) { next.style.visibility = "visible"; next.innerHTML = `<span class="pager-dir">Weiter ›</span><span class="pager-name">${n.t}</span>`; next.dataset.view = n.v; }
+    else { next.style.visibility = "hidden"; }
   }
   function showView(name, anchor) {
     $$(".view").forEach((v) => v.classList.toggle("is-active", v.id === "view-" + name));
@@ -245,6 +284,7 @@
     if (name === "stakeholder") drawStakeholder();
     if (name === "strategiewahl") renderStrategiewahl();
     if (name === "dossier") buildDossier();
+    updatePager(name);
     if (anchor) {
       const el = document.getElementById(anchor);
       if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
@@ -264,6 +304,10 @@
   });
   const navToggle = $("#nav-toggle");
   if (navToggle) navToggle.addEventListener("click", () => sidebar && sidebar.classList.toggle("open"));
+  ["#pager-prev", "#pager-next"].forEach((sel) => {
+    const el = $(sel);
+    if (el) el.addEventListener("click", () => { if (el.dataset.view) { navTo(el.dataset.view); closeSidebarOnMobile(); } });
+  });
   document.addEventListener("click", (e) => {
     const g = e.target.closest("[data-goto]");
     if (g) {
@@ -670,28 +714,47 @@
     });
   }
 
-  /* ---------- SMART-Ziele ---------- */
+  /* ---------- SMART-Ziele (geführt) ---------- */
   const SMART = ["s", "m", "a", "r", "t"];
+  const SMART_LABEL = { s: "Spezifisch", m: "Messbar", a: "Attraktiv", r: "Realistisch", t: "Terminiert" };
+  function smartMet(z, c) { const v = z[c]; return typeof v === "string" ? v.trim() !== "" : !!v; }
+  function smartText(z, c) { return typeof z[c] === "string" ? z[c] : (z[c] ? "✓" : ""); }
+  function smartSentence(z) {
+    return `${z.s || z.ziel}${z.m ? ` – messbar an ${z.m}` : ""}${z.t ? `, bis ${z.t}` : ""}`
+      + `${z.r ? ` (realistisch: ${z.r})` : ""}${z.a ? `. Nutzen: ${z.a}` : ""}.`;
+  }
   $("#ziele-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
     const z = { ziel: String(fd.get("ziel")).trim() };
-    SMART.forEach((c) => (z[c] = !!fd.get(c)));
+    SMART.forEach((c) => (z[c] = String(fd.get(c) || "").trim()));
     if (!z.ziel) return;
     state.ziele.push(z); save(); e.target.reset(); renderZiele();
   });
   function renderZiele() {
-    const tb = $("#ziele-tbody"); tb.innerHTML = "";
+    const list = $("#ziele-list"); if (!list) return;
+    list.innerHTML = "";
+    if (!state.ziele.length) {
+      list.innerHTML = '<p class="smart-empty">Noch keine Ziele – oben ein Ziel geführt formulieren.</p>';
+      return;
+    }
     state.ziele.forEach((z, i) => {
-      const count = SMART.filter((c) => z[c]).length;
-      const verdict = count === 5 ? '<span class="badge ok">SMART ✓</span>' : `<span class="badge warn">${count}/5</span>`;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${escapeHtml(z.ziel)}</td>` + SMART.map((c) => `<td>${z[c] ? "✓" : "–"}</td>`).join("") + `<td>${verdict}</td>`;
-      const td = document.createElement("td");
-      const btn = document.createElement("button");
-      btn.type = "button"; btn.textContent = "×"; btn.setAttribute("aria-label", "Entfernen");
-      btn.addEventListener("click", () => { state.ziele.splice(i, 1); save(); renderZiele(); });
-      td.appendChild(btn); tr.appendChild(td); tb.appendChild(tr);
+      const count = SMART.filter((c) => smartMet(z, c)).length;
+      const full = count === 5;
+      const card = document.createElement("div");
+      card.className = "smart-card";
+      const rows = SMART.map((c) => `<div class="smart-row ${smartMet(z, c) ? "ok" : "miss"}">`
+        + `<span class="smart-badge">${c.toUpperCase()}</span>`
+        + `<span class="smart-lab">${SMART_LABEL[c]}</span>`
+        + `<span class="smart-val">${smartMet(z, c) ? escapeHtml(smartText(z, c)) : "—"}</span></div>`).join("");
+      card.innerHTML = `<div class="smart-head"><h3>${escapeHtml(z.ziel)}</h3>`
+        + `<span class="badge ${full ? "ok" : "warn"}">${full ? "SMART ✓" : count + "/5"}</span>`
+        + `<button type="button" class="smart-del" aria-label="Entfernen">×</button></div>`
+        + `<div class="smart-meter"><span style="width:${count / 5 * 100}%"></span></div>`
+        + `<div class="smart-rows">${rows}</div>`
+        + (full ? `<p class="smart-sentence">„${escapeHtml(smartSentence(z))}"</p>` : "");
+      card.querySelector(".smart-del").addEventListener("click", () => { state.ziele.splice(i, 1); save(); renderZiele(); });
+      list.appendChild(card);
     });
   }
 
@@ -1290,4 +1353,5 @@
   wireFlashcards();
   wireQuiz();
   initAll();
+  updatePager("prozess");
 })();
