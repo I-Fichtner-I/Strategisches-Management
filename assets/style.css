@@ -573,6 +573,30 @@ button:active { transform: translateY(1px); }
 .sw-foot { margin-top: 12px; }
 .sw-foot .add-form { max-width: 360px; }
 
+/* Five-Forces-Layout mit Radar */
+.forces-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 440px); gap: 20px; align-items: start; }
+.forces-radar-box { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); padding: 14px; position: sticky; top: 82px; }
+#forces-radar { width: 100%; height: auto; display: block; }
+@media (max-width: 900px) { .forces-layout { grid-template-columns: 1fr; } .forces-radar-box { position: static; } }
+
+/* Fortschritts-Dashboard */
+.dash { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); padding: 18px; margin-bottom: 24px; }
+.dash-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.dash-head strong { color: var(--series-1); }
+.dash-bar { height: 8px; border-radius: 6px; background: var(--grid); overflow: hidden; margin: 12px 0 16px; }
+.dash-bar span { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width .35s ease; }
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.dash-chip { display: flex; align-items: center; gap: 8px; cursor: pointer; font: inherit; text-align: left;
+  background: var(--page); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--text-secondary);
+  transition: border-color .12s ease, color .12s ease; }
+.dash-chip:hover { border-color: var(--series-1); color: var(--text-primary); }
+.dash-chip .dot { flex: none; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center;
+  font-size: .7rem; font-weight: 700; color: #fff; background: var(--muted); }
+.dash-chip.done .dot { background: var(--good); }
+.dash-chip.done { color: var(--text-primary); }
+
 /* Geführte SMART-Ziele */
 .smart-form { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 16px; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
