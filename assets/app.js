@@ -154,6 +154,9 @@
         "<div><h5>EBIT</h5><p>Earnings before Interest and Taxes – operatives Ergebnis vor Zinsen und Steuern.</p></div>" +
         "<div><h5>EBITDA</h5><p>EBIT + Abschreibungen &amp; Amortisation. Zeigt die operative Ertragskraft unabhängig von Investitions-/Abschreibungspolitik.</p></div>" +
         "<div><h5>EBITDA-Marge</h5><p>EBITDA ÷ Umsatz. Relative Kennzahl der operativen Profitabilität; erlaubt Vergleiche zwischen Unternehmen.</p></div>" +
+        "<div><h5>NOPAT</h5><p>Net Operating Profit After Taxes – operatives Ergebnis nach Steuern, aber vor Finanzierungskosten (≈ EBIT × (1 − Steuersatz)). Grundlage für wertorientierte Kennzahlen.</p></div>" +
+        "<div><h5>WACC</h5><p>Weighted Average Cost of Capital – gewichteter Mischsatz aus Eigen- und Fremdkapitalkosten; die Mindestrendite, die das eingesetzte Kapital erwirtschaften muss.</p></div>" +
+        "<div><h5>ROCE</h5><p>Return on Capital Employed = NOPAT ÷ investiertes Kapital. Liegt ROCE über dem WACC, entsteht Wert (positiver Spread).</p></div>" +
         "<div><h5>EVA</h5><p>Economic Value Added = NOPAT − (investiertes Kapital × WACC). Positiver EVA = Wertschaffung über den Kapitalkosten.</p></div>" +
         "<div><h5>CFROI</h5><p>Cash Flow Return on Investment – wertorientierte Rendite auf Basis von Brutto-Cashflow und Bruttoinvestitionsbasis; mit den Kapitalkosten zu vergleichen.</p></div>" +
         "</div>",

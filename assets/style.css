@@ -328,6 +328,7 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .calc-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: grid; gap: 8px; }
 .calc-card h3 { margin: 0 0 4px; font-size: 1.02rem; }
 .calc-card label { display: grid; gap: 4px; font-size: .85rem; color: var(--text-secondary); }
+.field-hint { font-size: .74rem; color: var(--muted); font-weight: 400; line-height: 1.35; }
 .calc-out { margin-top: 8px; padding: 12px; background: var(--page); border-radius: 8px; font-size: .95rem; line-height: 1.7; }
 
 @media (max-width: 720px) {

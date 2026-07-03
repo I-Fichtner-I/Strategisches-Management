@@ -292,9 +292,9 @@
         </form>
         <form class="calc-card" id="calc-eva">
           <h3>EVA (Economic Value Added)</h3>
-          <label>NOPAT (Mio. €)<input type="number" step="any" name="nopat" placeholder="90" /></label>
+          <label>NOPAT (Mio. €) <span class="field-hint">operatives Ergebnis nach Steuern, vor Zinsen (≈ EBIT × (1 − Steuersatz))</span><input type="number" step="any" name="nopat" placeholder="90" /></label>
           <label>Investiertes Kapital (Mio. €)<input type="number" step="any" name="kapital" placeholder="600" /></label>
-          <label>WACC (%)<input type="number" step="any" name="wacc" placeholder="8" /></label>
+          <label>WACC (%) <span class="field-hint">gewichtete Kapitalkosten (Eigen- &amp; Fremdkapital)</span><input type="number" step="any" name="wacc" placeholder="8" /></label>
           <div class="calc-out" id="out-eva">Kapitalkosten: –<br>EVA: –</div>
         </form>
       </div>
