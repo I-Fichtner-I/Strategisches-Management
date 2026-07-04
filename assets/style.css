@@ -600,8 +600,18 @@ button:active { transform: translateY(1px); }
 .sw-total { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--series-1); }
 .sw-best { background: color-mix(in srgb, var(--good) 10%, transparent); }
 .sw-empty { color: var(--muted); font-style: italic; }
+.sw-excluded { opacity: .6; }
+.sw-excluded .sw-optname { text-decoration: line-through; text-decoration-color: var(--muted); }
+.sw-kolabel { display: block; font-size: .72rem; color: var(--muted); font-weight: 400; margin-top: 3px; cursor: pointer; }
+.sw-kolabel input { vertical-align: middle; margin-right: 3px; }
+.sw-crit.sw-ko { background: color-mix(in srgb, var(--warning) 12%, var(--surface-2)); }
 .sw-foot { margin-top: 12px; }
 .sw-foot .add-form { max-width: 360px; }
+.sw-foot .sw-suggest { margin-bottom: 10px; }
+.dossier-rec { font-size: .95rem; margin: 0 0 8px; padding: 8px 12px; border-radius: 8px;
+  background: color-mix(in srgb, var(--good) 12%, transparent); }
+.bsc-strategy-banner { font-size: .92rem; margin-bottom: 14px; padding: 10px 14px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: color-mix(in srgb, var(--series-1) 10%, var(--surface-1)); }
 
 /* Frühwarn-/KPI-Tracker (6.3) */
 .kpi-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; background: var(--surface-1);
