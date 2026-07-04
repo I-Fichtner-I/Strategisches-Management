@@ -6,6 +6,25 @@ Ein interaktives Web-Werkzeug, das zentrale Methoden des strategischen Managemen
 anwendbar macht. Läuft vollständig im Browser – ohne Installation und ohne Server –
 und lässt sich direkt über **GitHub Pages** veröffentlichen.
 
+## Der strategische Managementprozess
+
+Alle Werkzeuge folgen den sechs idealtypischen Phasen des strategischen
+Managementprozesses. Die **strategische Kontrolle und Frühaufklärung** wirkt dabei
+nicht nur am Ende, sondern **prozessbegleitend** – die Ergebnisse fließen laufend
+in die Zielplanung zurück (Regelkreis).
+
+```mermaid
+flowchart LR
+    P1["1 · Zielplanung<br/><i>Abell · Stakeholder · SMART-Ziele</i>"]
+    P2["2 · Analyse &amp; Prognose<br/><i>PESTEL · Five Forces · Szenario · Wertkette · SWOT · Portfolio</i>"]
+    P3["3 · Strategiekonzeption<br/><i>Strategietypen</i>"]
+    P4["4 · Bewertung &amp; Entscheidung<br/><i>Strategiewahl (Nutzwertanalyse)</i>"]
+    P5["5 · Implementierung<br/><i>Business Model Canvas · Balanced Scorecard</i>"]
+    P6["6 · Kontrolle &amp; Frühaufklärung<br/><i>Frühwarn- &amp; KPI-Tracker</i>"]
+    P1 --> P2 --> P3 --> P4 --> P5 --> P6
+    P6 -. "Rückkopplung / prozessbegleitend" .-> P1
+```
+
 ## Werkzeuge
 
 Die Werkzeuge folgen dem strategischen Management-Prozess – von der 
