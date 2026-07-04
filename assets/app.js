@@ -90,6 +90,8 @@
     },
     wettbewerb: { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [] },
     ansoff: emptyLists(["durchdringung", "marktentwicklung", "produktentwicklung", "diversifikation"]),
+    kontrolle: { indicators: [] },
+    learn: { known: [] },
   });
 
   let state = load();
@@ -268,6 +270,7 @@
     { v: "kontrolle", t: "6.3 Kontrolle & Frühaufklärung" },
     { v: "fallstudie", t: "Fallstudien-Report" },
     { v: "quiz", t: "Selbsttest" },
+    { v: "glossar", t: "Glossar" },
     { v: "dossier", t: "Strategie-Dossier" },
   ];
   function setNavActive(el) {
@@ -1031,6 +1034,36 @@
   }
   function setWbValues() { $("#wb-xlabel").value = state.wettbewerb.xLabel || ""; $("#wb-ylabel").value = state.wettbewerb.yLabel || ""; }
 
+  /* ---------- Frühwarn- & KPI-Tracker (6.3) ---------- */
+  const KPI_STATUS = { green: "🟢 im Plan", amber: "🟡 beobachten", red: "🔴 kritisch" };
+  const KPI_DIR = { hoch: "↑ höher besser", niedrig: "↓ niedriger besser" };
+  function renderKpi() {
+    const tb = $("#kpi-tbody"); if (!tb) return; tb.innerHTML = "";
+    state.kontrolle.indicators.forEach((ind, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${escapeHtml(ind.name)}</td><td>${escapeHtml(ind.target || "")}</td>`
+        + `<td>${escapeHtml(ind.actual || "")}</td><td>${KPI_DIR[ind.dir] || ""}</td>`
+        + `<td><span class="kpi-badge kpi-${ind.status}">${KPI_STATUS[ind.status] || ""}</span></td>`;
+      const td = document.createElement("td");
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.textContent = "×"; btn.setAttribute("aria-label", "Entfernen");
+      btn.addEventListener("click", () => { state.kontrolle.indicators.splice(i, 1); save(); renderKpi(); });
+      td.appendChild(btn); tr.appendChild(td); tb.appendChild(tr);
+    });
+  }
+  function wireKpi() {
+    $("#kpi-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const ind = {
+        name: String(fd.get("name")).trim(), target: String(fd.get("target") || "").trim(),
+        actual: String(fd.get("actual") || "").trim(), dir: fd.get("dir") || "hoch", status: fd.get("status") || "green",
+      };
+      if (!ind.name) return;
+      state.kontrolle.indicators.push(ind); save(); e.target.reset(); renderKpi();
+    });
+  }
+
   /* ---------- Strategiewahl (Nutzwertanalyse) ---------- */
   function computeTowsOptions() {
     const d = derivedSwot();
@@ -1045,6 +1078,14 @@
       combine(W, O).map((t) => ({ g: "WO", t })),
       combine(W, T).map((t) => ({ g: "WT", t }))
     );
+  }
+  const BCG_STRATEGY = { "Star": "ausbauen/investieren", "Question Mark": "selektiv fördern", "Cash Cow": "abschöpfen & halten", "Dog": "desinvestieren" };
+  function computeStrategyOptions() {
+    const tows = computeTowsOptions().map((o) => `[${o.g}] ${o.t}`);
+    const ansoff = [];
+    ANSOFF_CELLS.forEach((c) => (state.ansoff[c.key] || []).forEach((t) => ansoff.push(`[Ansoff] ${t}`)));
+    const bcg = state.bcg.map((u) => `[BCG] ${u.name}: ${BCG_STRATEGY[bcgQuadrant(u)]}`);
+    return tows.concat(ansoff, bcg);
   }
   function swNormalize() {
     const st = state.strategiewahl;
@@ -1064,8 +1105,8 @@
     const st = state.strategiewahl; swNormalize();
     const sug = $("#sw-suggest");
     const existing = new Set(st.options.map((o) => o.name));
-    const avail = computeTowsOptions().map((o) => `[${o.g}] ${o.t}`).filter((n) => !existing.has(n)).slice(0, 8);
-    sug.innerHTML = avail.length ? '<span class="sw-sug-label">Aus TOWS übernehmen:</span>'
+    const avail = computeStrategyOptions().filter((n) => !existing.has(n)).slice(0, 12);
+    sug.innerHTML = avail.length ? '<span class="sw-sug-label">Optionen übernehmen (TOWS · Ansoff · BCG):</span>'
       + avail.map((n, i) => `<button type="button" class="sw-chip" data-i="${i}">+ ${escapeHtml(n)}</button>`).join("") : "";
     $$(".sw-chip", sug).forEach((b) => b.addEventListener("click", () => {
       st.options.push({ name: avail[+b.dataset.i], scores: st.criteria.map(() => 3) }); save(); renderStrategiewahl();
@@ -1227,28 +1268,101 @@
   ];
 
   const QUIZ = [
-    { q: "Wodurch ist das strategische Management vor allem gekennzeichnet?", o: ["Fokus auf die langfristige Existenzsicherung des Unternehmens", "Steuerung der täglichen Liquidität", "Kurzfristige Umsatzmaximierung", "Ausschließlich interne Betrachtung"], c: 0, e: "Strategisches Management sichert langfristig Existenz und Erfolg; operatives Management ist kurz-/mittelfristig und intern orientiert." },
-    { q: "Über welche drei Dimensionen grenzt das Abell-Schema einen Markt ab?", o: ["Preis, Menge, Qualität", "Kundengruppen, Kundenfunktionen, Technologien", "Stärken, Schwächen, Chancen", "Politik, Ökonomie, Technologie"], c: 1, e: "Abell definiert den Markt über Wer (Kundengruppen), Was (Kundenfunktionen) und Wie (Technologien)." },
-    { q: "Die Bedrohung durch neue Anbieter ist tendenziell hoch, wenn …", o: ["die Skaleneffekte hoch sind", "der Kapitalbedarf hoch ist", "die Skaleneffekte niedrig sind", "die Wechselkosten hoch sind"], c: 2, e: "Niedrige Markteintrittsbarrieren (z. B. geringe Skaleneffekte, geringer Kapitalbedarf, niedrige Wechselkosten) erhöhen die Bedrohung durch neue Anbieter." },
-    { q: "Ein Geschäft mit hohem Marktwachstum und niedrigem relativem Marktanteil ist im BCG-Portfolio ein …", o: ["Star", "Cash Cow", "Dog", "Question Mark"], c: 3, e: "Hohes Wachstum + niedriger Anteil = Question Mark (Fragezeichen); Investition oder Rückzug ist zu prüfen." },
-    { q: "Was besagt die TOWS-Strategie „SO“?", o: ["Stärken nutzen, um Chancen zu ergreifen", "Schwächen abbauen, um Chancen zu nutzen", "Stärken nutzen, um Risiken abzuwehren", "Schwächen und Risiken begrenzen"], c: 0, e: "SO = Strengths × Opportunities: eigene Stärken einsetzen, um externe Chancen zu nutzen (Ausbaustrategie)." },
-    { q: "Wann ist der Economic Value Added (EVA) positiv?", o: ["Wenn der Umsatz steigt", "Wenn der NOPAT die Kapitalkosten übersteigt", "Wenn das EBIT positiv ist", "Wenn die Abschreibungen sinken"], c: 1, e: "EVA = NOPAT − (Kapital × WACC). Positiv, wenn der operative Gewinn nach Steuern über den Kapitalkosten liegt." },
-    { q: "Wie berechnet sich das EBITDA?", o: ["Umsatz − alle Kosten", "EBIT − Steuern", "EBIT + Abschreibungen und Amortisation", "NOPAT + Zinsen"], c: 2, e: "EBITDA = EBIT zzgl. Abschreibungen und Amortisation – zeigt die operative Ertragskraft unabhängig von der Abschreibungspolitik." },
-    { q: "Wofür steht das „A“ in SMART?", o: ["Absolut", "Attraktiv/akzeptiert", "Analytisch", "Aktuell"], c: 1, e: "SMART = Spezifisch, Messbar, Attraktiv/akzeptiert, Realistisch, Terminiert." },
-    { q: "Der Resource-based View erklärt Wettbewerbsvorteile primär durch …", o: ["die Attraktivität der Branche", "die Marktpositionierung", "interne Ressourcen und Kernkompetenzen", "staatliche Subventionen"], c: 2, e: "Der RBV ist inside-out: einzigartige, wertvolle Ressourcen und Kernkompetenzen begründen dauerhafte Vorteile." },
-    { q: "Welche ist KEINE Perspektive der Balanced Scorecard?", o: ["Finanzperspektive", "Kundenperspektive", "Lieferantenperspektive", "Lern- und Entwicklungsperspektive"], c: 2, e: "Die vier BSC-Perspektiven sind Finanzen, Kunden, interne Prozesse sowie Lernen & Entwicklung." },
-    { q: "Ein Stakeholder mit hoher Macht, aber geringem Interesse sollte …", o: ["eng gemanagt werden", "zufrieden gehalten werden", "nur beobachtet werden", "ignoriert werden"], c: 1, e: "Hohe Macht / geringes Interesse → „Zufrieden halten“, um Widerstand zu vermeiden." },
-    { q: "Was ist das zentrale Ziel der Szenario-Analyse?", o: ["Eine einzige exakte Prognose zu erstellen", "Mehrere plausible, konsistente Zukunftsbilder zu entwickeln", "Den Marktanteil zu berechnen", "Kennzahlen zu vergleichen"], c: 1, e: "Die Szenario-Analyse spannt mit mehreren konsistenten Zukunftsbildern (z. B. Best/Worst Case) den Möglichkeitsraum auf." },
+    { cat: "Grundlagen", q: "Wodurch ist das strategische Management vor allem gekennzeichnet?", o: ["Fokus auf die langfristige Existenzsicherung des Unternehmens", "Steuerung der täglichen Liquidität", "Kurzfristige Umsatzmaximierung", "Ausschließlich interne Betrachtung"], c: 0, e: "Strategisches Management sichert langfristig Existenz und Erfolg; operatives Management ist kurz-/mittelfristig und intern orientiert." },
+    { cat: "Grundlagen", q: "Der Resource-based View erklärt Wettbewerbsvorteile primär durch …", o: ["die Attraktivität der Branche", "die Marktpositionierung", "interne Ressourcen und Kernkompetenzen", "staatliche Subventionen"], c: 2, e: "Der RBV ist inside-out: einzigartige, wertvolle Ressourcen und Kernkompetenzen begründen dauerhafte Vorteile." },
+    { cat: "Analyse", q: "Über welche drei Dimensionen grenzt das Abell-Schema einen Markt ab?", o: ["Preis, Menge, Qualität", "Kundengruppen, Kundenfunktionen, Technologien", "Stärken, Schwächen, Chancen", "Politik, Ökonomie, Technologie"], c: 1, e: "Abell definiert den Markt über Wer (Kundengruppen), Was (Kundenfunktionen) und Wie (Technologien)." },
+    { cat: "Analyse", q: "Die Bedrohung durch neue Anbieter ist tendenziell hoch, wenn …", o: ["die Skaleneffekte hoch sind", "der Kapitalbedarf hoch ist", "die Skaleneffekte niedrig sind", "die Wechselkosten hoch sind"], c: 2, e: "Niedrige Markteintrittsbarrieren (z. B. geringe Skaleneffekte, geringer Kapitalbedarf, niedrige Wechselkosten) erhöhen die Bedrohung durch neue Anbieter." },
+    { cat: "Analyse", q: "Welche fünf Felder umfasst die PESTEL-Analyse neben „Political“?", o: ["Economic, Social, Technological, Environmental, Legal", "Economic, Structural, Technical, Ethical, Legal", "Political, Social, Strategic, Technological, Legal", "Economic, Social, Tactical, Environmental, Local"], c: 0, e: "PESTEL steht für Political, Economic, Social, Technological, Environmental und Legal – die sechs Felder der globalen Umweltanalyse." },
+    { cat: "Analyse", q: "Zu den Primäraktivitäten der Wertkette zählt NICHT …", o: ["Eingangslogistik", "Marketing & Vertrieb", "Beschaffung", "Kundendienst"], c: 2, e: "Beschaffung, Technologieentwicklung, Personal und Infrastruktur sind unterstützende Aktivitäten; Primäraktivitäten bilden den direkten Leistungsfluss." },
+    { cat: "Analyse", q: "Wann ist der Economic Value Added (EVA) positiv?", o: ["Wenn der Umsatz steigt", "Wenn der NOPAT die Kapitalkosten übersteigt", "Wenn das EBIT positiv ist", "Wenn die Abschreibungen sinken"], c: 1, e: "EVA = NOPAT − (Kapital × WACC). Positiv, wenn der operative Gewinn nach Steuern über den Kapitalkosten liegt." },
+    { cat: "Analyse", q: "Wie berechnet sich das EBITDA?", o: ["Umsatz − alle Kosten", "EBIT − Steuern", "EBIT + Abschreibungen und Amortisation", "NOPAT + Zinsen"], c: 2, e: "EBITDA = EBIT zzgl. Abschreibungen und Amortisation – zeigt die operative Ertragskraft unabhängig von der Abschreibungspolitik." },
+    { cat: "Analyse", q: "Damit eine Ressource nach VRIO einen dauerhaften Vorteil begründet, muss sie u. a. sein:", o: ["verfügbar, riskant, imitierbar, offen", "wertvoll, selten, schwer imitierbar, organisational nutzbar", "variabel, robust, integriert, offen", "wertvoll, standardisiert, imitierbar, ordentlich"], c: 1, e: "VRIO = Valuable, Rare, Inimitable, Organized. Nur Ressourcen mit allen vier Eigenschaften stiften dauerhafte Wettbewerbsvorteile." },
+    { cat: "Analyse", q: "Ein Stakeholder mit hoher Macht, aber geringem Interesse sollte …", o: ["eng gemanagt werden", "zufrieden gehalten werden", "nur beobachtet werden", "ignoriert werden"], c: 1, e: "Hohe Macht / geringes Interesse → „Zufrieden halten“, um Widerstand zu vermeiden." },
+    { cat: "Zielplanung", q: "Wofür steht das „A“ in SMART?", o: ["Absolut", "Attraktiv/akzeptiert", "Analytisch", "Aktuell"], c: 1, e: "SMART = Spezifisch, Messbar, Attraktiv/akzeptiert, Realistisch, Terminiert." },
+    { cat: "Zielplanung", q: "Was ist das zentrale Ziel der Szenario-Analyse?", o: ["Eine einzige exakte Prognose zu erstellen", "Mehrere plausible, konsistente Zukunftsbilder zu entwickeln", "Den Marktanteil zu berechnen", "Kennzahlen zu vergleichen"], c: 1, e: "Die Szenario-Analyse spannt mit mehreren konsistenten Zukunftsbildern (z. B. Best/Worst Case) den Möglichkeitsraum auf." },
+    { cat: "Strategiewahl", q: "Was besagt die TOWS-Strategie „SO“?", o: ["Stärken nutzen, um Chancen zu ergreifen", "Schwächen abbauen, um Chancen zu nutzen", "Stärken nutzen, um Risiken abzuwehren", "Schwächen und Risiken begrenzen"], c: 0, e: "SO = Strengths × Opportunities: eigene Stärken einsetzen, um externe Chancen zu nutzen (Ausbaustrategie)." },
+    { cat: "Strategiewahl", q: "Ein Geschäft mit hohem Marktwachstum und niedrigem relativem Marktanteil ist im BCG-Portfolio ein …", o: ["Star", "Cash Cow", "Dog", "Question Mark"], c: 3, e: "Hohes Wachstum + niedriger Anteil = Question Mark (Fragezeichen); Investition oder Rückzug ist zu prüfen." },
+    { cat: "Strategiewahl", q: "Welches Feld der Ansoff-Matrix gilt als am riskantesten?", o: ["Marktdurchdringung", "Marktentwicklung", "Produktentwicklung", "Diversifikation"], c: 3, e: "Diversifikation (neue Produkte in neuen Märkten) verbindet die höchste Unsicherheit, weil weder Markt noch Produkt vertraut sind." },
+    { cat: "Strategiewahl", q: "Was beschreibt Porters „stuck in the middle“?", o: ["Eine bewusste Nischenstrategie", "Fehlende klare Ausrichtung zwischen Kostenführerschaft und Differenzierung", "Die Marktmitte mit dem höchsten Absatz", "Eine Kombination aus Fokus und Wachstum"], c: 1, e: "Wer weder konsequent Kosten führt noch klar differenziert, bleibt „stuck in the middle“ – ohne dauerhaften Wettbewerbsvorteil." },
+    { cat: "Umsetzung", q: "Welche ist KEINE Perspektive der Balanced Scorecard?", o: ["Finanzperspektive", "Kundenperspektive", "Lieferantenperspektive", "Lern- und Entwicklungsperspektive"], c: 2, e: "Die vier BSC-Perspektiven sind Finanzen, Kunden, interne Prozesse sowie Lernen & Entwicklung." },
+    { cat: "Umsetzung", q: "Die strategische Frühaufklärung reagiert vor allem auf …", o: ["abgeschlossene Jahresabschlüsse", "schwache Signale und Diskontinuitäten im Umfeld", "die Tagesliquidität", "bereits eingetretene Krisen"], c: 1, e: "Frühaufklärung erfasst „schwache Signale“ früh, um auf Diskontinuitäten reagieren zu können, bevor sie voll wirksam werden." },
   ];
+
+  const GLOSSARY = [
+    ["Strategie", "Grundsätzliche, langfristig orientierte Ausrichtung eines Unternehmens: legt Geschäftsfelder, Wettbewerbsvorteile und die Verwendung der Ressourcen fest."],
+    ["Strategisches vs. operatives Management", "Strategisch = langfristige, zukunfts- und umweltorientierte Existenzsicherung. Operativ = kurz-/mittelfristige, interne Steuerung von Umsatz, Gewinn und Liquidität."],
+    ["Vision", "Konkretes, ambitioniertes Zukunftsbild („Wo wollen wir hin?“), das Orientierung und Motivation gibt."],
+    ["Leitbild / Mission", "Grundlegendes Selbstverständnis eines Unternehmens: Zweck, Werte und Verhaltensgrundsätze gegenüber den Anspruchsgruppen."],
+    ["Abell-Schema", "Marktabgrenzung über drei Dimensionen: Kundengruppen (wer), Kundenfunktionen (was) und Technologien (wie)."],
+    ["PESTEL", "Analyse der globalen Umwelt anhand von Political, Economic, Social, Technological, Environmental und Legal."],
+    ["Five Forces", "Branchenstrukturanalyse nach Porter: Rivalität, neue Anbieter, Ersatzprodukte sowie Verhandlungsmacht von Lieferanten und Abnehmern."],
+    ["Strategische Gruppen", "Unternehmen einer Branche mit ähnlicher Strategie; die Positionierung zeigt Wettbewerbsintensität und Mobilitätsbarrieren."],
+    ["Stakeholder", "Anspruchsgruppen mit Interesse am oder Einfluss auf das Unternehmen; Priorisierung über die Macht-Interesse-Matrix."],
+    ["SWOT", "Gegenüberstellung interner Stärken/Schwächen und externer Chancen/Risiken als Grundlage der Strategieentwicklung."],
+    ["TOWS", "Verknüpfung der SWOT-Felder zu Normstrategien: SO (ausbauen), ST (absichern), WO (aufholen), WT (vermeiden)."],
+    ["Wertkette", "Zerlegung des Unternehmens in Primär- und Unterstützungsaktivitäten, um Quellen von Kosten- oder Differenzierungsvorteilen zu finden."],
+    ["Kernkompetenz", "Wettbewerbsentscheidende, schwer imitierbare Fähigkeit, die Zugang zu mehreren Märkten eröffnet und Kundennutzen stiftet."],
+    ["VRIO", "Prüfraster für Ressourcen: Valuable, Rare, Inimitable, Organized – nur wenn alles erfüllt ist, entsteht ein dauerhafter Vorteil."],
+    ["MBV (Market-based View)", "Erklärt Wettbewerbsvorteile aus der Branchen- und Marktpositionierung (outside-in)."],
+    ["RBV (Resource-based View)", "Erklärt Wettbewerbsvorteile aus einzigartigen internen Ressourcen und Kernkompetenzen (inside-out)."],
+    ["Erfahrungskurve", "Empirischer Zusammenhang, dass die Stückkosten mit kumulierter Ausbringungsmenge sinken – Basis von Kostenführerschaftsstrategien."],
+    ["Produktlebenszyklus", "Idealtypischer Verlauf Einführung, Wachstum, Reife, Sättigung, Rückgang – mit unterschiedlichen strategischen Schwerpunkten."],
+    ["BCG-Portfolio", "Vier-Felder-Matrix aus Marktwachstum und relativem Marktanteil: Stars, Question Marks, Cash Cows, Dogs."],
+    ["McKinsey-Portfolio", "Neun-Felder-Matrix aus Marktattraktivität und relativer Wettbewerbsstärke zur Portfoliosteuerung."],
+    ["Benchmarking", "Systematischer Vergleich von Prozessen, Produkten oder Kennzahlen mit Wettbewerbern oder Best-Practice-Beispielen."],
+    ["SMART-Ziele", "Zielformulierung: Spezifisch, Messbar, Attraktiv/akzeptiert, Realistisch, Terminiert."],
+    ["Zielhierarchie", "Ableitung von Zielen von der Unternehmensspitze bis zur operativen Ebene (Ober-, Zwischen- und Unterziele)."],
+    ["Szenario-Analyse", "Entwicklung mehrerer konsistenter Zukunftsbilder (Szenariotrichter, z. B. Best/Worst Case) zum Umgang mit Unsicherheit."],
+    ["Ansoff-Matrix", "Wachstumsstrategien in der Produkt-Markt-Matrix: Marktdurchdringung, Marktentwicklung, Produktentwicklung, Diversifikation."],
+    ["Generische Strategien (Porter)", "Kostenführerschaft, Differenzierung und Fokus (Nische) als grundlegende Wege zum Wettbewerbsvorteil."],
+    ["Stuck in the middle", "Fehlende klare Ausrichtung zwischen Kostenführerschaft und Differenzierung – gilt als riskante Zwischenposition."],
+    ["Diversifikation", "Wachstum mit neuen Produkten in neuen Märkten – die risikoreichste Ansoff-Stoßrichtung (horizontal, vertikal, lateral)."],
+    ["Make or Buy", "Entscheidung über Eigenerstellung oder Fremdbezug von Leistungen entlang der Wertschöpfung."],
+    ["M&A / externes Wachstum", "Wachstum durch Fusionen und Übernahmen statt aus eigener Kraft (internes Wachstum)."],
+    ["Strategische Allianz", "Kooperation rechtlich selbstständiger Unternehmen zur Verfolgung gemeinsamer strategischer Ziele."],
+    ["Business Model Canvas", "Neun-Bausteine-Modell zur Beschreibung eines Geschäftsmodells von Kundensegmenten bis Kostenstruktur."],
+    ["Balanced Scorecard", "Umsetzungssystem mit vier Perspektiven: Finanzen, Kunden, interne Prozesse, Lernen & Entwicklung."],
+    ["Strategy Map", "Ursache-Wirkungs-Diagramm, das die strategischen Ziele der BSC-Perspektiven verknüpft."],
+    ["EVA", "Economic Value Added = NOPAT − (investiertes Kapital × WACC). Positiv bedeutet Wertschaffung über den Kapitalkosten."],
+    ["WACC", "Weighted Average Cost of Capital – gewichteter Mischzinssatz aus Eigen- und Fremdkapitalkosten."],
+    ["NOPAT", "Net Operating Profit After Taxes – operativer Gewinn nach Steuern, aber vor Finanzierungskosten."],
+    ["EBIT / EBITDA", "EBIT = Ergebnis vor Zinsen und Steuern. EBITDA = EBIT zzgl. Abschreibungen und Amortisation (operative Ertragskraft)."],
+    ["KPI", "Key Performance Indicator – Steuerungskennzahl, die den Fortschritt gegenüber einem strategischen Ziel misst."],
+    ["Prämissenkontrolle", "Laufende Überprüfung der Annahmen, auf denen eine Strategie beruht, um bei Abweichungen gegenzusteuern."],
+    ["Frühaufklärung / schwache Signale", "Frühzeitiges Erkennen von Diskontinuitäten anhand schwacher Signale, bevor sie voll wirksam werden."],
+  ];
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
   // Lernkarten
   let fcIndex = 0;
+  function isKnown(term) { return state.learn.known.includes(term); }
+  function setKnown(term, val) {
+    const arr = state.learn.known;
+    const i = arr.indexOf(term);
+    if (val && i < 0) arr.push(term);
+    if (!val && i >= 0) arr.splice(i, 1);
+    save();
+  }
   function renderFlashcard() {
     const card = FLASHCARDS[fcIndex];
     $("#fc-front-text").textContent = card[0];
     $("#fc-back-text").textContent = card[1];
-    $("#flashcard").classList.remove("flipped");
+    const fc = $("#flashcard");
+    fc.classList.remove("flipped");
     $("#fc-count").textContent = `${fcIndex + 1} / ${FLASHCARDS.length}`;
+    const known = isKnown(card[0]);
+    fc.classList.toggle("is-known", known);
+    $("#fc-known").classList.toggle("is-active", known);
+    const n = state.learn.known.length;
+    $("#fc-progress").textContent = `${n} / ${FLASHCARDS.length} als „kann ich“ markiert`;
   }
   function wireFlashcards() {
     const fc = $("#flashcard");
@@ -1256,39 +1370,61 @@
     fc.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fc.classList.toggle("flipped"); } });
     $("#fc-prev").addEventListener("click", () => { fcIndex = (fcIndex - 1 + FLASHCARDS.length) % FLASHCARDS.length; renderFlashcard(); });
     $("#fc-next").addEventListener("click", () => { fcIndex = (fcIndex + 1) % FLASHCARDS.length; renderFlashcard(); });
+    $("#fc-known").addEventListener("click", () => {
+      const term = FLASHCARDS[fcIndex][0];
+      setKnown(term, !isKnown(term));
+      if (isKnown(term)) { fcIndex = (fcIndex + 1) % FLASHCARDS.length; }
+      renderFlashcard();
+    });
+    $("#fc-unknown").addEventListener("click", () => {
+      setKnown(FLASHCARDS[fcIndex][0], false);
+      fcIndex = (fcIndex + 1) % FLASHCARDS.length;
+      renderFlashcard();
+    });
   }
 
   // Quiz
+  let quizFilter = "all";
+  function buildQuizFilter() {
+    const sel = $("#quiz-filter");
+    if (!sel) return;
+    const cats = [...new Set(QUIZ.map((q) => q.cat))];
+    sel.innerHTML = `<option value="all">Alle Themen</option>` +
+      cats.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+    sel.value = quizFilter;
+  }
   function renderQuiz() {
     const list = $("#quiz-list");
     list.innerHTML = "";
-    $("#quiz-total").textContent = QUIZ.length;
+    const set = shuffle(QUIZ.filter((q) => quizFilter === "all" || q.cat === quizFilter));
+    $("#quiz-total").textContent = set.length;
     $("#quiz-score").textContent = "0";
     let score = 0;
-    const answered = new Array(QUIZ.length).fill(false);
-    QUIZ.forEach((item, qi) => {
+    const answered = new Array(set.length).fill(false);
+    set.forEach((item, qi) => {
       const card = document.createElement("div");
       card.className = "quiz-card";
       const h = document.createElement("h3");
-      h.textContent = `${qi + 1}. ${item.q}`;
+      h.innerHTML = `${qi + 1}. ${escapeHtml(item.q)} <span class="quiz-tag">${escapeHtml(item.cat)}</span>`;
       const opts = document.createElement("div");
       opts.className = "quiz-opts";
-      item.o.forEach((opt, oi) => {
+      const choices = shuffle(item.o.map((text, idx) => ({ text, correct: idx === item.c })));
+      choices.forEach((choice) => {
         const b = document.createElement("button");
-        b.type = "button"; b.className = "quiz-opt"; b.textContent = opt;
+        b.type = "button"; b.className = "quiz-opt"; b.textContent = choice.text;
         b.addEventListener("click", () => {
           if (answered[qi]) return;
           answered[qi] = true;
           const buttons = $$(".quiz-opt", opts);
           buttons.forEach((btn, bi) => {
             btn.disabled = true;
-            if (bi === item.c) btn.classList.add("correct");
+            if (choices[bi].correct) btn.classList.add("correct");
           });
-          if (oi === item.c) { b.classList.add("correct"); score++; $("#quiz-score").textContent = String(score); }
+          if (choice.correct) { score++; $("#quiz-score").textContent = String(score); }
           else b.classList.add("wrong");
           const ex = document.createElement("p");
           ex.className = "quiz-explain";
-          ex.textContent = (oi === item.c ? "Richtig. " : "Nicht ganz. ") + item.e;
+          ex.textContent = (choice.correct ? "Richtig. " : "Nicht ganz. ") + item.e;
           card.appendChild(ex);
         });
         opts.appendChild(b);
@@ -1299,6 +1435,8 @@
   }
   function wireQuiz() {
     $("#quiz-restart").addEventListener("click", renderQuiz);
+    const sel = $("#quiz-filter");
+    if (sel) sel.addEventListener("change", () => { quizFilter = sel.value; renderQuiz(); });
     $("#quiz-mode").addEventListener("click", (e) => {
       const btn = e.target.closest(".mode-btn"); if (!btn) return;
       $$(".mode-btn").forEach((m) => m.classList.toggle("is-active", m === btn));
@@ -1306,6 +1444,25 @@
       $("#mode-cards").classList.toggle("is-active", mode === "cards");
       $("#mode-quiz").classList.toggle("is-active", mode === "quiz");
     });
+  }
+
+  // Glossar
+  function renderGlossar(filter) {
+    const dl = $("#glossar-list");
+    if (!dl) return;
+    const q = (filter || "").trim().toLowerCase();
+    const items = GLOSSARY.filter(([t, d]) => !q || t.toLowerCase().includes(q) || d.toLowerCase().includes(q));
+    dl.innerHTML = items.length
+      ? items.map(([t, d]) => `<div class="glossar-item"><dt>${escapeHtml(t)}</dt><dd>${escapeHtml(d)}</dd></div>`).join("")
+      : `<p class="glossar-empty">Kein Begriff gefunden.</p>`;
+    $("#glossar-count").textContent = q
+      ? `${items.length} von ${GLOSSARY.length} Begriffen`
+      : `${GLOSSARY.length} Begriffe`;
+  }
+  function wireGlossar() {
+    const s = $("#glossar-search");
+    if (!s) return;
+    s.addEventListener("input", () => renderGlossar(s.value));
   }
 
   /* ---------- Strategie-Dossier ---------- */
@@ -1499,6 +1656,14 @@
         return `<div class="dossier-bsc"><h3 class="dossier-sub">${p.label}</h3>${body}</div>`;
       }).join("")));
 
+    // Frühwarn-/KPI-Tracker
+    if (state.kontrolle.indicators.length) {
+      const rows = state.kontrolle.indicators.map((ind) =>
+        `<tr><td>${esc(ind.name)}</td><td>${esc(ind.target || "")}</td><td>${esc(ind.actual || "")}</td><td>${KPI_STATUS[ind.status] || ""}</td></tr>`).join("");
+      parts.push(section("Frühwarn- & KPI-Tracker",
+        `<table class="dossier-table"><thead><tr><th>Indikator</th><th>Ziel</th><th>Ist</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`));
+    }
+
     root.innerHTML = parts.join("");
   }
 
@@ -1527,6 +1692,7 @@
     { v: "strategiewahl", label: "Strategiewahl", has: () => state.strategiewahl.options.length > 0 },
     { v: "bmc", label: "Business Model Canvas", has: () => listHas(state.bmc) },
     { v: "bsc", label: "Balanced Scorecard", has: () => listHas(state.bsc) },
+    { v: "kontrolle", label: "Frühwarn-/KPI-Tracker", has: () => state.kontrolle.indicators.length > 0 },
     { v: "fallstudie", label: "Fallstudien-Report", has: () => { const f = state.fallstudie; return !!(f.company || f.titel || (f.sources || []).length || f.ki || Object.values(f.sections).some((x) => String(x).trim() !== "")); } },
   ];
   function renderDashboard() {
@@ -1602,6 +1768,10 @@
     s.bsc.customer = [{ ziel: "Zufriedenheit erhöhen", kennzahl: "NPS", zielwert: "> 40", massnahme: "Support verbessern" }];
     s.bsc.process = [{ ziel: "Time-to-Market senken", kennzahl: "Releasezyklus", zielwert: "−20 %", massnahme: "CI/CD einführen" }];
     s.bsc.learning = [{ ziel: "Kompetenzen aufbauen", kennzahl: "Schulungstage/Jahr", zielwert: "5", massnahme: "Weiterbildungsprogramm" }];
+    s.kontrolle = { indicators: [
+      { name: "Marktanteil DACH", target: "15 %", actual: "12 %", dir: "hoch", status: "amber" },
+      { name: "Kundenzufriedenheit (NPS)", target: "> 40", actual: "45", dir: "hoch", status: "green" },
+      { name: "Fluktuationsrate", target: "< 8 %", actual: "11 %", dir: "niedrig", status: "red" }] };
     s.fallstudie = { company: "SAP SE", titel: "Strategische Analyse eines Unternehmens", gruppe: "", ki: "", sources: ["Geschäftsbericht 2024"],
       sections: { einleitung: "Diese Fallstudie analysiert Lage, Umfeld und Strategie des gewählten Unternehmens.", ueberblick: "", extern: "", intern: "", swotopt: "", diskussion: "", fazit: "" } };
     return s;
@@ -1682,6 +1852,7 @@
     initListTool("#bmc-root", state.bmc, BMC_BLOCKS);
     initListTool("#ansoff-root", state.ansoff, ANSOFF_CELLS);
     $$("#ansoff-root .list-card").forEach((el, i) => el.classList.add("ansoff-cell-" + i));
+    renderKpi();
     buildBSC();
     initListTool("#abell-root", state.abell, ABELL_CATS);
     renderZiele();
@@ -1695,18 +1866,22 @@
     renderKnowledge();
     renderForcesChecklist();
     renderFlashcard();
+    buildQuizFilter();
     renderQuiz();
+    renderGlossar("");
     renderDashboard();
     refreshSwotDerived();
   }
   wireSwotForms();
   wireWettbewerb();
+  wireKpi();
   wireSzenario();
   wireKennzahlen();
   wireFallstudie();
   wireStrategiewahl();
   wireFlashcards();
   wireQuiz();
+  wireGlossar();
   initAll();
   updatePager("prozess");
 })();

@@ -360,9 +360,22 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .fc-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 16px 0 4px; }
 .fc-count { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 64px; text-align: center; }
 .fc-tip { text-align: center; color: var(--muted); font-size: .82rem; margin: 4px 0 0; }
+.flashcard.is-known .fc-front { border-top-color: var(--good); }
+.fc-mark { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
+.fc-mark-btn { appearance: none; cursor: pointer; font: inherit; font-size: .9rem; padding: 8px 16px;
+  border-radius: 999px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); }
+.fc-mark-btn.known:hover, .fc-mark-btn.known.is-active { border-color: var(--good);
+  background: color-mix(in srgb, var(--good) 14%, var(--page)); color: var(--good); font-weight: 600; }
+.fc-mark-btn.unknown:hover { border-color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 14%, var(--page)); color: var(--text-primary); }
 
 /* Quiz */
-.quiz-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: .95rem; }
+.quiz-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; font-size: .95rem; }
+.quiz-actions { display: flex; align-items: center; gap: 8px; }
+#quiz-filter { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary); cursor: pointer; }
+.quiz-tag { display: inline-block; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted); background: var(--surface-2); border-radius: 999px; padding: 2px 9px; margin-left: 6px; vertical-align: middle; }
 .quiz-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 16px; margin-bottom: 14px; }
 .quiz-card h3 { margin: 0 0 12px; font-size: 1rem; }
@@ -375,6 +388,19 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .quiz-opt.wrong { border-color: var(--critical); background: color-mix(in srgb, var(--critical) 14%, var(--page)); }
 .quiz-explain { margin: 12px 0 0; font-size: .9rem; color: var(--text-secondary);
   border-left: 3px solid var(--series-1); padding: 6px 0 6px 12px; }
+
+/* Glossar */
+.glossar-search { width: 100%; max-width: 520px; font: inherit; padding: 11px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+.glossar-search:focus { outline: none; border-color: var(--series-1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--series-1) 20%, transparent); }
+.glossar-count { color: var(--muted); font-size: .82rem; margin: 8px 0 16px; }
+.glossar-list { display: grid; gap: 10px; margin: 0; }
+.glossar-item { background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--series-1);
+  border-radius: var(--radius); padding: 12px 16px; }
+.glossar-item dt { font-weight: 700; margin: 0 0 3px; }
+.glossar-item dd { margin: 0; color: var(--text-secondary); font-size: .92rem; line-height: 1.5; }
+.glossar-empty { color: var(--muted); padding: 12px 0; }
 
 /* Fallstudien-Report */
 #fs-company-select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
@@ -574,6 +600,15 @@ button:active { transform: translateY(1px); }
 .sw-foot { margin-top: 12px; }
 .sw-foot .add-form { max-width: 360px; }
 
+/* Frühwarn-/KPI-Tracker (6.3) */
+.kpi-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; background: var(--surface-1);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow-sm); }
+.kpi-form input[type=text] { flex: 1 1 150px; }
+.kpi-form select { flex: 0 1 auto; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--page); color: var(--text-primary); font: inherit; }
+.kpi-badge { font-size: .85rem; white-space: nowrap; font-weight: 600; }
+.kpi-badge.kpi-green { color: var(--good); } .kpi-badge.kpi-amber { color: var(--warning); } .kpi-badge.kpi-red { color: var(--critical); }
+
 /* Ansoff- & Porter-Matrix (5.1) */
 .ansoff-block, .porter-block { max-width: 780px; }
 .ansoff-cols, .porter-cols { display: grid; grid-template-columns: 26px 1fr 1fr; gap: 8px; margin-bottom: 6px; }
@@ -594,9 +629,11 @@ button:active { transform: translateY(1px); }
 .porter-cell h4 { margin: 0 0 4px; font-size: 1rem; }
 .porter-cell p { margin: 0; color: var(--text-secondary); font-size: .88rem; }
 @media (max-width: 600px) {
-  .ansoff-cols, .porter-cols, .ansoff-main, .porter-main { grid-template-columns: 1fr; }
+  .ansoff-cols, .porter-cols { display: none; }
+  .ansoff-main, .porter-main { grid-template-columns: 1fr; }
   .ansoff-rowlabels, .porter-rowlabels { display: none; }
   .ansoff, .porter-grid { grid-template-columns: 1fr; grid-template-rows: none; grid-template-areas: none; }
+  .ansoff .list-card { grid-area: auto !important; }
 }
 
 /* Wettbewerbsumfeld – Strategische-Gruppen-Karte */

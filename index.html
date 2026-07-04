@@ -67,6 +67,7 @@
           <p class="nav-head">Werkzeuge & Export</p>
           <button class="nav-item" data-view="fallstudie">Fallstudien-Report</button>
           <button class="nav-item" data-view="quiz">Selbsttest</button>
+          <button class="nav-item" data-view="glossar">Glossar</button>
           <button class="nav-item" data-view="dossier">Strategie-Dossier</button>
         </div>
       </nav>
@@ -85,7 +86,7 @@
       </div>
 
       <details class="dash" id="dash" open>
-        <summary class="dash-summary"><strong id="dash-count">0 / 16</strong>&nbsp;Werkzeugen befüllt</summary>
+        <summary class="dash-summary"><strong id="dash-count">0 / 17</strong>&nbsp;Werkzeugen befüllt</summary>
         <div class="dash-body">
           <div class="dash-actions"><button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button></div>
           <div class="dash-bar"><span id="dash-bar-fill"></span></div>
@@ -466,16 +467,35 @@
           <span id="fc-count" class="fc-count"></span>
           <button id="fc-next" class="ghost">Weiter ›</button>
         </div>
-        <p class="fc-tip">Karte anklicken zum Umdrehen.</p>
+        <div class="fc-mark">
+          <button id="fc-unknown" class="fc-mark-btn unknown" type="button">✗ Nochmal üben</button>
+          <button id="fc-known" class="fc-mark-btn known" type="button">✓ Kann ich</button>
+        </div>
+        <p class="fc-tip">Karte anklicken zum Umdrehen · <span id="fc-progress"></span></p>
       </div>
 
       <div class="mode-panel" id="mode-quiz">
         <div class="quiz-head">
           <span>Punkte: <strong id="quiz-score">0</strong> / <span id="quiz-total">0</span></span>
-          <button id="quiz-restart" class="ghost">Neu starten</button>
+          <div class="quiz-actions">
+            <select id="quiz-filter" aria-label="Kapitel filtern"></select>
+            <button id="quiz-restart" class="ghost">Neu &amp; mischen</button>
+          </div>
         </div>
         <div id="quiz-list"></div>
       </div>
+    </section>
+
+    <!-- GLOSSAR -->
+    <section class="view" id="view-glossar">
+      <div class="view-head">
+        <h2>Glossar</h2>
+        <p class="lead">Nachschlagewerk der wichtigsten Begriffe des strategischen Managements.
+        Tippen Sie in das Suchfeld, um nach Begriff oder Erklärung zu filtern.</p>
+      </div>
+      <input type="search" id="glossar-search" class="glossar-search" placeholder="Begriff oder Stichwort suchen …" autocomplete="off" />
+      <p id="glossar-count" class="glossar-count"></p>
+      <dl id="glossar-list" class="glossar-list"></dl>
     </section>
 
     <!-- 2 ANSÄTZE -->
@@ -598,6 +618,23 @@
       <article class="know"><h3>Arten der strategischen Kontrolle</h3><p><strong>Prämissenkontrolle</strong> (Gelten die Planungsannahmen noch?), <strong>Durchführungskontrolle</strong> (Wird der Plan erreicht?) und <strong>strategische Überwachung</strong> (ungerichtetes Beobachten des Umfelds).</p></article>
       <article class="know"><h3>Frühaufklärung</h3><p>Frühwarn- und Frühaufklärungssysteme erfassen <strong>schwache Signale</strong> (Ansoff), um Chancen und Risiken zu erkennen, bevor sie voll wirksam werden.</p></article>
       <article class="know"><h3>Instrumente</h3><p>Die <em>Balanced Scorecard</em> dient zugleich als Kontrollinstrument (Soll-Ist-Vergleich der Kennzahlen); <em>Szenarien</em> liefern Referenzpunkte für die Prämissenkontrolle.</p></article>
+
+      <h3 class="sub">Frühwarn- &amp; KPI-Tracker</h3>
+      <p class="lead">Steuerungsgrößen und Frühwarnindikatoren mit Soll-Ist-Vergleich überwachen. Die
+      <strong>Ampel</strong> zeigt je Indikator, ob der Zielwert erreicht wird – ideal zur
+      Durchführungskontrolle und zum Erkennen schwacher Signale.</p>
+      <form class="kpi-form" id="kpi-form">
+        <input type="text" name="name" required placeholder="Indikator (z. B. Marktanteil)" />
+        <input type="text" name="target" placeholder="Zielwert (z. B. 15 %)" />
+        <input type="text" name="actual" placeholder="Ist-Wert (z. B. 12 %)" />
+        <select name="dir" title="Zielrichtung"><option value="hoch">↑ höher besser</option><option value="niedrig">↓ niedriger besser</option></select>
+        <select name="status" title="Ampel"><option value="green">🟢 im Plan</option><option value="amber">🟡 beobachten</option><option value="red">🔴 kritisch</option></select>
+        <button type="submit">Hinzufügen</button>
+      </form>
+      <table class="bcg-table kpi-table">
+        <thead><tr><th>Indikator</th><th>Ziel</th><th>Ist</th><th>Richtung</th><th>Status</th><th></th></tr></thead>
+        <tbody id="kpi-tbody"></tbody>
+      </table>
     </section>
 
     <!-- DOSSIER -->
