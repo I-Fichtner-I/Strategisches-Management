@@ -152,11 +152,11 @@ input[type=text], input[type=number] {
 .force-top h3 { margin: 0; font-size: 1.05rem; }
 .force-val { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--series-1); }
 .force-badge { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
+/* Neutrales Niveau-Badge: die Staerke einer einzelnen Kraft ist eine analytische
+   Aussage, keine Zielerreichungs-Ampel. Die gruen-gelb-rot-Wertung liegt allein
+   beim Branchenattraktivitaets-Gauge. */
 .force-level { font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
   background: var(--grid); color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
-.force-level.lvl-stark { background: color-mix(in srgb, var(--critical) 18%, transparent); color: var(--critical); }
-.force-level.lvl-mittel { background: color-mix(in srgb, var(--warning) 20%, transparent); color: var(--warning); }
-.force-level.lvl-schwach { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
 .force-note-hint { margin: 4px 0 12px; font-size: .82rem; color: var(--muted); }
 .drivers { display: grid; gap: 12px; }
 .driver { padding: 6px 0; }
