@@ -22,7 +22,7 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 | **Stakeholder-Matrix** | Zielplanung | Anspruchsgruppen nach Macht und Interesse positionieren und passende Steuerungsstrategie ableiten. |
 | **SMART-Ziele** | Zielplanung | Ziele formulieren und automatisch auf die fünf SMART-Kriterien prüfen. |
 | **PESTEL-Analyse** | Umweltanalyse | Einflussfaktoren der globalen Umwelt in sechs Feldern erfassen. |
-| **Porters Five Forces** | Umweltanalyse | Die fünf Wettbewerbskräfte bewerten und die **Branchenattraktivität** berechnen – inkl. **Checkliste**, wann jede Kraft stark ist. |
+| **Porters Five Forces** | Umweltanalyse | Jede der fünf Wettbewerbskräfte über ihre einzelnen **Treiber** (sehr niedrig … sehr hoch) einstellen; daraus werden Kraftstärke und **Branchenattraktivität** automatisch berechnet. |
 | **Wertkette** | Unternehmensanalyse | Primär- und Unterstützungsaktivitäten analysieren. |
 | **Szenario-Analyse** | Umweltanalyse | Problem, Einflussfaktoren und zwei kontrastierende Zukunftsszenarien entwickeln. |
 | **Strategische Kennzahlen** | Analyse & Steuerung | EBITDA/EBITDA-Marge und EVA berechnen; wert- vs. traditionell einordnen. |

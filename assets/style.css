@@ -301,16 +301,6 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .kb-cards h5 { margin: 0 0 4px; color: var(--text-primary); font-size: .9rem; }
 .kb-cards p { margin: 0; font-size: .85rem; }
 
-/* Five-Forces-Checkliste */
-.checklist { margin-top: 20px; }
-.cl-force { margin-bottom: 14px; }
-.cl-force h4 { margin: 0 0 2px; font-size: .95rem; color: var(--text-primary); }
-.cl-note { margin: 0 0 8px; font-size: .85rem; color: var(--muted); }
-.cl-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 16px; }
-.cl-list li { display: flex; justify-content: space-between; gap: 10px; font-size: .88rem; padding: 3px 0; border-bottom: 1px solid var(--border); }
-.cl-val { font-weight: 700; flex: none; }
-.cl-hoch { color: var(--good); } .cl-niedrig { color: var(--critical); }
-
 /* Badges */
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; }
 .badge.ok { background: var(--good); color: #fff; }

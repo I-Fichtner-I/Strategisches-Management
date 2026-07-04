@@ -149,7 +149,7 @@
     },
     forces: {
       def: "Die <strong>Branchenstrukturanalyse (Five Forces)</strong> nach Porter beurteilt die Attraktivität einer Branche anhand von fünf Wettbewerbskräften. Je stärker die Kräfte insgesamt, desto <strong>geringer</strong> das Gewinnpotenzial und die Attraktivität der Branche.",
-      leitfragen: ["Wie stark ist jede der fünf Kräfte (siehe Checkliste)?", "Welche Kraft dominiert und warum?", "Wie könnte sich die Branchenstruktur künftig verändern?", "Welche strategischen Konsequenzen ergeben sich?"],
+      leitfragen: ["Wie stark ist jede der fünf Kräfte (aus den Treibern abgeleitet)?", "Welche Kraft dominiert und warum?", "Wie könnte sich die Branchenstruktur künftig verändern?", "Welche strategischen Konsequenzen ergeben sich?"],
     },
     wertkette: {
       def: "Die <strong>Wertkette</strong> nach Porter zerlegt das Unternehmen in wertschöpfende <strong>Primäraktivitäten</strong> (Eingangslogistik, Produktion, Ausgangslogistik, Marketing &amp; Vertrieb, Kundendienst) und <strong>Unterstützungsaktivitäten</strong> (Infrastruktur, Personal, Technologie, Beschaffung). Ziel ist es, Quellen von Wettbewerbsvorteilen (Kosten oder Differenzierung) aufzudecken.",
@@ -213,15 +213,6 @@
       if (k.leitfragen) inner += `<h4>Leitfragen</h4><ul>${k.leitfragen.map((x) => `<li>${x}</li>`).join("")}</ul>`;
       slot.innerHTML = `<details class="kb"><summary>Theorie &amp; Leitfragen</summary><div class="kb-body">${inner}</div></details>`;
     });
-  }
-
-  function renderForcesChecklist() {
-    const box = $("#forces-checklist"); if (!box) return;
-    box.innerHTML = `<details class="kb"><summary>Checkliste: Wann ist eine Wettbewerbskraft stark?</summary><div class="kb-body">${
-      FORCES.map((f) => `<div class="cl-force"><h4>${f.label}</h4><p class="cl-note">${f.note}:</p><ul class="cl-list">${
-        f.drivers.map((d) => `<li><span>${d[0]}</span><span class="cl-val cl-${d[1]}">${d[1]}</span></li>`).join("")
-      }</ul></div>`).join("")
-    }</div></details>`;
   }
 
   /* ---------- Navigation (Kapitelstruktur) ---------- */
@@ -459,10 +450,10 @@
   function refreshSwotDerived() { renderDerived(); renderTows(); if (document.getElementById("sw-matrix")) renderStrategiewahl(); }
 
   /* ---------- Five Forces ----------
-     Jede Kraft wird nicht direkt bewertet, sondern über ihre einzelnen Treiber
-     (Checkliste). Jeder Treiber wird von "sehr niedrig" (1) bis "sehr hoch" (5)
-     eingestellt; das zweite Element gibt an, bei welcher Ausprägung die Kraft
-     STARK ist ("hoch" oder "niedrig"). Daraus ergibt sich die Stärke der Kraft. */
+     Jede Kraft wird nicht direkt bewertet, sondern über ihre einzelnen Treiber.
+     Jeder Treiber wird von "sehr niedrig" (1) bis "sehr hoch" (5) eingestellt;
+     das zweite Element gibt an, bei welcher Ausprägung die Kraft STARK ist
+     ("hoch" oder "niedrig"). Daraus ergibt sich die Stärke der Kraft. */
   const FORCES = [
     { key: "rivalry", label: "Rivalität unter Wettbewerbern", short: "Wettbewerbsrivalität",
       note: "stark, wenn der Verdrängungswettbewerb intensiv ist", drivers: [
@@ -473,7 +464,7 @@
       note: "stark, wenn die Markteintrittsbarrieren niedrig sind", drivers: [
       ["Skaleneffekte (Economies of Scale)", "niedrig"], ["Produktdifferenzierung", "niedrig"], ["Kapitalbedarf", "niedrig"],
       ["Wechselkosten", "niedrig"], ["Kontrolle der Vertriebskanäle durch Etablierte", "niedrig"],
-      ["Geschütztes Wissen der Etablierten", "niedrig"], ["Zugang der Etablierten zu Rohstoffen", "niedrig"], ["Zugang zu staatlichen Subventionen", "niedrig"],
+      ["Geschütztes Wissen der Etablierten", "niedrig"], ["Zugang der Etablierten zu Rohstoffen", "niedrig"], ["Staatliche Subventionen für Etablierte", "niedrig"],
     ]},
     { key: "suppliers", label: "Verhandlungsmacht der Lieferanten", short: "Lieferantenmacht",
       note: "stark, wenn Lieferanten Druck ausüben können", drivers: [
@@ -1911,7 +1902,6 @@
     setFallstudieValues();
     renderStrategiewahl();
     renderKnowledge();
-    renderForcesChecklist();
     renderFlashcard();
     buildQuizFilter();
     renderQuiz();
