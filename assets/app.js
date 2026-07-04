@@ -63,8 +63,11 @@
   const defaultState = () => ({
     swot: emptyLists(["strengths", "weaknesses", "opportunities", "threats"]),
     forces: {
-      rivalry: { v: 3, note: "" }, newEntrants: { v: 3, note: "" },
-      suppliers: { v: 3, note: "" }, buyers: { v: 3, note: "" }, substitutes: { v: 3, note: "" },
+      rivalry: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] },
+      newEntrants: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] },
+      suppliers: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3] },
+      buyers: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3] },
+      substitutes: { v: 3, note: "", drivers: [3, 3] },
     },
     bcg: [],
     stakeholders: [],
@@ -200,32 +203,6 @@
     },
   };
 
-  // Checkliste: Wann ist eine Wettbewerbskraft STARK? (Ausprägung der Treiber)
-  const FORCES_CHECKLIST = [
-    { force: "Bedrohung durch neue Anbieter", note: "stark, wenn die Markteintrittsbarrieren niedrig sind", drivers: [
-      ["Skaleneffekte (Economies of Scale)", "niedrig"], ["Produktdifferenzierung", "niedrig"], ["Kapitalbedarf", "niedrig"],
-      ["Wechselkosten", "niedrig"], ["Kontrolle der Vertriebskanäle durch Etablierte", "niedrig"],
-      ["Geschütztes Wissen der Etablierten", "niedrig"], ["Zugang der Etablierten zu Rohstoffen", "niedrig"], ["Zugang zu staatlichen Subventionen", "niedrig"],
-    ]},
-    { force: "Verhandlungsmacht der Abnehmer", note: "stark, wenn Abnehmer Druck ausüben können", drivers: [
-      ["Konzentration der Abnehmer (relativ zu Anbietern)", "hoch"], ["Wechselkosten der Abnehmer", "niedrig"],
-      ["Produktdifferenzierung der Anbieter", "niedrig"], ["Drohung der Rückwärtsintegration durch Abnehmer", "hoch"],
-      ["Gewinnsituation der Abnehmer", "niedrig"], ["Bedeutung des Inputs für die Qualität des Abnehmerprodukts", "niedrig"],
-    ]},
-    { force: "Verhandlungsmacht der Lieferanten", note: "stark, wenn Lieferanten Druck ausüben können", drivers: [
-      ["Konzentration der Lieferanten (relativ zur Abnehmerbranche)", "hoch"], ["Verfügbarkeit von Substituten", "niedrig"],
-      ["Bedeutung des Kunden für den Lieferanten", "niedrig"], ["Differenzierung der Lieferantenprodukte", "hoch"],
-      ["Wechselkosten des Abnehmers", "hoch"], ["Drohung der Vorwärtsintegration durch Lieferanten", "hoch"],
-    ]},
-    { force: "Bedrohung durch Ersatzprodukte", note: "stark, wenn attraktive Substitute existieren", drivers: [
-      ["Differenzierung/Attraktivität des Substituts", "hoch"], ["Verbesserungsrate des Preis-Leistungs-Verhältnisses des Substituts", "hoch"],
-    ]},
-    { force: "Rivalität unter Wettbewerbern", note: "stark, wenn der Verdrängungswettbewerb intensiv ist", drivers: [
-      ["Anzahl der Wettbewerber", "hoch"], ["Branchenwachstum", "niedrig"], ["Fixkosten", "hoch"], ["Lagerkosten", "hoch"],
-      ["Produktdifferenzierung", "niedrig"], ["Wechselkosten", "niedrig"], ["Austrittsbarrieren", "hoch"], ["Strategische Bedeutung des Geschäfts", "hoch"],
-    ]},
-  ];
-
   function renderKnowledge() {
     $$(".kb-slot").forEach((slot) => {
       const k = KB[slot.dataset.kb];
@@ -241,7 +218,7 @@
   function renderForcesChecklist() {
     const box = $("#forces-checklist"); if (!box) return;
     box.innerHTML = `<details class="kb"><summary>Checkliste: Wann ist eine Wettbewerbskraft stark?</summary><div class="kb-body">${
-      FORCES_CHECKLIST.map((f) => `<div class="cl-force"><h4>${f.force}</h4><p class="cl-note">${f.note}:</p><ul class="cl-list">${
+      FORCES.map((f) => `<div class="cl-force"><h4>${f.label}</h4><p class="cl-note">${f.note}:</p><ul class="cl-list">${
         f.drivers.map((d) => `<li><span>${d[0]}</span><span class="cl-val cl-${d[1]}">${d[1]}</span></li>`).join("")
       }</ul></div>`).join("")
     }</div></details>`;
@@ -481,36 +458,105 @@
 
   function refreshSwotDerived() { renderDerived(); renderTows(); if (document.getElementById("sw-matrix")) renderStrategiewahl(); }
 
-  /* ---------- Five Forces ---------- */
+  /* ---------- Five Forces ----------
+     Jede Kraft wird nicht direkt bewertet, sondern über ihre einzelnen Treiber
+     (Checkliste). Jeder Treiber wird von "sehr niedrig" (1) bis "sehr hoch" (5)
+     eingestellt; das zweite Element gibt an, bei welcher Ausprägung die Kraft
+     STARK ist ("hoch" oder "niedrig"). Daraus ergibt sich die Stärke der Kraft. */
   const FORCES = [
-    { key: "rivalry", label: "Rivalität unter Wettbewerbern", short: "Wettbewerbsrivalität" },
-    { key: "newEntrants", label: "Bedrohung durch neue Anbieter", short: "Bedrohung durch neue Anbieter" },
-    { key: "suppliers", label: "Verhandlungsmacht der Lieferanten", short: "Lieferantenmacht" },
-    { key: "buyers", label: "Verhandlungsmacht der Abnehmer", short: "Abnehmermacht" },
-    { key: "substitutes", label: "Bedrohung durch Ersatzprodukte", short: "Bedrohung durch Ersatzprodukte" },
+    { key: "rivalry", label: "Rivalität unter Wettbewerbern", short: "Wettbewerbsrivalität",
+      note: "stark, wenn der Verdrängungswettbewerb intensiv ist", drivers: [
+      ["Anzahl der Wettbewerber", "hoch"], ["Branchenwachstum", "niedrig"], ["Fixkosten", "hoch"], ["Lagerkosten", "hoch"],
+      ["Produktdifferenzierung", "niedrig"], ["Wechselkosten", "niedrig"], ["Austrittsbarrieren", "hoch"], ["Strategische Bedeutung des Geschäfts", "hoch"],
+    ]},
+    { key: "newEntrants", label: "Bedrohung durch neue Anbieter", short: "Bedrohung durch neue Anbieter",
+      note: "stark, wenn die Markteintrittsbarrieren niedrig sind", drivers: [
+      ["Skaleneffekte (Economies of Scale)", "niedrig"], ["Produktdifferenzierung", "niedrig"], ["Kapitalbedarf", "niedrig"],
+      ["Wechselkosten", "niedrig"], ["Kontrolle der Vertriebskanäle durch Etablierte", "niedrig"],
+      ["Geschütztes Wissen der Etablierten", "niedrig"], ["Zugang der Etablierten zu Rohstoffen", "niedrig"], ["Zugang zu staatlichen Subventionen", "niedrig"],
+    ]},
+    { key: "suppliers", label: "Verhandlungsmacht der Lieferanten", short: "Lieferantenmacht",
+      note: "stark, wenn Lieferanten Druck ausüben können", drivers: [
+      ["Konzentration der Lieferanten (relativ zur Abnehmerbranche)", "hoch"], ["Verfügbarkeit von Substituten", "niedrig"],
+      ["Bedeutung des Kunden für den Lieferanten", "niedrig"], ["Differenzierung der Lieferantenprodukte", "hoch"],
+      ["Wechselkosten des Abnehmers", "hoch"], ["Drohung der Vorwärtsintegration durch Lieferanten", "hoch"],
+    ]},
+    { key: "buyers", label: "Verhandlungsmacht der Abnehmer", short: "Abnehmermacht",
+      note: "stark, wenn Abnehmer Druck ausüben können", drivers: [
+      ["Konzentration der Abnehmer (relativ zu Anbietern)", "hoch"], ["Wechselkosten der Abnehmer", "niedrig"],
+      ["Produktdifferenzierung der Anbieter", "niedrig"], ["Drohung der Rückwärtsintegration durch Abnehmer", "hoch"],
+      ["Gewinnsituation der Abnehmer", "niedrig"], ["Bedeutung des Inputs für die Qualität des Abnehmerprodukts", "niedrig"],
+    ]},
+    { key: "substitutes", label: "Bedrohung durch Ersatzprodukte", short: "Bedrohung durch Ersatzprodukte",
+      note: "stark, wenn attraktive Substitute existieren", drivers: [
+      ["Differenzierung/Attraktivität des Substituts", "hoch"], ["Verbesserungsrate des Preis-Leistungs-Verhältnisses des Substituts", "hoch"],
+    ]},
   ];
+  const DRIVER_WORDS = ["sehr niedrig", "niedrig", "mittel", "hoch", "sehr hoch"];
+  const driverWord = (v) => DRIVER_WORDS[Math.round(v) - 1] || "mittel";
+  // Beitrag eines Treibers zur Stärke der Kraft: bei Zielrichtung "hoch" direkt,
+  // bei "niedrig" invertiert (niedrige Ausprägung = starke Kraft).
+  function computeForce(f) {
+    const arr = state.forces[f.key].drivers || [];
+    const contribs = f.drivers.map((d, i) => {
+      const val = arr[i] != null ? arr[i] : 3;
+      return d[1] === "hoch" ? val : (6 - val);
+    });
+    const avg = contribs.reduce((a, b) => a + b, 0) / (contribs.length || 1);
+    return Math.round(avg * 10) / 10;
+  }
+  function ensureForceDrivers() {
+    FORCES.forEach((f) => {
+      const fx = state.forces[f.key];
+      if (!Array.isArray(fx.drivers)) fx.drivers = [];
+      for (let i = 0; i < f.drivers.length; i++) if (fx.drivers[i] == null) fx.drivers[i] = 3;
+      fx.drivers.length = f.drivers.length;
+    });
+  }
   function buildForces() {
+    ensureForceDrivers();
     const box = $("#forces-list"); box.innerHTML = "";
     FORCES.forEach((f) => {
       const cur = state.forces[f.key];
       const el = document.createElement("div");
       el.className = "force";
       el.innerHTML = `
-        <div class="force-top"><h3>${f.label}</h3><span class="force-val" id="val-${f.key}">${cur.v}</span></div>
-        <input type="range" min="1" max="5" step="1" value="${cur.v}" aria-label="${f.label}" />
-        <div class="scale-hint"><span>1 – schwach</span><span>5 – stark</span></div>
+        <div class="force-top">
+          <h3>${f.label}</h3>
+          <span class="force-badge"><span class="force-val" id="val-${f.key}">${cur.v}</span><span class="force-level" id="lvl-${f.key}"></span></span>
+        </div>
+        <p class="force-note-hint">Kraft ${f.note}. Die Stärke ergibt sich aus den Treibern.</p>
+        <div class="drivers">${
+          f.drivers.map((d, i) => `
+            <div class="driver">
+              <div class="driver-head"><span class="driver-label">${d[0]}</span><span class="driver-val" id="dv-${f.key}-${i}">${driverWord(cur.drivers[i])}</span></div>
+              <input type="range" min="1" max="5" step="1" value="${cur.drivers[i]}" data-i="${i}" aria-label="${d[0]}" />
+              <div class="scale-hint"><span>sehr niedrig</span><span>sehr hoch</span></div>
+            </div>`).join("")
+        }</div>
         <textarea placeholder="Begründung / Notizen …">${escapeHtml(cur.note || "")}</textarea>`;
-      const range = el.querySelector("input");
-      const ta = el.querySelector("textarea");
-      range.addEventListener("input", () => {
-        state.forces[f.key].v = Number(range.value);
-        $("#val-" + f.key).textContent = range.value; save(); updateForcesResult();
+      el.querySelectorAll(".driver input").forEach((range) => {
+        range.addEventListener("input", () => {
+          const i = Number(range.dataset.i);
+          state.forces[f.key].drivers[i] = Number(range.value);
+          $("#dv-" + f.key + "-" + i).textContent = driverWord(range.value);
+          save(); updateForcesResult();
+        });
       });
+      const ta = el.querySelector("textarea");
       ta.addEventListener("input", () => { state.forces[f.key].note = ta.value; save(); });
       box.appendChild(el);
     });
   }
   function updateForcesResult() {
+    ensureForceDrivers();
+    FORCES.forEach((f) => {
+      const v = computeForce(f);
+      state.forces[f.key].v = v;
+      const badge = $("#val-" + f.key); if (badge) badge.textContent = v.toFixed(1);
+      const lvl = $("#lvl-" + f.key);
+      if (lvl) { const lv = forceLevel(v); lvl.textContent = lv; lvl.className = "force-level lvl-" + lv; }
+    });
     const vals = FORCES.map((f) => state.forces[f.key].v);
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
     const attractiveness = ((5 - avg) / 4) * 100;
@@ -1724,11 +1770,12 @@
     s.pestel.economic = [{ text: "Möglicher Konjunkturabschwung", sign: -1 }];
     s.pestel.technological = [{ text: "Schnelle KI-Entwicklung", sign: 1 }];
     s.pestel.legal = [{ text: "Strengere Datenschutzauflagen", sign: -1 }];
-    s.forces.rivalry = { v: 4, note: "Viele Anbieter, geringes Marktwachstum" };
-    s.forces.newEntrants = { v: 3, note: "" };
-    s.forces.suppliers = { v: 2, note: "Standardkomponenten, viele Bezugsquellen" };
-    s.forces.buyers = { v: 4, note: "Preissensible Großkunden" };
-    s.forces.substitutes = { v: 3, note: "" };
+    // Treiber-Ausprägungen (sehr niedrig 1 … sehr hoch 5); daraus wird die Kraft berechnet
+    s.forces.rivalry = { v: 4, note: "Viele Anbieter, geringes Marktwachstum", drivers: [5, 2, 4, 3, 2, 2, 4, 4] };
+    s.forces.newEntrants = { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] };
+    s.forces.suppliers = { v: 2, note: "Standardkomponenten, viele Bezugsquellen", drivers: [2, 4, 4, 2, 2, 2] };
+    s.forces.buyers = { v: 4, note: "Preissensible Großkunden", drivers: [5, 2, 2, 4, 2, 2] };
+    s.forces.substitutes = { v: 3, note: "", drivers: [3, 3] };
     s.wettbewerb = { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [
       { name: "Wir", x: 6, y: 8, group: "Premium" }, { name: "Anbieter A", x: 7, y: 8, group: "Premium" },
       { name: "Anbieter B", x: 3, y: 4, group: "Discount" }, { name: "Anbieter C", x: 4, y: 3, group: "Discount" },
