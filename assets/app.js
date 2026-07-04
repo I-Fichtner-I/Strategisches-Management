@@ -1402,7 +1402,16 @@
     const ansoff = [];
     ANSOFF_CELLS.forEach((c) => (state.ansoff[c.key] || []).forEach((t) => ansoff.push(`[Ansoff] ${t}`)));
     const bcg = state.bcg.map((u) => `[BCG] ${u.name}: ${BCG_STRATEGY[bcgQuadrant(u)]}`);
-    return tows.concat(ansoff, bcg);
+    // Round-Robin über die Quellen, damit Ansoff und BCG nicht hinter der
+    // Menge an TOWS-Normstrategien verschwinden, sondern gleichberechtigt
+    // als übernehmbare Optionen erscheinen.
+    const groups = [tows, ansoff, bcg].filter((g) => g.length);
+    const out = [];
+    const max = Math.max(0, ...groups.map((g) => g.length));
+    for (let i = 0; i < max; i++) {
+      groups.forEach((g) => { if (i < g.length) out.push(g[i]); });
+    }
+    return out;
   }
   function swNormalize() {
     const st = state.strategiewahl;
@@ -1436,7 +1445,7 @@
     const st = state.strategiewahl; swNormalize();
     const sug = $("#sw-suggest");
     const existing = new Set(st.options.map((o) => o.name));
-    const avail = computeStrategyOptions().filter((n) => !existing.has(n)).slice(0, 12);
+    const avail = computeStrategyOptions().filter((n) => !existing.has(n)).slice(0, 15);
     sug.innerHTML = avail.length ? '<span class="sw-sug-label">Optionen übernehmen (TOWS · Ansoff · BCG):</span>'
       + avail.map((n, i) => `<button type="button" class="sw-chip" data-i="${i}">+ ${escapeHtml(n)}</button>`).join("") : "";
     $$(".sw-chip", sug).forEach((b) => b.addEventListener("click", () => {
@@ -1461,7 +1470,7 @@
 
     const tbl = $("#sw-matrix");
     if (!st.options.length) {
-      tbl.innerHTML = '<tbody><tr><td class="sw-empty">Noch keine Optionen – oben aus TOWS übernehmen oder eigene hinzufügen.</td></tr></tbody>';
+      tbl.innerHTML = '<tbody><tr><td class="sw-empty">Noch keine Optionen – oben aus TOWS, Ansoff oder BCG übernehmen oder eigene hinzufügen.</td></tr></tbody>';
       return;
     }
     const totals = swTotals();
