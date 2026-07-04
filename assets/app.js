@@ -488,7 +488,7 @@
   const driverContribution = (val, dir) => (dir === "hoch" ? val : (6 - val));
   // Auswirkung der aktuellen Einstellung auf die Branchenattraktivität.
   // Starker Beitrag zur Kraft = geringere Attraktivität = "unattraktiv".
-  const IMPACT_WORDS = ["attraktiv", "eher attraktiv", "neutral", "eher unattraktiv", "unattraktiv"];
+  const IMPACT_WORDS = ["Chance", "eher Chance", "neutral", "eher Risiko", "Risiko"];
   const driverImpact = (val, dir) => IMPACT_WORDS[Math.round(driverContribution(val, dir)) - 1] || "neutral";
   // Auswirkung der gesamten Kraft (1..5) auf die Attraktivität: je stärker die
   // Kraft, desto geringer die Attraktivität der Branche.
