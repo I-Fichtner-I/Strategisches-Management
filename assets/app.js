@@ -63,7 +63,7 @@
   const defaultState = () => ({
     swot: emptyLists(["strengths", "weaknesses", "opportunities", "threats"]),
     forces: {
-      rivalry: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] },
+      rivalry: { v: 3, note: "", drivers: [3, 3, 3, 3, 3] },
       newEntrants: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] },
       suppliers: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3] },
       buyers: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3] },
@@ -85,9 +85,9 @@
     },
     strategiewahl: {
       criteria: [
-        { name: "Eignung", weight: 1 },
-        { name: "Akzeptanz", weight: 1 },
-        { name: "Machbarkeit", weight: 1 },
+        { name: "Wertziele", weight: 1 },
+        { name: "Sachziele", weight: 1 },
+        { name: "Sozialziele", weight: 1 },
       ],
       options: [],
     },
@@ -149,7 +149,7 @@
     },
     forces: {
       def: "Die <strong>Branchenstrukturanalyse (Five Forces)</strong> nach Porter beurteilt die Attraktivität einer Branche anhand von fünf Wettbewerbskräften. Je stärker die Kräfte insgesamt, desto <strong>geringer</strong> das Gewinnpotenzial und die Attraktivität der Branche.",
-      leitfragen: ["Wie stark ist jede der fünf Kräfte (siehe Checkliste)?", "Welche Kraft dominiert und warum?", "Wie könnte sich die Branchenstruktur künftig verändern?", "Welche strategischen Konsequenzen ergeben sich?"],
+      leitfragen: ["Wie stark ist jede der fünf Kräfte (aus den Treibern abgeleitet)?", "Welche Kraft dominiert und warum?", "Wie könnte sich die Branchenstruktur künftig verändern?", "Welche strategischen Konsequenzen ergeben sich?"],
     },
     wertkette: {
       def: "Die <strong>Wertkette</strong> nach Porter zerlegt das Unternehmen in wertschöpfende <strong>Primäraktivitäten</strong> (Eingangslogistik, Produktion, Ausgangslogistik, Marketing &amp; Vertrieb, Kundendienst) und <strong>Unterstützungsaktivitäten</strong> (Infrastruktur, Personal, Technologie, Beschaffung). Ziel ist es, Quellen von Wettbewerbsvorteilen (Kosten oder Differenzierung) aufzudecken.",
@@ -215,15 +215,6 @@
     });
   }
 
-  function renderForcesChecklist() {
-    const box = $("#forces-checklist"); if (!box) return;
-    box.innerHTML = `<details class="kb"><summary>Checkliste: Wann ist eine Wettbewerbskraft stark?</summary><div class="kb-body">${
-      FORCES.map((f) => `<div class="cl-force"><h4>${f.label}</h4><p class="cl-note">${f.note}:</p><ul class="cl-list">${
-        f.drivers.map((d) => `<li><span>${d[0]}</span><span class="cl-val cl-${d[1]}">${d[1]}</span></li>`).join("")
-      }</ul></div>`).join("")
-    }</div></details>`;
-  }
-
   /* ---------- Navigation (Kapitelstruktur) ---------- */
   // Reihenfolge der Seiten (entspricht der Sidebar) für die Zurück/Weiter-Navigation
   const PAGES = [
@@ -277,6 +268,8 @@
     if (name === "wettbewerb") drawWettbewerb();
     if (name === "kennzahlen") { drawWaterfall(); renderKzCompare(); }
     if (name === "strategiewahl") renderStrategiewahl();
+    if (name === "kontrolle") renderKpi();
+    if (name === "bsc") buildBSC();
     if (name === "prozess") renderDashboard();
     if (name === "dossier") buildDossier();
     updatePager(name);
@@ -459,21 +452,21 @@
   function refreshSwotDerived() { renderDerived(); renderTows(); if (document.getElementById("sw-matrix")) renderStrategiewahl(); }
 
   /* ---------- Five Forces ----------
-     Jede Kraft wird nicht direkt bewertet, sondern über ihre einzelnen Treiber
-     (Checkliste). Jeder Treiber wird von "sehr niedrig" (1) bis "sehr hoch" (5)
-     eingestellt; das zweite Element gibt an, bei welcher Ausprägung die Kraft
-     STARK ist ("hoch" oder "niedrig"). Daraus ergibt sich die Stärke der Kraft. */
+     Jede Kraft wird nicht direkt bewertet, sondern über ihre einzelnen Treiber.
+     Jeder Treiber wird von "sehr niedrig" (1) bis "sehr hoch" (5) eingestellt;
+     das zweite Element gibt an, bei welcher Ausprägung die Kraft STARK ist
+     ("hoch" oder "niedrig"). Daraus ergibt sich die Stärke der Kraft. */
   const FORCES = [
     { key: "rivalry", label: "Rivalität unter Wettbewerbern", short: "Wettbewerbsrivalität",
       note: "stark, wenn der Verdrängungswettbewerb intensiv ist", drivers: [
-      ["Anzahl der Wettbewerber", "hoch"], ["Branchenwachstum", "niedrig"], ["Fixkosten", "hoch"], ["Lagerkosten", "hoch"],
-      ["Produktdifferenzierung", "niedrig"], ["Wechselkosten", "niedrig"], ["Austrittsbarrieren", "hoch"], ["Strategische Bedeutung des Geschäfts", "hoch"],
+      ["Kapazitätsauslastung", "niedrig"], ["Produkthomogenität", "hoch"], ["Bindung der Abnehmer", "niedrig"],
+      ["Marktaustrittsbarrieren", "hoch"], ["Härte der Branchenkultur", "hoch"],
     ]},
     { key: "newEntrants", label: "Bedrohung durch neue Anbieter", short: "Bedrohung durch neue Anbieter",
       note: "stark, wenn die Markteintrittsbarrieren niedrig sind", drivers: [
       ["Skaleneffekte (Economies of Scale)", "niedrig"], ["Produktdifferenzierung", "niedrig"], ["Kapitalbedarf", "niedrig"],
       ["Wechselkosten", "niedrig"], ["Kontrolle der Vertriebskanäle durch Etablierte", "niedrig"],
-      ["Geschütztes Wissen der Etablierten", "niedrig"], ["Zugang der Etablierten zu Rohstoffen", "niedrig"], ["Zugang zu staatlichen Subventionen", "niedrig"],
+      ["Geschütztes Wissen der Etablierten", "niedrig"], ["Zugang der Etablierten zu Rohstoffen", "niedrig"], ["Staatliche Subventionen für Etablierte", "niedrig"],
     ]},
     { key: "suppliers", label: "Verhandlungsmacht der Lieferanten", short: "Lieferantenmacht",
       note: "stark, wenn Lieferanten Druck ausüben können", drivers: [
@@ -492,15 +485,21 @@
       ["Differenzierung/Attraktivität des Substituts", "hoch"], ["Verbesserungsrate des Preis-Leistungs-Verhältnisses des Substituts", "hoch"],
     ]},
   ];
-  const DRIVER_WORDS = ["sehr niedrig", "niedrig", "mittel", "hoch", "sehr hoch"];
-  const driverWord = (v) => DRIVER_WORDS[Math.round(v) - 1] || "mittel";
-  // Beitrag eines Treibers zur Stärke der Kraft: bei Zielrichtung "hoch" direkt,
-  // bei "niedrig" invertiert (niedrige Ausprägung = starke Kraft).
+  // Beitrag eines Treibers zur Stärke der Kraft (1..5); bei Zielrichtung "hoch"
+  // direkt, bei "niedrig" invertiert (niedrige Ausprägung = starke Kraft).
+  const driverContribution = (val, dir) => (dir === "hoch" ? val : (6 - val));
+  // Auswirkung der aktuellen Einstellung auf die Branchenattraktivität.
+  // Starker Beitrag zur Kraft = geringere Attraktivität = "unattraktiv".
+  const IMPACT_WORDS = ["Chance", "eher Chance", "neutral", "eher Risiko", "Risiko"];
+  const driverImpact = (val, dir) => IMPACT_WORDS[Math.round(driverContribution(val, dir)) - 1] || "neutral";
+  // Auswirkung der gesamten Kraft (1..5) auf die Attraktivität: je stärker die
+  // Kraft, desto geringer die Attraktivität der Branche.
+  const forceImpact = (v) => IMPACT_WORDS[Math.min(4, Math.max(0, Math.round(v) - 1))] || "neutral";
   function computeForce(f) {
     const arr = state.forces[f.key].drivers || [];
     const contribs = f.drivers.map((d, i) => {
       const val = arr[i] != null ? arr[i] : 3;
-      return d[1] === "hoch" ? val : (6 - val);
+      return driverContribution(val, d[1]);
     });
     const avg = contribs.reduce((a, b) => a + b, 0) / (contribs.length || 1);
     return Math.round(avg * 10) / 10;
@@ -529,7 +528,7 @@
         <div class="drivers">${
           f.drivers.map((d, i) => `
             <div class="driver">
-              <div class="driver-head"><span class="driver-label">${d[0]}</span><span class="driver-val" id="dv-${f.key}-${i}">${driverWord(cur.drivers[i])}</span></div>
+              <div class="driver-head"><span class="driver-label">${d[0]}</span><span class="driver-val" id="dv-${f.key}-${i}">${driverImpact(cur.drivers[i], d[1])}</span></div>
               <input type="range" min="1" max="5" step="1" value="${cur.drivers[i]}" data-i="${i}" aria-label="${d[0]}" />
               <div class="scale-hint"><span>sehr niedrig</span><span>sehr hoch</span></div>
             </div>`).join("")
@@ -539,7 +538,7 @@
         range.addEventListener("input", () => {
           const i = Number(range.dataset.i);
           state.forces[f.key].drivers[i] = Number(range.value);
-          $("#dv-" + f.key + "-" + i).textContent = driverWord(range.value);
+          $("#dv-" + f.key + "-" + i).textContent = driverImpact(range.value, f.drivers[i][1]);
           save(); updateForcesResult();
         });
       });
@@ -555,7 +554,7 @@
       state.forces[f.key].v = v;
       const badge = $("#val-" + f.key); if (badge) badge.textContent = v.toFixed(1);
       const lvl = $("#lvl-" + f.key);
-      if (lvl) { const lv = forceLevel(v); lvl.textContent = lv; lvl.className = "force-level lvl-" + lv; }
+      if (lvl) lvl.textContent = forceImpact(v);
     });
     const vals = FORCES.map((f) => state.forces[f.key].v);
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
@@ -772,6 +771,13 @@
   /* ---------- Balanced Scorecard ---------- */
   function buildBSC() {
     const root = $("#bsc-root"); root.innerHTML = "";
+    const best = swBest();
+    if (best) {
+      const banner = document.createElement("div");
+      banner.className = "bsc-strategy-banner";
+      banner.innerHTML = `Diese Scorecard setzt die gewählte Strategie um: <strong>${escapeHtml(best.name)}</strong>`;
+      root.appendChild(banner);
+    }
     BSC_VIEWS.forEach((p) => {
       if (!state.bsc[p.key]) state.bsc[p.key] = [];
       const card = document.createElement("div");
@@ -1083,7 +1089,37 @@
   /* ---------- Frühwarn- & KPI-Tracker (6.3) ---------- */
   const KPI_STATUS = { green: "🟢 im Plan", amber: "🟡 beobachten", red: "🔴 kritisch" };
   const KPI_DIR = { hoch: "↑ höher besser", niedrig: "↓ niedriger besser" };
+  // Frühwarn-Indikatoren aus SMART-Zielen (Kontrollfunktion: Soll-Ist) und aus
+  // BSC-Kennzahlen (Zielwert) vorschlagen – schließt den Ziel-Kennzahl-Kontroll-Kreis.
+  function kpiCandidates() {
+    const out = [];
+    (state.ziele || []).forEach((z) => {
+      const name = (z.m || "").trim() || (z.ziel || "").trim();
+      if (name) out.push({ name, target: "" });
+    });
+    BSC_VIEWS.forEach((p) => (state.bsc[p.key] || []).forEach((row) => {
+      const name = (row.kennzahl || "").trim() || (row.ziel || "").trim();
+      if (name) out.push({ name, target: (row.zielwert || "").trim() });
+    }));
+    return out;
+  }
+  function renderKpiSuggest() {
+    const box = $("#kpi-suggest"); if (!box) return;
+    const have = new Set(state.kontrolle.indicators.map((i) => i.name));
+    const seen = new Set();
+    const avail = kpiCandidates().filter((c) => !have.has(c.name) && !seen.has(c.name) && seen.add(c.name)).slice(0, 12);
+    box.innerHTML = avail.length
+      ? '<span class="sw-sug-label">Als Frühwarn-Indikator übernehmen (SMART-Ziele · BSC):</span>'
+        + avail.map((c, i) => `<button type="button" class="sw-chip" data-i="${i}">+ ${escapeHtml(c.name)}</button>`).join("")
+      : "";
+    $$(".sw-chip", box).forEach((b) => b.addEventListener("click", () => {
+      const c = avail[+b.dataset.i];
+      state.kontrolle.indicators.push({ name: c.name, target: c.target || "", actual: "", dir: "hoch", status: "green" });
+      save(); renderKpi();
+    }));
+  }
   function renderKpi() {
+    renderKpiSuggest();
     const tb = $("#kpi-tbody"); if (!tb) return; tb.innerHTML = "";
     state.kontrolle.indicators.forEach((ind, i) => {
       const tr = document.createElement("tr");
@@ -1142,10 +1178,24 @@
       if (o.scores.length > n) o.scores.length = n;
     });
   }
+  // Unabdingbares (K.-o.-)Kriterium nicht erfüllt (Bewertung 1) -> Option ausgeschlossen.
+  function swExcluded(o) {
+    return state.strategiewahl.criteria.some((c, i) => c.ko && Number(o.scores[i]) <= 1);
+  }
   function swTotals() {
     const st = state.strategiewahl;
     const wsum = st.criteria.reduce((s, c) => s + (Number(c.weight) || 0), 0);
-    return st.options.map((o) => wsum ? o.scores.reduce((s, v, i) => s + (Number(v) || 0) * (Number(st.criteria[i].weight) || 0), 0) / wsum : 0);
+    return st.options.map((o) => swExcluded(o) ? 0 : (wsum ? o.scores.reduce((s, v, i) => s + (Number(v) || 0) * (Number(st.criteria[i].weight) || 0), 0) / wsum : 0));
+  }
+  // Siegerstrategie (höchster Nutzwert) – speist Umsetzung (BSC) und Dossier-Fazit.
+  function swBest() {
+    swNormalize();
+    const st = state.strategiewahl;
+    if (!st.options.length) return null;
+    const totals = swTotals();
+    let bi = -1, bv = -1;
+    totals.forEach((t, i) => { if (!swExcluded(st.options[i]) && t > bv) { bv = t; bi = i; } });
+    return bi < 0 ? null : { name: st.options[bi].name, total: bv };
   }
   function renderStrategiewahl() {
     const st = state.strategiewahl; swNormalize();
@@ -1158,6 +1208,22 @@
       st.options.push({ name: avail[+b.dataset.i], scores: st.criteria.map(() => 3) }); save(); renderStrategiewahl();
     }));
 
+    // Kriterien aus SMART-Zielen (Entscheidungsfunktion: Ziele liefern die Bewertungskriterien)
+    const critBox = $("#sw-crit-suggest");
+    if (critBox) {
+      const haveCrit = new Set(st.criteria.map((c) => c.name));
+      const zieleCrit = (state.ziele || []).map((z) => (z.ziel || "").trim())
+        .filter((n) => n && !haveCrit.has(n)).slice(0, 10);
+      critBox.innerHTML = zieleCrit.length
+        ? '<span class="sw-sug-label">Kriterien aus SMART-Zielen übernehmen:</span>'
+          + zieleCrit.map((n, i) => `<button type="button" class="sw-chip" data-i="${i}">+ ${escapeHtml(n)}</button>`).join("")
+        : "";
+      $$(".sw-chip", critBox).forEach((b) => b.addEventListener("click", () => {
+        st.criteria.push({ name: zieleCrit[+b.dataset.i], weight: 1 });
+        st.options.forEach((o) => o.scores.push(3)); save(); renderStrategiewahl();
+      }));
+    }
+
     const tbl = $("#sw-matrix");
     if (!st.options.length) {
       tbl.innerHTML = '<tbody><tr><td class="sw-empty">Noch keine Optionen – oben aus TOWS übernehmen oder eigene hinzufügen.</td></tr></tbody>';
@@ -1166,20 +1232,24 @@
     const totals = swTotals();
     const best = Math.max.apply(null, totals);
     const head = "<thead><tr><th>Option</th>" + st.criteria.map((c, ci) =>
-      `<th class="sw-crit"><span class="sw-cname">${escapeHtml(c.name)}</span>`
-      + `<span class="sw-w">Gew. <input type="number" min="0" step="1" value="${c.weight}" data-crit="${ci}" class="sw-weight" /></span>`
+      `<th class="sw-crit${c.ko ? " sw-ko" : ""}"><span class="sw-cname">${escapeHtml(c.name)}</span>`
+      + `<label class="sw-kolabel" title="Unabdingbar: Option mit Bewertung 1 (nicht erfüllt) wird ausgeschlossen"><input type="checkbox" class="sw-ko-toggle" data-crit="${ci}"${c.ko ? " checked" : ""}/> K.-o.</label>`
+      + `<span class="sw-w">Gew. <input type="number" min="0" step="1" value="${c.weight}" data-crit="${ci}" class="sw-weight"${c.ko ? " disabled" : ""} /></span>`
       + `<button type="button" class="sw-critdel" data-crit="${ci}" aria-label="Kriterium entfernen">×</button></th>`).join("")
       + "<th>Nutzwert</th><th></th></tr></thead>";
     const body = "<tbody>" + st.options.map((o, oi) => {
+      const excl = swExcluded(o);
       const cells = st.criteria.map((c, ci) => `<td><select class="sw-score" data-opt="${oi}" data-crit="${ci}">`
         + [1, 2, 3, 4, 5].map((v) => `<option value="${v}"${Number(o.scores[ci]) === v ? " selected" : ""}>${v}</option>`).join("")
         + "</select></td>").join("");
-      const isBest = totals[oi] === best && best > 0;
-      return `<tr class="${isBest ? "sw-best" : ""}"><td class="sw-optname">${escapeHtml(o.name)}${isBest ? ' <span class="badge ok">Top</span>' : ""}</td>`
-        + `${cells}<td class="sw-total">${totals[oi].toFixed(2)}</td>`
+      const isBest = !excl && totals[oi] === best && best > 0;
+      return `<tr class="${isBest ? "sw-best" : ""}${excl ? " sw-excluded" : ""}"><td class="sw-optname">${escapeHtml(o.name)}`
+        + `${isBest ? ' <span class="badge ok">Top</span>' : ""}${excl ? ' <span class="badge warn">ausgeschlossen</span>' : ""}</td>`
+        + `${cells}<td class="sw-total">${excl ? "–" : totals[oi].toFixed(2)}</td>`
         + `<td><button type="button" class="sw-optdel" data-opt="${oi}" aria-label="Option entfernen">×</button></td></tr>`;
     }).join("") + "</tbody>";
     tbl.innerHTML = head + body;
+    $$(".sw-ko-toggle", tbl).forEach((chk) => chk.addEventListener("change", () => { st.criteria[+chk.dataset.crit].ko = chk.checked; save(); renderStrategiewahl(); }));
     $$(".sw-weight", tbl).forEach((inp) => inp.addEventListener("change", () => { st.criteria[+inp.dataset.crit].weight = Number(inp.value); save(); renderStrategiewahl(); }));
     $$(".sw-critdel", tbl).forEach((b) => b.addEventListener("click", () => { st.criteria.splice(+b.dataset.crit, 1); st.options.forEach((o) => o.scores.splice(+b.dataset.crit, 1)); save(); renderStrategiewahl(); }));
     $$(".sw-score", tbl).forEach((sel) => sel.addEventListener("change", () => { st.options[+sel.dataset.opt].scores[+sel.dataset.crit] = Number(sel.value); save(); renderStrategiewahl(); }));
@@ -1674,8 +1744,10 @@
       const order = sw.options.map((o, i) => ({ name: o.name, t: totals[i] })).sort((a, b) => b.t - a.t);
       const critLabel = sw.criteria.map((c) => `${esc(c.name)} (×${c.weight})`).join(", ");
       const rows = order.map((r, idx) => `<tr><td>${idx + 1}</td><td>${esc(r.name)}</td><td>${r.t.toFixed(2)}</td></tr>`).join("");
+      const best = swBest();
+      const rec = best ? `<p class="dossier-rec"><strong>Empfohlene Strategie</strong> (höchster Nutzwert): ${esc(best.name)} · ${best.total.toFixed(2)}</p>` : "";
       parts.push(section("Strategiewahl (Nutzwertanalyse)",
-        `<p class="dossier-kpi">Kriterien: ${critLabel}</p><table class="dossier-table"><thead><tr><th>Rang</th><th>Option</th><th>Nutzwert</th></tr></thead><tbody>${rows}</tbody></table>`));
+        rec + `<p class="dossier-kpi">Kriterien: ${critLabel}</p><table class="dossier-table"><thead><tr><th>Rang</th><th>Option</th><th>Nutzwert</th></tr></thead><tbody>${rows}</tbody></table>`));
     }
 
     // 6 BCG
@@ -1771,7 +1843,7 @@
     s.pestel.technological = [{ text: "Schnelle KI-Entwicklung", sign: 1 }];
     s.pestel.legal = [{ text: "Strengere Datenschutzauflagen", sign: -1 }];
     // Treiber-Ausprägungen (sehr niedrig 1 … sehr hoch 5); daraus wird die Kraft berechnet
-    s.forces.rivalry = { v: 4, note: "Viele Anbieter, geringes Marktwachstum", drivers: [5, 2, 4, 3, 2, 2, 4, 4] };
+    s.forces.rivalry = { v: 4, note: "Viele Anbieter, geringes Marktwachstum", drivers: [2, 4, 2, 4, 3] };
     s.forces.newEntrants = { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] };
     s.forces.suppliers = { v: 2, note: "Standardkomponenten, viele Bezugsquellen", drivers: [2, 4, 4, 2, 2, 2] };
     s.forces.buyers = { v: 4, note: "Preissensible Großkunden", drivers: [5, 2, 2, 4, 2, 2] };
@@ -1911,7 +1983,6 @@
     setFallstudieValues();
     renderStrategiewahl();
     renderKnowledge();
-    renderForcesChecklist();
     renderFlashcard();
     buildQuizFilter();
     renderQuiz();

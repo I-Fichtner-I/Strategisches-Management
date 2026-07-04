@@ -82,13 +82,39 @@ a { color: var(--series-1); }
 .view-head { margin-bottom: 20px; }
 
 /* Prozess */
-.process { list-style: none; padding: 0; margin: 0 0 28px;
-  display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 12px; }
-.process li { display: flex; gap: 12px; align-items: flex-start;
-  background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
-.process li > div { min-width: 0; overflow-wrap: anywhere; font-size: .92rem; }
-.step-no { flex: none; width: 28px; height: 28px; border-radius: 50%;
-  background: var(--series-1); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: .9rem; }
+/* Prozess-Visualisierung (Startseite): 6 Phasen + laufende Rückkopplung */
+.procflow { margin: 0 0 28px; }
+.procflow-cap { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--muted); font-weight: 700; margin: 0 0 18px; }
+.procflow-track { list-style: none; margin: 0; padding: 0; display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 30px; }
+.procphase { position: relative; background: var(--surface-1);
+  border: 1px solid var(--border); border-top: 3px solid var(--series-1); border-radius: var(--radius);
+  padding: 20px 14px 14px; box-shadow: var(--shadow-sm); }
+.procphase-no { position: absolute; top: -15px; left: 14px; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; font-size: .95rem; color: #fff;
+  background: linear-gradient(135deg, var(--series-1), color-mix(in srgb, var(--series-1) 55%, #7b3ff2));
+  box-shadow: var(--shadow-sm); }
+.procphase-title { margin: 0 0 7px; font-size: .95rem; overflow-wrap: anywhere; hyphens: auto; }
+.procphase-tools { margin: 0; font-size: .82rem; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+.procphase-tools a { color: var(--text-secondary); text-decoration: none; }
+.procphase-tools a:hover { color: var(--series-1); text-decoration: underline; }
+.procphase:not(:last-child)::after { content: "›"; position: absolute; right: -21px; top: 50%;
+  transform: translateY(-50%); font-size: 1.6rem; line-height: 1; color: var(--baseline); font-weight: 700; }
+.procflow-loop { margin: 24px 0 0; position: relative; text-align: center; }
+.procflow-loop::before { content: ""; position: absolute; left: 0; right: 0; top: 50%;
+  border-top: 2px dashed var(--baseline); }
+.procflow-loop-inner { position: relative; background: var(--page); padding: 4px 16px;
+  font-size: .82rem; color: var(--text-secondary); font-weight: 600; }
+@media (max-width: 980px) {
+  .procflow-track { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 20px; }
+  .procphase:not(:last-child)::after { content: none; }
+}
+@media (max-width: 560px) {
+  .procflow-track { grid-template-columns: 1fr; gap: 30px; }
+  .procphase:not(:last-child)::after { content: "⌄"; right: auto; left: 50%; top: auto;
+    bottom: -25px; transform: translateX(-50%); font-size: 1.3rem; }
+}
 .tool-cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 14px; }
 .tool-card { text-align: left; cursor: pointer; font: inherit; color: inherit;
   background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; transition: transform .08s, border-color .12s; }
@@ -152,11 +178,11 @@ input[type=text], input[type=number] {
 .force-top h3 { margin: 0; font-size: 1.05rem; }
 .force-val { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--series-1); }
 .force-badge { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
+/* Neutrales Niveau-Badge: die Staerke einer einzelnen Kraft ist eine analytische
+   Aussage, keine Zielerreichungs-Ampel. Die gruen-gelb-rot-Wertung liegt allein
+   beim Branchenattraktivitaets-Gauge. */
 .force-level { font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
   background: var(--grid); color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
-.force-level.lvl-stark { background: color-mix(in srgb, var(--critical) 18%, transparent); color: var(--critical); }
-.force-level.lvl-mittel { background: color-mix(in srgb, var(--warning) 20%, transparent); color: var(--warning); }
-.force-level.lvl-schwach { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
 .force-note-hint { margin: 4px 0 12px; font-size: .82rem; color: var(--muted); }
 .drivers { display: grid; gap: 12px; }
 .driver { padding: 6px 0; }
@@ -300,16 +326,6 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .kb-cards > div { border: 1px solid var(--border); border-radius: 6px; padding: 10px; }
 .kb-cards h5 { margin: 0 0 4px; color: var(--text-primary); font-size: .9rem; }
 .kb-cards p { margin: 0; font-size: .85rem; }
-
-/* Five-Forces-Checkliste */
-.checklist { margin-top: 20px; }
-.cl-force { margin-bottom: 14px; }
-.cl-force h4 { margin: 0 0 2px; font-size: .95rem; color: var(--text-primary); }
-.cl-note { margin: 0 0 8px; font-size: .85rem; color: var(--muted); }
-.cl-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 16px; }
-.cl-list li { display: flex; justify-content: space-between; gap: 10px; font-size: .88rem; padding: 3px 0; border-bottom: 1px solid var(--border); }
-.cl-val { font-weight: 700; flex: none; }
-.cl-hoch { color: var(--good); } .cl-niedrig { color: var(--critical); }
 
 /* Badges */
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; }
@@ -560,10 +576,6 @@ button:active { transform: translateY(1px); }
 .tool-card h3::after { content: " →"; color: var(--series-1); opacity: 0; transition: opacity .15s ease; }
 .tool-card:hover h3::after { opacity: 1; }
 
-/* Prozess-Kacheln & Nummern */
-.process li { border-radius: var(--radius); box-shadow: var(--shadow-sm); }
-.step-no { background: var(--accent); box-shadow: var(--shadow-sm); }
-
 /* Sidebar: aktives Kapitel mit Akzent-Verlauf */
 .nav-item.is-active { background: var(--accent); color: #fff; box-shadow: var(--shadow-sm); }
 
@@ -610,8 +622,18 @@ button:active { transform: translateY(1px); }
 .sw-total { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--series-1); }
 .sw-best { background: color-mix(in srgb, var(--good) 10%, transparent); }
 .sw-empty { color: var(--muted); font-style: italic; }
+.sw-excluded { opacity: .6; }
+.sw-excluded .sw-optname { text-decoration: line-through; text-decoration-color: var(--muted); }
+.sw-kolabel { display: block; font-size: .72rem; color: var(--muted); font-weight: 400; margin-top: 3px; cursor: pointer; }
+.sw-kolabel input { vertical-align: middle; margin-right: 3px; }
+.sw-crit.sw-ko { background: color-mix(in srgb, var(--warning) 12%, var(--surface-2)); }
 .sw-foot { margin-top: 12px; }
 .sw-foot .add-form { max-width: 360px; }
+.sw-foot .sw-suggest { margin-bottom: 10px; }
+.dossier-rec { font-size: .95rem; margin: 0 0 8px; padding: 8px 12px; border-radius: 8px;
+  background: color-mix(in srgb, var(--good) 12%, transparent); }
+.bsc-strategy-banner { font-size: .92rem; margin-bottom: 14px; padding: 10px 14px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: color-mix(in srgb, var(--series-1) 10%, var(--surface-1)); }
 
 /* Frühwarn-/KPI-Tracker (6.3) */
 .kpi-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; background: var(--surface-1);
