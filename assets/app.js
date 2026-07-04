@@ -490,6 +490,9 @@
   // Starker Beitrag zur Kraft = geringere Attraktivität = "unattraktiv".
   const IMPACT_WORDS = ["attraktiv", "eher attraktiv", "neutral", "eher unattraktiv", "unattraktiv"];
   const driverImpact = (val, dir) => IMPACT_WORDS[Math.round(driverContribution(val, dir)) - 1] || "neutral";
+  // Auswirkung der gesamten Kraft (1..5) auf die Attraktivität: je stärker die
+  // Kraft, desto geringer die Attraktivität der Branche.
+  const forceImpact = (v) => IMPACT_WORDS[Math.min(4, Math.max(0, Math.round(v) - 1))] || "neutral";
   function computeForce(f) {
     const arr = state.forces[f.key].drivers || [];
     const contribs = f.drivers.map((d, i) => {
@@ -549,7 +552,7 @@
       state.forces[f.key].v = v;
       const badge = $("#val-" + f.key); if (badge) badge.textContent = v.toFixed(1);
       const lvl = $("#lvl-" + f.key);
-      if (lvl) { const lv = forceLevel(v); lvl.textContent = lv; lvl.className = "force-level lvl-" + lv; }
+      if (lvl) lvl.textContent = forceImpact(v);
     });
     const vals = FORCES.map((f) => state.forces[f.key].v);
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
