@@ -483,15 +483,18 @@
       ["Differenzierung/Attraktivität des Substituts", "hoch"], ["Verbesserungsrate des Preis-Leistungs-Verhältnisses des Substituts", "hoch"],
     ]},
   ];
-  const DRIVER_WORDS = ["sehr niedrig", "niedrig", "mittel", "hoch", "sehr hoch"];
-  const driverWord = (v) => DRIVER_WORDS[Math.round(v) - 1] || "mittel";
-  // Beitrag eines Treibers zur Stärke der Kraft: bei Zielrichtung "hoch" direkt,
-  // bei "niedrig" invertiert (niedrige Ausprägung = starke Kraft).
+  // Beitrag eines Treibers zur Stärke der Kraft (1..5); bei Zielrichtung "hoch"
+  // direkt, bei "niedrig" invertiert (niedrige Ausprägung = starke Kraft).
+  const driverContribution = (val, dir) => (dir === "hoch" ? val : (6 - val));
+  // Auswirkung der aktuellen Einstellung auf die Branchenattraktivität.
+  // Starker Beitrag zur Kraft = geringere Attraktivität = "unattraktiv".
+  const IMPACT_WORDS = ["attraktiv", "eher attraktiv", "neutral", "eher unattraktiv", "unattraktiv"];
+  const driverImpact = (val, dir) => IMPACT_WORDS[Math.round(driverContribution(val, dir)) - 1] || "neutral";
   function computeForce(f) {
     const arr = state.forces[f.key].drivers || [];
     const contribs = f.drivers.map((d, i) => {
       const val = arr[i] != null ? arr[i] : 3;
-      return d[1] === "hoch" ? val : (6 - val);
+      return driverContribution(val, d[1]);
     });
     const avg = contribs.reduce((a, b) => a + b, 0) / (contribs.length || 1);
     return Math.round(avg * 10) / 10;
@@ -520,7 +523,7 @@
         <div class="drivers">${
           f.drivers.map((d, i) => `
             <div class="driver">
-              <div class="driver-head"><span class="driver-label">${d[0]}</span><span class="driver-val" id="dv-${f.key}-${i}">${driverWord(cur.drivers[i])}</span></div>
+              <div class="driver-head"><span class="driver-label">${d[0]}</span><span class="driver-val" id="dv-${f.key}-${i}">${driverImpact(cur.drivers[i], d[1])}</span></div>
               <input type="range" min="1" max="5" step="1" value="${cur.drivers[i]}" data-i="${i}" aria-label="${d[0]}" />
               <div class="scale-hint"><span>sehr niedrig</span><span>sehr hoch</span></div>
             </div>`).join("")
@@ -530,7 +533,7 @@
         range.addEventListener("input", () => {
           const i = Number(range.dataset.i);
           state.forces[f.key].drivers[i] = Number(range.value);
-          $("#dv-" + f.key + "-" + i).textContent = driverWord(range.value);
+          $("#dv-" + f.key + "-" + i).textContent = driverImpact(range.value, f.drivers[i][1]);
           save(); updateForcesResult();
         });
       });
