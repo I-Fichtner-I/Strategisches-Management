@@ -63,7 +63,7 @@
   const defaultState = () => ({
     swot: emptyLists(["strengths", "weaknesses", "opportunities", "threats"]),
     forces: {
-      rivalry: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] },
+      rivalry: { v: 3, note: "", drivers: [3, 3, 3, 3, 3] },
       newEntrants: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] },
       suppliers: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3] },
       buyers: { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3] },
@@ -457,8 +457,8 @@
   const FORCES = [
     { key: "rivalry", label: "Rivalität unter Wettbewerbern", short: "Wettbewerbsrivalität",
       note: "stark, wenn der Verdrängungswettbewerb intensiv ist", drivers: [
-      ["Anzahl der Wettbewerber", "hoch"], ["Branchenwachstum", "niedrig"], ["Fixkosten", "hoch"], ["Lagerkosten", "hoch"],
-      ["Produktdifferenzierung", "niedrig"], ["Wechselkosten", "niedrig"], ["Austrittsbarrieren", "hoch"], ["Strategische Bedeutung des Geschäfts", "hoch"],
+      ["Kapazitätsauslastung", "niedrig"], ["Produkthomogenität", "hoch"], ["Bindung der Abnehmer", "niedrig"],
+      ["Marktaustrittsbarrieren", "hoch"], ["Härte der Branchenkultur", "hoch"],
     ]},
     { key: "newEntrants", label: "Bedrohung durch neue Anbieter", short: "Bedrohung durch neue Anbieter",
       note: "stark, wenn die Markteintrittsbarrieren niedrig sind", drivers: [
@@ -1768,7 +1768,7 @@
     s.pestel.technological = [{ text: "Schnelle KI-Entwicklung", sign: 1 }];
     s.pestel.legal = [{ text: "Strengere Datenschutzauflagen", sign: -1 }];
     // Treiber-Ausprägungen (sehr niedrig 1 … sehr hoch 5); daraus wird die Kraft berechnet
-    s.forces.rivalry = { v: 4, note: "Viele Anbieter, geringes Marktwachstum", drivers: [5, 2, 4, 3, 2, 2, 4, 4] };
+    s.forces.rivalry = { v: 4, note: "Viele Anbieter, geringes Marktwachstum", drivers: [2, 4, 2, 4, 3] };
     s.forces.newEntrants = { v: 3, note: "", drivers: [3, 3, 3, 3, 3, 3, 3, 3] };
     s.forces.suppliers = { v: 2, note: "Standardkomponenten, viele Bezugsquellen", drivers: [2, 4, 4, 2, 2, 2] };
     s.forces.buyers = { v: 4, note: "Preissensible Großkunden", drivers: [5, 2, 2, 4, 2, 2] };
