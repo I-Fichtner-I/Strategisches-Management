@@ -13,11 +13,35 @@ Planungsprozesses. Die **strategische Kontrolle und Frühaufklärung** ist dabei
 keine bloße Schlussphase, sondern läuft **während aller Phasen** mit und speist
 die Ergebnisse laufend in die Zielplanung zurück (Regelkreis).
 
-```mermaid
-flowchart LR
-    P1["1 · Strategische Zielplanung"] --> P2["2 · Strategische Analyse und Prognose"] --> P3["3 · Strategiekonzeption"] --> P4["4 · Bewertung der Strategiealternativen und Auswahl"] --> P5["5 · Strategieimplementierung"]
-    P5 -.->|Rückkopplung| P1
-    K["Strategische Kontrolle & Frühaufklärung · während aller Phasen"] -.-> P1 & P2 & P3 & P4 & P5
+```
+┌────────────────────────────────────────────────────────────┐
+│ 1 · Strategische Zielplanung                               │ ◀─┐
+│     Vision · Leitbild · Strategische Ziele                 │   │
+└────────────────────────────┬───────────────────────────────┘   │
+                             ▼                                   │
+┌────────────────────────────────────────────────────────────┐   │
+│ 2 · Strategische Analyse und Prognose                      │   │
+│     Umweltanalyse · Unternehmensanalyse · Prognose         │   │
+└────────────────────────────┬───────────────────────────────┘   │
+                             ▼                                   R
+┌────────────────────────────────────────────────────────────┐   ü
+│ 3 · Strategiekonzeption                                    │   c
+│     Unternehmen gesamt · Geschäftsbereiche ·               │   k
+│     Funktionsbereiche                                      │   k
+└────────────────────────────┬───────────────────────────────┘   o
+                             ▼                                   p
+┌────────────────────────────────────────────────────────────┐   p
+│ 4 · Bewertung der Strategiealternativen und Auswahl        │   l
+└────────────────────────────┬───────────────────────────────┘   u
+                             ▼                                   n
+┌────────────────────────────────────────────────────────────┐   g
+│ 5 · Strategieimplementierung                               │   │
+│     Maßnahmenplanung · Budgetierung                        │ ──┘
+└────────────────────────────────────────────────────────────┘
+
+═══ Strategische Kontrolle & Frühaufklärung ═══════════════════
+    läuft WÄHREND ALLER PHASEN mit (Prämissen- und
+    Durchführungskontrolle, schwache Signale)
 ```
 
 | Phase | Inhalte | Werkzeuge |
