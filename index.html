@@ -66,10 +66,9 @@
         </details>
         <details class="nav-group">
           <summary class="nav-head">Werkzeuge &amp; Export</summary>
-          <button class="nav-item" data-view="fallstudie">Fallstudien-Report</button>
           <button class="nav-item" data-view="quiz">Selbsttest</button>
           <button class="nav-item" data-view="glossar">Glossar</button>
-          <button class="nav-item" data-view="dossier">Strategie-Dossier</button>
+          <button class="nav-item" data-view="dossier">Strategie-Dossier &amp; Fallstudie</button>
         </details>
       </nav>
     </aside>
@@ -86,15 +85,6 @@
         so beantwortet das Tool die typischen Fragestellungen und führt zugleich durch die Anwendung.</p>
       </div>
 
-      <details class="dash" id="dash" open>
-        <summary class="dash-summary"><strong id="dash-count">0 / 18</strong>&nbsp;Werkzeugen befüllt</summary>
-        <div class="dash-body">
-          <div class="dash-actions"><button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button></div>
-          <div class="dash-bar"><span id="dash-bar-fill"></span></div>
-          <div class="dash-grid" id="dash-grid"></div>
-          <div class="dash-consistency" id="dash-consistency"></div>
-        </div>
-      </details>
       <details class="kb" id="help-panel">
         <summary>So nutzt du das Toolkit</summary>
         <div class="kb-body">
@@ -200,15 +190,32 @@
           </div>
         </details>
         <details class="chap" name="chap">
-          <summary><span class="chap-no">✦</span><span class="chap-title">Werkzeuge &amp; Export</span><span class="chap-hint">Fallstudie · Selbsttest · Glossar · Dossier</span></summary>
+          <summary><span class="chap-no">✦</span><span class="chap-title">Werkzeuge &amp; Export</span><span class="chap-hint">Selbsttest · Glossar · Dossier &amp; Fallstudie</span></summary>
           <div class="chap-links">
-            <a href="#" data-goto="fallstudie"><strong>Fallstudien-Report</strong><span>Bericht mit Firmenbibliothek, Gliederung und Umfangszähler.</span></a>
             <a href="#" data-goto="quiz"><strong>Selbsttest</strong><span>Lernkarten und Quiz mit Sofort-Feedback.</span></a>
             <a href="#" data-goto="glossar"><strong>Glossar</strong><span>Zentrale Begriffe nachschlagen und durchsuchen.</span></a>
-            <a href="#" data-goto="dossier"><strong>Strategie-Dossier</strong><span>Alle Ergebnisse als druckfertiges Gesamtdokument (PDF).</span></a>
+            <a href="#" data-goto="dossier"><strong>Strategie-Dossier &amp; Fallstudien-Report</strong><span>Alle Ergebnisse als druckfertiges Gesamtdokument (PDF) – der gegliederte Fallstudien-Report wird hier direkt bearbeitet.</span></a>
           </div>
         </details>
       </div>
+
+      <h3 class="sub">Fortschritt &amp; Beispieldaten</h3>
+      <details class="dash" id="dash" open>
+        <summary class="dash-summary"><strong id="dash-count">0 / 18</strong>&nbsp;Werkzeugen befüllt</summary>
+        <div class="dash-body">
+          <div class="dash-actions">
+            <select id="example-company" aria-label="Unternehmen für den Beispiel-Datensatz">
+              <option value="">Generisches Beispielunternehmen</option>
+            </select>
+            <button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button>
+          </div>
+          <p class="dash-hint">Firmenprofil &amp; Geschäftsfelder sind reale (gerundete) Angaben; Analyse-Einträge
+          und Kennzahlen-Verhältnisse sind fiktive Übungsannahmen.</p>
+          <div class="dash-bar"><span id="dash-bar-fill"></span></div>
+          <div class="dash-grid" id="dash-grid"></div>
+          <div class="dash-consistency" id="dash-consistency"></div>
+        </div>
+      </details>
     </section>
 
     <!-- ABELL -->
@@ -494,37 +501,6 @@
       <div class="bsc" id="bsc-root"></div>
     </section>
 
-    <!-- FALLSTUDIE -->
-    <section class="view" id="view-fallstudie">
-      <div class="view-head">
-        <h2>Fallstudien-Report</h2>
-        <p class="lead">Arbeitsbereich für eine Fallstudie: Unternehmen wählen, den Bericht nach
-        wissenschaftlichen Standards gliedern, Quellen sammeln und die KI-Nutzung dokumentieren.
-        Der Zähler zeigt den ungefähren Umfang. Die Abschnitte sind zweisprachig (DE/EN) angelegt.</p>
-      </div>
-      <div class="kb-slot" data-kb="fallstudie"></div>
-
-      <label class="field-label">Unternehmen (Auswahl aus der Fallstudien-Liste)
-        <select id="fs-company-select"><option value="">– bitte wählen –</option></select>
-      </label>
-      <div id="fs-profile" class="fs-profile"></div>
-
-      <div class="fs-meta">
-        <label class="field-label">Titel der Fallstudie<input type="text" id="fs-titel" placeholder="z. B. Strategic Analysis of …" /></label>
-        <label class="field-label">Gruppe / Autor:innen<input type="text" id="fs-gruppe" placeholder="Namen der Gruppenmitglieder" /></label>
-      </div>
-
-      <div id="fs-sections"></div>
-
-      <div class="list-tool cols-1" id="fs-sources"></div>
-
-      <label class="field-label">Dokumentation der KI-Nutzung
-        <textarea id="fs-ki" placeholder="Welche KI-Tools wurden wofür genutzt? (z. B. Recherche, Strukturierung, Übersetzung) – Aussagen kritisch geprüft und belegt."></textarea>
-      </label>
-
-      <div class="fs-counter" id="fs-counter" aria-live="polite"></div>
-    </section>
-
     <!-- SELBSTTEST -->
     <section class="view" id="view-quiz">
       <div class="view-head">
@@ -745,10 +721,26 @@
     <section class="view" id="view-dossier">
       <div class="view-head no-print">
         <h2>Strategie-Dossier</h2>
-        <p class="lead">Zusammenfassung aller Werkzeuge in einem Dokument. Über
-        <strong>„Als PDF exportieren"</strong> lässt sich das Dossier drucken oder als PDF sichern.</p>
+        <p class="lead">Zusammenfassung aller Werkzeuge in einem Dokument – inklusive des
+        <strong>Fallstudien-Reports</strong>, der unten direkt bearbeitet wird. Über
+        <strong>„Als PDF exportieren"</strong> lässt sich alles drucken oder als PDF sichern.</p>
         <button id="btn-dossier-pdf" class="primary-btn">Als PDF exportieren</button>
       </div>
+
+      <details class="kb fs-editor no-print" id="fs-editor">
+        <summary>Fallstudien-Report bearbeiten</summary>
+        <div class="kb-body">
+          <div class="kb-slot" data-kb="fallstudie"></div>
+          <p class="fs-company-line">Unternehmen: <strong id="fs-company-display">–</strong>
+            <span class="fs-company-hint">Auswahl über <a href="#" data-goto="prozess">„Beispiel-Datensatz laden"</a> auf der Startseite (20 Firmenprofile).</span></p>
+          <div class="fs-meta">
+            <label class="field-label">Titel der Fallstudie<input type="text" id="fs-titel" placeholder="z. B. Strategic Analysis of …" /></label>
+            <label class="field-label">Gruppe / Autor:innen<input type="text" id="fs-gruppe" placeholder="Namen der Gruppenmitglieder" /></label>
+          </div>
+          <div id="fs-sections"></div>
+        </div>
+      </details>
+
       <div id="dossier-root" class="dossier"></div>
     </section>
 

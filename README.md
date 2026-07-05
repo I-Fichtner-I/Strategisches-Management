@@ -78,7 +78,7 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 | **BCG-Portfolio** | Zusammenführung | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz): Stars / Question Marks / Cash Cows / Dogs. |
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
 | **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
-| **Fallstudien-Report** | Analyse & Anwendung | Bericht für eine Fallstudie: Firmenauswahl aus einer Bibliothek mit **20 Unternehmensprofilen** (echte Eckdaten), gegliederte Struktur nach wissenschaftlichen Standards, Quellenverzeichnis, KI-Nutzungs-Doku und **Umfangszähler** (Seiten/Wörter). |
+| **Fallstudien-Report** *(im Strategie-Dossier)* | Analyse & Anwendung | Berichts-Arbeitsbereich direkt im Dossier: Titel, Autor:innen und gegliederte Struktur nach wissenschaftlichen Standards (Einleitung bis Fazit). Das Unternehmen (Bibliothek mit **20 Unternehmensprofilen**, echte Eckdaten) wird über „Beispiel-Datensatz laden" gewählt. |
 | **Selbsttest** | Wiederholung | Lernkarten und ein Multiple-Choice-Quiz mit Sofort-Feedback. |
 | **Strategie-Dossier** | Gesamt­dokument | Fasst alle Werkzeuge in einem druckfertigen Bericht zusammen – inkl. eingebetteter Diagramme und automatischer Einordnung (Stakeholder-Strategie, BCG-Kategorie, Branchenattraktivität). Per „Als PDF exportieren" als PDF sicherbar. |
 
@@ -105,6 +105,15 @@ Zusätzlich werden **Kennzahlen aus der Balanced Scorecard automatisch in den
 Frühwarn- & KPI-Tracker übernommen** (erkennbar am Badge *BSC*). Zielwert,
 Ist-Wert, Zielrichtung und Ampel-Status lassen sich anschließend direkt in der
 Tracker-Tabelle bearbeiten; entfernte Kennzahlen werden nicht erneut angelegt.
+
+### Beispieldaten
+
+Über **„Beispiel-Datensatz laden"** (Startseite, unten im Panel „Fortschritt &
+Beispieldaten") lässt sich das komplette Toolkit befüllen – wahlweise mit einem
+generischen Beispielunternehmen oder mit einem der **20 Firmenprofile** aus der
+Fallstudien-Bibliothek. Firmenprofil und Geschäftsfelder sind reale (gerundete)
+Angaben; die Analyse-Einträge und Kennzahlen-Verhältnisse sind fiktive
+Übungsannahmen.
 
 ## Nutzung
 
