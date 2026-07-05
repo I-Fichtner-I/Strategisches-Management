@@ -87,7 +87,7 @@ a { color: var(--series-1); }
 .procflow-cap { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em;
   color: var(--muted); font-weight: 700; margin: 0 0 18px; }
 .procflow-track { list-style: none; margin: 0; padding: 0; display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 30px; }
+  grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 30px; }
 .procphase { position: relative; background: var(--surface-1);
   border: 1px solid var(--border); border-top: 3px solid var(--series-1); border-radius: var(--radius);
   padding: 20px 14px 14px; box-shadow: var(--shadow-sm); }
@@ -101,14 +101,27 @@ a { color: var(--series-1); }
 .procphase-tools a:hover { color: var(--series-1); text-decoration: underline; }
 .procphase:not(:last-child)::after { content: "›"; position: absolute; right: -21px; top: 50%;
   transform: translateY(-50%); font-size: 1.6rem; line-height: 1; color: var(--baseline); font-weight: 700; }
-.procflow-loop { margin: 24px 0 0; position: relative; text-align: center; }
-.procflow-loop::before { content: ""; position: absolute; left: 0; right: 0; top: 50%;
-  border-top: 2px dashed var(--baseline); }
-.procflow-loop-inner { position: relative; background: var(--page); padding: 4px 16px;
-  font-size: .82rem; color: var(--text-secondary); font-weight: 600; }
+/* Prozessbegleitende Kontrolle: durchlaufendes Band unter allen Phasen */
+.procflow-control { position: relative; display: flex; gap: 14px; align-items: flex-start;
+  margin: 30px 0 0; padding: 16px 18px; border-radius: var(--radius);
+  border: 1px dashed color-mix(in srgb, var(--series-1) 45%, var(--border));
+  background: color-mix(in srgb, var(--series-1) 8%, var(--surface-1)); }
+.procflow-control::before { content: ""; position: absolute; left: 24px; right: 24px; top: -18px; height: 18px;
+  border: 2px dashed var(--baseline); border-bottom: none; border-radius: 8px 8px 0 0; opacity: .7; }
+.procflow-control-no { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: .95rem; color: #fff;
+  background: linear-gradient(135deg, var(--series-1), color-mix(in srgb, var(--series-1) 55%, #7b3ff2));
+  box-shadow: var(--shadow-sm); }
+.procflow-control-body { min-width: 0; }
+.procflow-control-body strong { font-size: 1rem; }
+.procflow-control-tag { display: inline-block; margin-left: 8px; font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--series-1);
+  background: color-mix(in srgb, var(--series-1) 16%, transparent); padding: 2px 8px; border-radius: 999px; }
+.procflow-control-body p { margin: 6px 0 0; font-size: .86rem; color: var(--text-secondary); line-height: 1.55; }
 @media (max-width: 980px) {
   .procflow-track { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 20px; }
   .procphase:not(:last-child)::after { content: none; }
+  .procflow-control::before { content: none; }
 }
 @media (max-width: 560px) {
   .procflow-track { grid-template-columns: 1fr; gap: 30px; }
@@ -634,6 +647,31 @@ button:active { transform: translateY(1px); }
   background: color-mix(in srgb, var(--good) 12%, transparent); }
 .bsc-strategy-banner { font-size: .92rem; margin-bottom: 14px; padding: 10px 14px; border-radius: var(--radius);
   border: 1px solid var(--border); background: color-mix(in srgb, var(--series-1) 10%, var(--surface-1)); }
+
+/* Werkzeug-Verzahnung: Abell-Marktanker, Übernahme-Chips, Prämissen, Konsistenz */
+.tool-anchor { font-size: .88rem; margin: 0 0 16px; padding: 9px 13px; border-radius: var(--radius);
+  border: 1px solid var(--border); border-left: 3px solid var(--series-1);
+  background: color-mix(in srgb, var(--series-1) 7%, var(--surface-1)); color: var(--text-secondary); }
+.tool-anchor .anchor-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
+  font-weight: 700; color: var(--series-1); margin-right: 8px; }
+.list-suggest { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.prem-table { width: 100%; }
+.prem-btn { cursor: pointer; font: inherit; font-size: .82rem; border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px 12px; background: var(--surface-1); color: var(--text-primary); white-space: nowrap; }
+.prem-btn.prem-watch { border-color: var(--warning); }
+.prem-btn.prem-broken { border-color: var(--critical); }
+.prem-empty { color: var(--muted); font-style: italic; }
+.consistency-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.consistency-list li { font-size: .9rem; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface-1); }
+.consistency-list .cons-warn { border-left: 3px solid var(--critical);
+  background: color-mix(in srgb, var(--critical) 7%, var(--surface-1)); }
+.consistency-list .cons-info { border-left: 3px solid var(--warning);
+  background: color-mix(in srgb, var(--warning) 7%, var(--surface-1)); }
+.consistency-list .cons-ok { border-left: 3px solid var(--good);
+  background: color-mix(in srgb, var(--good) 7%, var(--surface-1)); }
+.dash-consistency { margin-top: 16px; }
+.dash-cons-head { margin: 0 0 8px; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 
 /* Frühwarn-/KPI-Tracker (6.3) */
 .kpi-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; background: var(--surface-1);
