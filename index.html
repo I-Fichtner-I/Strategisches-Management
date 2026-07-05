@@ -18,7 +18,7 @@
           <p class="tagline">Werkzeuge &amp; Wissen für das strategische Management</p>
         </div>
       </div>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Navigation ein-/ausblenden">☰ Kapitel</button>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Navigation ein-/ausblenden" aria-controls="sidebar" aria-expanded="false">☰ Kapitel</button>
     </div>
   </header>
 
@@ -86,7 +86,7 @@
       </div>
 
       <details class="dash" id="dash" open>
-        <summary class="dash-summary"><strong id="dash-count">0 / 17</strong>&nbsp;Werkzeugen befüllt</summary>
+        <summary class="dash-summary"><strong id="dash-count">0 / 18</strong>&nbsp;Werkzeugen befüllt</summary>
         <div class="dash-body">
           <div class="dash-actions"><button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button></div>
           <div class="dash-bar"><span id="dash-bar-fill"></span></div>
@@ -259,7 +259,7 @@
       </div>
       <div class="forces-result">
         <div class="gauge"><div class="gauge-fill" id="forces-gauge"></div></div>
-        <div class="forces-score">
+        <div class="forces-score" aria-live="polite">
           <span class="score-num" id="forces-score">–</span>
           <span class="score-label" id="forces-verdict">Branchenattraktivität</span>
         </div>
@@ -320,14 +320,14 @@
           <label>EBIT (Mio. €)<input type="number" step="any" name="ebit" placeholder="120" /></label>
           <label>Abschreibungen &amp; Amortisation (Mio. €)<input type="number" step="any" name="da" placeholder="40" /></label>
           <label>Umsatz (Mio. €)<input type="number" step="any" name="umsatz" placeholder="800" /></label>
-          <div class="calc-out" id="out-ebitda">EBITDA: –<br>EBITDA-Marge: –</div>
+          <div class="calc-out" id="out-ebitda" aria-live="polite">EBITDA: –<br>EBITDA-Marge: –</div>
         </form>
         <form class="calc-card" id="calc-eva">
           <h3>EVA (Economic Value Added)</h3>
           <label>NOPAT (Mio. €) <span class="field-hint">operatives Ergebnis nach Steuern, vor Zinsen (≈ EBIT × (1 − Steuersatz))</span><input type="number" step="any" name="nopat" placeholder="90" /></label>
           <label>Investiertes Kapital (Mio. €)<input type="number" step="any" name="kapital" placeholder="600" /></label>
           <label>WACC (%) <span class="field-hint">gewichtete Kapitalkosten (Eigen- &amp; Fremdkapital)</span><input type="number" step="any" name="wacc" placeholder="8" /></label>
-          <div class="calc-out" id="out-eva">Kapitalkosten: –<br>EVA: –</div>
+          <div class="calc-out" id="out-eva" aria-live="polite">Kapitalkosten: –<br>EVA: –</div>
         </form>
       </div>
 
@@ -472,7 +472,7 @@
         <textarea id="fs-ki" placeholder="Welche KI-Tools wurden wofür genutzt? (z. B. Recherche, Strukturierung, Übersetzung) – Aussagen kritisch geprüft und belegt."></textarea>
       </label>
 
-      <div class="fs-counter" id="fs-counter"></div>
+      <div class="fs-counter" id="fs-counter" aria-live="polite"></div>
     </section>
 
     <!-- SELBSTTEST -->
@@ -539,11 +539,23 @@
       <article class="know" id="mbv"><h3>2.1 Marktorientierter Ansatz (Market-based View)</h3>
         <p><strong>Outside-in.</strong> Wettbewerbsvorteile entstehen aus der Positionierung in einer attraktiven Branche. Zentrale Instrumente sind die Branchenstrukturanalyse (Five Forces) und die generischen Wettbewerbsstrategien nach Porter (Kostenführerschaft, Differenzierung, Fokus). Leitfrage: „In welcher Branche und Position sind überdurchschnittliche Renditen möglich?"</p></article>
       <article class="know" id="rbv"><h3>2.2 Ressourcenbasierter Ansatz (Resource-based View)</h3>
-        <p><strong>Inside-out.</strong> Vorteile beruhen auf internen Ressourcen und Kernkompetenzen, die <strong>wertvoll, selten, schwer imitierbar und nicht substituierbar</strong> (VRIN) sind. Leitfrage: „Welche einzigartigen Ressourcen und Fähigkeiten besitzen wir?"</p></article>
+        <p><strong>Inside-out.</strong> Vorteile beruhen auf internen Ressourcen und Kernkompetenzen, die <strong>wertvoll, selten, schwer imitierbar und nicht substituierbar</strong> (VRIN) sind. Leitfrage: „Welche einzigartigen Ressourcen und Fähigkeiten besitzen wir?" <a href="#vrio-tool">→ Ressourcen unten im VRIO-Check prüfen</a></p></article>
       <article class="know" id="kbv"><h3>2.3 Wissensbasierter Ansatz (Knowledge-based View)</h3>
         <p>Erweiterung des RBV: <strong>Wissen</strong> gilt als wichtigste strategische Ressource. Im Fokus stehen organisationales Lernen sowie Aufbau, Transfer und Schutz von (implizitem) Wissen. Leitfrage: „Wie bauen wir Wissen auf und nutzen es besser als der Wettbewerb?"</p></article>
       <article class="know" id="vbv"><h3>2.4 Wertorientierter Ansatz (Value-based View)</h3>
         <p>Oberstes Ziel ist die nachhaltige Steigerung des <strong>Unternehmenswerts</strong> (Shareholder Value). Strategien werden danach beurteilt, ob sie Wert über den Kapitalkosten schaffen; Steuerung über wertorientierte Kennzahlen wie <strong>EVA</strong> und <strong>CFROI</strong>. Leitfrage: „Schafft die Strategie Wert oberhalb der Kapitalkosten?"</p></article>
+
+      <h3 class="sub" id="vrio-tool">VRIO-Check – Ressourcen &amp; Fähigkeiten (zu 2.2)</h3>
+      <p class="lead">Ressourcen und Fähigkeiten nach dem <strong>VRIO-Schema</strong> prüfen: Ist die Ressource
+      wertvoll, selten, schwer imitierbar – und nutzt die Organisation sie? Daraus ergibt sich die
+      Wettbewerbsimplikation. Ressourcen mit (temporärem oder dauerhaftem) Vorteil fließen automatisch
+      als <strong>Stärken in die SWOT</strong>; nicht wertvolle Ressourcen als Schwächen.</p>
+      <div class="kb-slot" data-kb="vrio"></div>
+      <form class="kpi-form" id="vrio-form">
+        <input type="text" name="name" required placeholder="Ressource / Fähigkeit (z. B. Markenimage, Patente, Vertriebsnetz)" />
+        <button type="submit">Hinzufügen</button>
+      </form>
+      <div class="sw-matrix-wrap"><table class="sw-matrix vrio-table" id="vrio-table"></table></div>
     </section>
 
     <!-- 4.1.3 WETTBEWERBSUMFELD -->
