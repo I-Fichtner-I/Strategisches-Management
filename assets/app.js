@@ -1528,14 +1528,23 @@
 
   function countWords(s) { return ((s || "").trim().match(/\S+/g) || []).length; }
 
+  function fsProfileText(c) {
+    return `${c.name} (${c.legal}, Sitz: ${c.hq}) ist in der Branche ${c.sector} tätig. `
+      + `Geschäftsfelder: ${c.fields.join(", ")}. Märkte: ${c.markets}. `
+      + `Größe: Umsatz ${c.revenue}, ${c.employees} Mitarbeitende (${c.fy}). `
+      + `Strategischer Fokus: ${c.strategy}`;
+  }
+
   function populateCompanySelect() {
-    const sel = $("#fs-company-select");
-    if (!sel || sel.dataset.filled) return;
-    COMPANIES.forEach((c) => {
-      const o = document.createElement("option");
-      o.value = c.name; o.textContent = c.name; sel.appendChild(o);
+    ["#fs-company-select", "#example-company"].forEach((s) => {
+      const sel = $(s);
+      if (!sel || sel.dataset.filled) return;
+      COMPANIES.forEach((c) => {
+        const o = document.createElement("option");
+        o.value = c.name; o.textContent = c.name; sel.appendChild(o);
+      });
+      sel.dataset.filled = "1";
     });
-    sel.dataset.filled = "1";
   }
 
   function renderFsProfile() {
@@ -1557,10 +1566,7 @@
       </dl>
       <p class="fs-note">Kennzahlen sind gerundete Näherungswerte – im Bericht mit aktuellem Geschäftsbericht belegen und zitieren.</p>`;
     $("#fs-apply").addEventListener("click", () => {
-      const text = `${c.name} (${c.legal}, Sitz: ${c.hq}) ist in der Branche ${c.sector} tätig. `
-        + `Geschäftsfelder: ${c.fields.join(", ")}. Märkte: ${c.markets}. `
-        + `Größe: Umsatz ${c.revenue}, ${c.employees} Mitarbeitende (${c.fy}). `
-        + `Strategischer Fokus: ${c.strategy}`;
+      const text = fsProfileText(c);
       const ta = $("#fs-sec-ueberblick");
       if (ta.value.trim() && !confirm("Den vorhandenen Unternehmensüberblick überschreiben?")) return;
       ta.value = text; state.fallstudie.sections.ueberblick = text; save(); updateFsCounter();
@@ -2216,6 +2222,80 @@
     return s;
   }
 
+  /* Beispiel-Datensatz für ein konkretes Unternehmen aus der Firmenbibliothek:
+     Profil, Geschäftsfelder und Strategie stammen aus dem Firmenprofil (real,
+     gerundet); die Analyse-Einträge und Kennzahlen-Verhältnisse sind bewusst
+     einfache Übungsannahmen auf Basis des generischen Beispiels. */
+  function companyShortName(c) {
+    const legal = new Set(["AG", "SE", "S.A.", "SA", "PLC", "Inc.", "N.V.", "A/S", "Corporation", "Holding"]);
+    const words = c.name.replace(/,.*$/, "").split(/\s+/).filter((w) => !legal.has(w));
+    if (/^[A-Z0-9]{2,}$/.test(words[0])) return words[0];
+    return words.slice(0, 2).join(" ");
+  }
+  function parseRevenueMio(rev) {
+    const m = String(rev).replace(/\./g, "").match(/([\d,]+)\s*(Mrd|Mio)/);
+    if (!m) return null;
+    const num = parseFloat(m[1].replace(",", "."));
+    return Math.round(m[2] === "Mrd" ? num * 1000 : num);
+  }
+  // Feste Positionsmuster für die Geschäftsfelder im BCG-Portfolio
+  // (Star, Cash Cow, Question Mark, Dog, Mitte) – fiktive Übungswerte.
+  const BCG_PATTERNS = [
+    { growth: 12, share: 1.6, revenue: 35 },
+    { growth: 3, share: 2.2, revenue: 45 },
+    { growth: 15, share: 0.6, revenue: 12 },
+    { growth: 2, share: 0.6, revenue: 8 },
+    { growth: 8, share: 1.1, revenue: 18 },
+  ];
+  function companyState(c) {
+    const s = sampleState();
+    const short = companyShortName(c);
+    s.fallstudie = {
+      company: c.name, titel: `Strategische Analyse der ${c.name}`, gruppe: "", ki: "",
+      sources: [`Geschäftsbericht ${c.fy}`],
+      sections: {
+        einleitung: `Diese Fallstudie analysiert Lage, Umfeld und Strategie der ${c.name}.`,
+        ueberblick: fsProfileText(c), extern: "", intern: "", swotopt: "", diskussion: "", fazit: "",
+      },
+    };
+    s.abell = {
+      groups: [`Märkte/Kunden: ${c.markets}`],
+      functions: c.fields.slice(0, 4),
+      technologies: [`Kerntechnologien der Branche ${c.sector}`],
+    };
+    s.bcg = c.fields.slice(0, 5).map((f, i) => {
+      const name = f.length > 22 ? f.slice(0, 21) + "…" : f;
+      return Object.assign({ name }, BCG_PATTERNS[i % BCG_PATTERNS.length]);
+    });
+    s.ziele = [{
+      ziel: `Strategischen Fokus von ${short} umsetzen`,
+      s: c.strategy,
+      m: "Umsatzwachstum und Marktanteile der Geschäftsfelder",
+      a: "sichert die Wettbewerbsposition nachhaltig",
+      r: "aufbauend auf vorhandenen Kernkompetenzen",
+      t: "bis Ende 2028",
+    }];
+    s.szenario.frage = `Entwicklung der Branche ${c.sector} bis 2030`;
+    s.wettbewerb.competitors = s.wettbewerb.competitors.map((x) =>
+      x.name === "Wir" ? Object.assign({}, x, { name: short }) : x);
+    s.vrio = [
+      { name: `Marke & Reputation (${short})`, v: 1, r: 1, i: 1, o: 1 },
+      { name: `Kompetenzen im Feld „${c.fields[0]}“`, v: 1, r: 1, i: 0, o: 1 },
+      { name: "Standardisierte IT-Systeme", v: 1, r: 0, i: 0, o: 1 },
+    ];
+    s.strategiewahl.options = [{ name: `[Ist-Strategie] ${c.strategy}`, scores: [5, 4, 4] }]
+      .concat(s.strategiewahl.options);
+    s.kontrolle.indicators[0].name = `Marktanteil ${s.bcg[0] ? s.bcg[0].name : "Kernsegment"}`;
+    const u = parseRevenueMio(c.revenue);
+    if (u) {
+      s.kennzahlen = {
+        ebit: String(Math.round(u * 0.12)), da: String(Math.round(u * 0.05)), umsatz: String(u),
+        nopat: String(Math.round(u * 0.085)), kapital: String(Math.round(u * 0.7)), wacc: "8",
+      };
+    }
+    return s;
+  }
+
   /* ---------- Footer-Aktionen ---------- */
   function exportPdf() { showView("dossier"); window.print(); }
   $("#btn-export").addEventListener("click", exportPdf);
@@ -2242,8 +2322,12 @@
   });
   $("#btn-example").addEventListener("click", () => {
     const filled = DASH.filter((d) => { try { return d.has(); } catch (e) { return false; } }).length;
-    if (filled > 0 && !confirm("Aktuelle Eingaben durch den Beispiel-Datensatz ersetzen?")) return;
-    state = sampleState(); save(); fullRebuild(); navTo("prozess");
+    const sel = $("#example-company");
+    const comp = COMPANIES.find((c) => c.name === (sel ? sel.value : ""));
+    const label = comp ? `die Beispieldaten für „${comp.name}“` : "den Beispiel-Datensatz";
+    if (filled > 0 && !confirm(`Aktuelle Eingaben durch ${label} ersetzen?`)) return;
+    state = comp ? companyState(comp) : sampleState();
+    save(); fullRebuild(); navTo("prozess");
   });
   $("#btn-import-json").addEventListener("click", () => $("#import-file").click());
   $("#import-file").addEventListener("change", (e) => {

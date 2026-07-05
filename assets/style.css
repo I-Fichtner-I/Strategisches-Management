@@ -804,7 +804,11 @@ button:active { transform: translateY(1px); }
 .dash[open] .dash-summary::before { transform: rotate(90deg); }
 .dash-summary strong { color: var(--series-1); }
 .dash-body { padding: 0 0 14px; }
-.dash-actions { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.dash-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; margin-bottom: 6px; }
+#example-company { font: inherit; font-size: .9rem; padding: 7px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+  cursor: pointer; max-width: 100%; }
+.dash-hint { margin: 0 0 10px; font-size: .78rem; color: var(--muted); text-align: right; }
 .dash-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .dash-head strong { color: var(--series-1); }
 .dash-bar { height: 8px; border-radius: 6px; background: var(--grid); overflow: hidden; margin: 12px 0 16px; }

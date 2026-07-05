@@ -86,15 +86,6 @@
         so beantwortet das Tool die typischen Fragestellungen und führt zugleich durch die Anwendung.</p>
       </div>
 
-      <details class="dash" id="dash" open>
-        <summary class="dash-summary"><strong id="dash-count">0 / 18</strong>&nbsp;Werkzeugen befüllt</summary>
-        <div class="dash-body">
-          <div class="dash-actions"><button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button></div>
-          <div class="dash-bar"><span id="dash-bar-fill"></span></div>
-          <div class="dash-grid" id="dash-grid"></div>
-          <div class="dash-consistency" id="dash-consistency"></div>
-        </div>
-      </details>
       <details class="kb" id="help-panel">
         <summary>So nutzt du das Toolkit</summary>
         <div class="kb-body">
@@ -209,6 +200,24 @@
           </div>
         </details>
       </div>
+
+      <h3 class="sub">Fortschritt &amp; Beispieldaten</h3>
+      <details class="dash" id="dash" open>
+        <summary class="dash-summary"><strong id="dash-count">0 / 18</strong>&nbsp;Werkzeugen befüllt</summary>
+        <div class="dash-body">
+          <div class="dash-actions">
+            <select id="example-company" aria-label="Unternehmen für den Beispiel-Datensatz">
+              <option value="">Generisches Beispielunternehmen</option>
+            </select>
+            <button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button>
+          </div>
+          <p class="dash-hint">Firmenprofil &amp; Geschäftsfelder sind reale (gerundete) Angaben; Analyse-Einträge
+          und Kennzahlen-Verhältnisse sind fiktive Übungsannahmen.</p>
+          <div class="dash-bar"><span id="dash-bar-fill"></span></div>
+          <div class="dash-grid" id="dash-grid"></div>
+          <div class="dash-consistency" id="dash-consistency"></div>
+        </div>
+      </details>
     </section>
 
     <!-- ABELL -->

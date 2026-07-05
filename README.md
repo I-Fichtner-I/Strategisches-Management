@@ -106,6 +106,15 @@ Frühwarn- & KPI-Tracker übernommen** (erkennbar am Badge *BSC*). Zielwert,
 Ist-Wert, Zielrichtung und Ampel-Status lassen sich anschließend direkt in der
 Tracker-Tabelle bearbeiten; entfernte Kennzahlen werden nicht erneut angelegt.
 
+### Beispieldaten
+
+Über **„Beispiel-Datensatz laden"** (Startseite, unten im Panel „Fortschritt &
+Beispieldaten") lässt sich das komplette Toolkit befüllen – wahlweise mit einem
+generischen Beispielunternehmen oder mit einem der **20 Firmenprofile** aus der
+Fallstudien-Bibliothek. Firmenprofil und Geschäftsfelder sind reale (gerundete)
+Angaben; die Analyse-Einträge und Kennzahlen-Verhältnisse sind fiktive
+Übungsannahmen.
+
 ## Nutzung
 
 Lokal: `index.html` im Browser öffnen.
