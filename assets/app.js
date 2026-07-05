@@ -2263,9 +2263,9 @@
     }
     // Branchen-Vorlage: PESTEL, Five Forces, Wertkette, SWOT, Szenario, Ansoff,
     // Stakeholder und BMC mit branchentypischen Übungsinhalten überschreiben.
+    const asItems = (arr) => (arr || []).map(([text, sign]) => ({ text, sign }));
     const tpl = sectorTemplate(c);
     if (tpl) {
-      const asItems = (arr) => (arr || []).map(([text, sign]) => ({ text, sign }));
       s.pestel = emptyLists(PESTEL_CATS.map((x) => x.key));
       Object.keys(tpl.pestel || {}).forEach((k) => { s.pestel[k] = asItems(tpl.pestel[k]); });
       FORCES.forEach((f) => {
@@ -2291,6 +2291,26 @@
         s.bmc = emptyLists(BMC_BLOCKS.map((x) => x.key));
         Object.keys(tpl.bmc).forEach((k) => { s.bmc[k] = tpl.bmc[k].slice(); });
       }
+    }
+    // Unternehmensindividuelle Ebene (assets/company-data.js) über der
+    // Branchen-Vorlage: firmenspezifische SWOT, VRIO-Ressourcen, reale
+    // Wettbewerber, zusätzliche PESTEL-Faktoren und BCG-Positionen.
+    const ov = (window.TOOLKIT_COMPANY_DATA || {})[c.name];
+    if (ov) {
+      if (ov.pestel) Object.keys(ov.pestel).forEach((k) => {
+        s.pestel[k] = (s.pestel[k] || []).concat(asItems(ov.pestel[k]));
+      });
+      if (ov.swot) {
+        s.swot.strengths = ov.swot.strengths.slice();
+        s.swot.weaknesses = ov.swot.weaknesses.slice();
+      }
+      if (ov.vrio) s.vrio = ov.vrio.map((x) => ({ name: x[0], v: x[1], r: x[2], i: x[3], o: x[4] }));
+      if (ov.wettbewerb) s.wettbewerb = {
+        xLabel: ov.wettbewerb.x, yLabel: ov.wettbewerb.y,
+        competitors: ov.wettbewerb.wer.map((x) => ({ name: x[0], x: x[1], y: x[2], group: x[3] })),
+      };
+      if (ov.bcg) s.bcg = s.bcg.map((u, i) =>
+        ov.bcg[i] ? { name: u.name, growth: ov.bcg[i][0], share: ov.bcg[i][1], revenue: ov.bcg[i][2] } : u);
     }
     return s;
   }
