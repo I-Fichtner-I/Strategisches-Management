@@ -95,8 +95,11 @@ a { color: var(--series-1); }
   display: grid; place-items: center; font-weight: 700; font-size: .95rem; color: #fff;
   background: linear-gradient(135deg, var(--series-1), color-mix(in srgb, var(--series-1) 55%, #7b3ff2));
   box-shadow: var(--shadow-sm); }
-.procphase-title { margin: 0 0 7px; font-size: .95rem; overflow-wrap: anywhere; hyphens: auto; }
-.procphase-tools { margin: 0; font-size: .82rem; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+.procphase-title { margin: 0 0 7px; font-size: .95rem; hyphens: auto; overflow-wrap: break-word; }
+/* Inhalte der Phase (z. B. Vision · Leitbild · Strategische Ziele) */
+.procphase-items { margin: 0 0 8px; font-size: .8rem; color: var(--text-secondary); line-height: 1.5;
+  hyphens: auto; overflow-wrap: break-word; padding-bottom: 7px; border-bottom: 1px dashed var(--border); }
+.procphase-tools { margin: 0; font-size: .82rem; color: var(--muted); line-height: 1.55; hyphens: auto; overflow-wrap: break-word; }
 .procphase-tools a { color: var(--text-secondary); text-decoration: none; }
 .procphase-tools a:hover { color: var(--series-1); text-decoration: underline; }
 .procphase:not(:last-child)::after { content: "›"; position: absolute; right: -21px; top: 50%;

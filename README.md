@@ -6,28 +6,28 @@ Ein interaktives Web-Werkzeug, das zentrale Methoden des strategischen Managemen
 anwendbar macht. Läuft vollständig im Browser – ohne Installation und ohne Server –
 und lässt sich direkt über **GitHub Pages** veröffentlichen.
 
-## Der strategische Managementprozess
+## Der strategische Planungsprozess
 
 Die Werkzeuge folgen den idealtypischen Phasen des strategischen
-Managementprozesses. Die **strategische Kontrolle und Frühaufklärung** ist dabei
-keine bloße Schlussphase, sondern läuft **prozessbegleitend** neben allen Phasen
-mit und speist die Ergebnisse laufend in die Zielplanung zurück (Regelkreis).
+Planungsprozesses. Die **strategische Kontrolle und Frühaufklärung** ist dabei
+keine bloße Schlussphase, sondern läuft **während aller Phasen** mit und speist
+die Ergebnisse laufend in die Zielplanung zurück (Regelkreis).
 
 ```mermaid
 flowchart LR
-    P1["1 · Zielplanung"] --> P2["2 · Analyse & Prognose"] --> P3["3 · Strategiekonzeption"] --> P4["4 · Bewertung & Entscheidung"] --> P5["5 · Implementierung"]
+    P1["1 · Strategische Zielplanung"] --> P2["2 · Strategische Analyse und Prognose"] --> P3["3 · Strategiekonzeption"] --> P4["4 · Bewertung der Strategiealternativen und Auswahl"] --> P5["5 · Strategieimplementierung"]
     P5 -.->|Rückkopplung| P1
-    K["Strategische Kontrolle & Frühaufklärung · prozessbegleitend"] -.-> P1 & P2 & P3 & P4 & P5
+    K["Strategische Kontrolle & Frühaufklärung · während aller Phasen"] -.-> P1 & P2 & P3 & P4 & P5
 ```
 
-| Phase | Werkzeuge |
-|-------|-----------|
-| 1 · Zielplanung | Abell · Stakeholder · SMART-Ziele |
-| 2 · Analyse & Prognose | PESTEL · Five Forces · Szenario · Wertkette · VRIO-Check · SWOT · Portfolio |
-| 3 · Strategiekonzeption | Strategietypen |
-| 4 · Bewertung & Entscheidung | Strategiewahl (Nutzwertanalyse) |
-| 5 · Implementierung | Business Model Canvas · Balanced Scorecard |
-| *prozessbegleitend* | Frühwarn- & KPI-Tracker · Prämissenkontrolle |
+| Phase | Inhalte | Werkzeuge |
+|-------|---------|-----------|
+| 1 · Strategische Zielplanung | Vision · Leitbild · Strategische Ziele | Stakeholder · SMART-Ziele · Kennzahlen · Abell |
+| 2 · Strategische Analyse und Prognose | Umweltanalyse · Unternehmensanalyse · Prognose | PESTEL · Five Forces · Wettbewerbsumfeld · Wertkette · VRIO-Check · SWOT · Portfolio · Szenario |
+| 3 · Strategiekonzeption | Unternehmen gesamt · Geschäftsbereiche · Funktionsbereiche | Strategietypen (Porter · Ansoff) |
+| 4 · Bewertung der Strategiealternativen und Auswahl | Gewichtete Kriterien · Rangfolge · Entscheidung | Strategiewahl (Nutzwertanalyse) |
+| 5 · Strategieimplementierung | Maßnahmenplanung · Budgetierung | Business Model Canvas · Balanced Scorecard |
+| *während aller Phasen* | Strategische Kontrolle & Frühaufklärung | Frühwarn- & KPI-Tracker · Prämissenkontrolle |
 
 ## Werkzeuge
 
