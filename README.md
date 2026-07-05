@@ -23,7 +23,7 @@ flowchart LR
 | Phase | Werkzeuge |
 |-------|-----------|
 | 1 · Zielplanung | Abell · Stakeholder · SMART-Ziele |
-| 2 · Analyse & Prognose | PESTEL · Five Forces · Szenario · Wertkette · SWOT · Portfolio |
+| 2 · Analyse & Prognose | PESTEL · Five Forces · Szenario · Wertkette · VRIO-Check · SWOT · Portfolio |
 | 3 · Strategiekonzeption | Strategietypen |
 | 4 · Bewertung & Entscheidung | Strategiewahl (Nutzwertanalyse) |
 | 5 · Implementierung | Business Model Canvas · Balanced Scorecard |
@@ -43,6 +43,7 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 |----------|--------------|-----------|
 | **Abell-Marktabgrenzung** | Zielplanung | Den relevanten Markt über Kundengruppen, -funktionen und Technologien definieren. |
 | **Stakeholder-Matrix** | Zielplanung | Anspruchsgruppen nach Macht und Interesse positionieren und passende Steuerungsstrategie ableiten. |
+| **VRIO-Check** | Ansätze (RBV) / Unternehmensanalyse | Ressourcen und Fähigkeiten nach Valuable · Rare · Inimitable · Organized prüfen; die Wettbewerbsimplikation (Nachteil … dauerhafter Vorteil) wird automatisch abgeleitet. |
 | **SMART-Ziele** | Zielplanung | Ziele formulieren und automatisch auf die fünf SMART-Kriterien prüfen. |
 | **PESTEL-Analyse** | Umweltanalyse | Einflussfaktoren der globalen Umwelt in sechs Feldern erfassen. |
 | **Porters Five Forces** | Umweltanalyse | Jede der fünf Wettbewerbskräfte über ihre einzelnen **Treiber** (sehr niedrig … sehr hoch) einstellen; daraus werden Kraftstärke und **Branchenattraktivität** automatisch berechnet. |
@@ -65,13 +66,15 @@ sich als PDF exportieren.
 Die Analyse-Ergebnisse fließen zusammen: In **PESTEL** und **Wertkette** lässt sich
 jeder Eintrag per Symbol als positiv (＋) oder negativ (–) markieren. Diese Einträge
 – zusammen mit den **Five-Forces**-Bewertungen (starke Kraft → Risiko, schwache Kraft
-→ Chance) – erscheinen automatisch im Bereich „Aus Analyse" der **SWOT** und speisen
+→ Chance) und den **VRIO**-Implikationen (Vorteil → Stärke, Nachteil → Schwäche) –
+erscheinen automatisch im Bereich „Aus Analyse" der **SWOT** und speisen
 die daraus abgeleiteten **TOWS-Normstrategien**.
 
 ```
-Wertkette (＋/–) ─┐
-PESTEL   (＋/–) ─┼─▶  SWOT  ─▶  TOWS-Normstrategien (SO · ST · WO · WT)
-Five Forces     ─┘
+Wertkette (＋/–) ──┐
+VRIO-Check (RBV) ──┼─▶  SWOT  ─▶  TOWS-Normstrategien (SO · ST · WO · WT)
+PESTEL   (＋/–)  ──┤
+Five Forces      ──┘
 ```
 
 ## Nutzung

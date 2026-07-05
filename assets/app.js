@@ -93,6 +93,7 @@
     },
     wettbewerb: { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [] },
     ansoff: emptyLists(["durchdringung", "marktentwicklung", "produktentwicklung", "diversifikation"]),
+    vrio: [],
     kontrolle: { indicators: [], premises: {} },
     learn: { known: [] },
   });
@@ -125,6 +126,18 @@
   function cssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
+  // HiDPI-Rendering: die Backing-Store-Größe folgt dem devicePixelRatio, gezeichnet
+  // wird weiterhin in den logischen Maßen aus den width/height-Attributen.
+  function canvas2d(canvas) {
+    if (!canvas.dataset.w) { canvas.dataset.w = canvas.width; canvas.dataset.h = canvas.height; }
+    const W = +canvas.dataset.w, H = +canvas.dataset.h;
+    const dpr = Math.min(2.5, Math.max(1, window.devicePixelRatio || 1));
+    const bw = Math.round(W * dpr), bh = Math.round(H * dpr);
+    if (canvas.width !== bw || canvas.height !== bh) { canvas.width = bw; canvas.height = bh; }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, W, H };
+  }
 
   /* ---------- Wissensbasis (Theorie & Leitfragen je Werkzeug) ---------- */
   const KB = {
@@ -132,6 +145,11 @@
       def: "Die Marktabgrenzung nach <strong>Abell</strong> definiert den relevanten Markt nicht über Produkte, sondern über den gestifteten Nutzen – dreidimensional entlang von Kundengruppen (<em>wer</em>), Kundenfunktionen/Bedürfnissen (<em>was</em>) und Technologien (<em>wie</em>). So wird bewusst festgelegt, wie breit oder eng der Markt gefasst wird.",
       vorgehen: ["Kundengruppen bestimmen (Wer wird bedient?)", "Kundenfunktionen/Bedürfnisse bestimmen (Welches Problem wird gelöst?)", "Technologien bestimmen (Womit wird der Nutzen erbracht?)", "Kombinationen betrachten und Markt bewusst breit oder eng abgrenzen"],
       leitfragen: ["Wer sind die relevanten Kundengruppen?", "Welche Funktionen/Bedürfnisse erfüllen wir?", "Mit welchen (alternativen) Technologien?", "Wie verändert sich der Markt bei breiterer/engerer Abgrenzung?"],
+    },
+    vrio: {
+      def: "Das <strong>VRIO-Schema</strong> (Barney) prüft, ob eine Ressource oder Fähigkeit einen dauerhaften Wettbewerbsvorteil begründet: <strong>V</strong>aluable (wertvoll), <strong>R</strong>are (selten), <strong>I</strong>nimitable (schwer imitierbar) und <strong>O</strong>rganized (organisatorisch nutzbar). Erst wenn alle vier Kriterien erfüllt sind, entsteht ein dauerhafter Vorteil – das zentrale Prüfraster des Resource-based View.",
+      vorgehen: ["Ressourcen und Fähigkeiten sammeln (materiell, immateriell, organisational)", "Jede Ressource an den vier VRIO-Fragen prüfen", "Wettbewerbsimplikation ablesen (Nachteil → Parität → temporärer → ungenutzter → dauerhafter Vorteil)", "Kernkompetenzen (dauerhafte Vorteile) schützen und gezielt ausbauen"],
+      leitfragen: ["Stiftet die Ressource Kundennutzen oder senkt sie Kosten (wertvoll)?", "Verfügen nur wenige Wettbewerber darüber (selten)?", "Ist sie schwer zu imitieren oder zu substituieren?", "Ist das Unternehmen so organisiert, dass es die Ressource voll ausschöpft?"],
     },
     stakeholder: {
       def: "<strong>Stakeholder</strong> sind alle Anspruchsgruppen, die ein Interesse am Unternehmen haben oder von dessen Handeln betroffen sind. Die <strong>Macht-Interesse-Matrix</strong> ordnet sie nach Einfluss (Macht) und Betroffenheit (Interesse) und leitet daraus die Steuerungsstrategie ab.",
@@ -242,8 +260,8 @@
     { v: "dossier", t: "Strategie-Dossier" },
   ];
   function setNavActive(el) {
-    $$("#nav .nav-item").forEach((i) => i.classList.remove("is-active"));
-    if (el) el.classList.add("is-active");
+    $$("#nav .nav-item").forEach((i) => { i.classList.remove("is-active"); i.removeAttribute("aria-current"); });
+    if (el) { el.classList.add("is-active"); el.setAttribute("aria-current", "page"); }
   }
   function navTo(view) {
     showView(view);
@@ -283,7 +301,10 @@
   }
   const sidebar = $("#sidebar");
   function closeSidebarOnMobile() {
-    if (sidebar && window.matchMedia("(max-width: 900px)").matches) sidebar.classList.remove("open");
+    if (sidebar && window.matchMedia("(max-width: 900px)").matches) {
+      sidebar.classList.remove("open");
+      if (navToggle) navToggle.setAttribute("aria-expanded", "false");
+    }
   }
   $("#nav").addEventListener("click", (e) => {
     const btn = e.target.closest(".nav-item");
@@ -293,7 +314,10 @@
     closeSidebarOnMobile();
   });
   const navToggle = $("#nav-toggle");
-  if (navToggle) navToggle.addEventListener("click", () => sidebar && sidebar.classList.toggle("open"));
+  if (navToggle) navToggle.addEventListener("click", () => {
+    if (!sidebar) return;
+    navToggle.setAttribute("aria-expanded", sidebar.classList.toggle("open") ? "true" : "false");
+  });
   ["#pager-prev", "#pager-next"].forEach((sel) => {
     const el = $(sel);
     if (el) el.addEventListener("click", () => { if (el.dataset.view) { navTo(el.dataset.view); closeSidebarOnMobile(); } });
@@ -439,6 +463,60 @@
     });
   }
 
+  /* ---------- VRIO-Check (2.2 Resource-based View) ----------
+     Jede Ressource wird an den vier Kriterien geprüft; die Reihenfolge der
+     Prüfung (V → R → I → O) bestimmt die Wettbewerbsimplikation nach Barney. */
+  const VRIO_CRITERIA = [
+    { key: "v", label: "Wertvoll?" },
+    { key: "r", label: "Selten?" },
+    { key: "i", label: "Schwer imitierbar?" },
+    { key: "o", label: "Organisatorisch genutzt?" },
+  ];
+  function vrioImplication(r) {
+    if (!r.v) return { label: "Wettbewerbsnachteil", cls: 0, rank: 0 };
+    if (!r.r) return { label: "Wettbewerbsparität", cls: 1, rank: 1 };
+    if (!r.i) return { label: "Temporärer Vorteil", cls: 2, rank: 2 };
+    if (!r.o) return { label: "Ungenutzter Vorteil", cls: 3, rank: 3 };
+    return { label: "Dauerhafter Vorteil", cls: 4, rank: 4 };
+  }
+  function renderVrio() {
+    const tbl = $("#vrio-table"); if (!tbl) return;
+    if (!state.vrio.length) {
+      tbl.innerHTML = '<tbody><tr><td class="sw-empty">Noch keine Ressourcen – oben eine Ressource oder Fähigkeit hinzufügen.</td></tr></tbody>';
+      return;
+    }
+    const head = "<thead><tr><th>Ressource / Fähigkeit</th>"
+      + VRIO_CRITERIA.map((c) => `<th class="vrio-crit">${c.label}</th>`).join("")
+      + "<th>Implikation</th><th></th></tr></thead>";
+    const body = "<tbody>" + state.vrio.map((r, ri) => {
+      const imp = vrioImplication(r);
+      const cells = VRIO_CRITERIA.map((c) =>
+        `<td><button type="button" class="vrio-toggle ${r[c.key] ? "yes" : "no"}" data-r="${ri}" data-c="${c.key}" aria-pressed="${r[c.key] ? "true" : "false"}" title="${c.label} umschalten">${r[c.key] ? "✓ ja" : "– nein"}</button></td>`).join("");
+      return `<tr><td class="sw-optname">${escapeHtml(r.name)}</td>${cells}`
+        + `<td><span class="vrio-imp vrio-${imp.cls}">${imp.label}</span></td>`
+        + `<td><button type="button" class="sw-optdel" data-r="${ri}" aria-label="Entfernen">×</button></td></tr>`;
+    }).join("") + "</tbody>";
+    tbl.innerHTML = head + body;
+    $$(".vrio-toggle", tbl).forEach((b) => b.addEventListener("click", () => {
+      const r = state.vrio[+b.dataset.r];
+      r[b.dataset.c] = r[b.dataset.c] ? 0 : 1;
+      save(); renderVrio(); refreshSwotDerived();
+    }));
+    $$(".sw-optdel", tbl).forEach((b) => b.addEventListener("click", () => {
+      state.vrio.splice(+b.dataset.r, 1); save(); renderVrio(); refreshSwotDerived();
+    }));
+  }
+  function wireVrio() {
+    const form = $("#vrio-form"); if (!form) return;
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const inp = form.querySelector("input");
+      const name = inp.value.trim(); if (!name) return;
+      state.vrio.push({ name, v: 1, r: 0, i: 0, o: 0 });
+      inp.value = ""; save(); renderVrio(); refreshSwotDerived();
+    });
+  }
+
   // Prämissenkontrolle (Brief 6.3): die Einflussfaktoren der Szenario-Analyse als
   // Planungsannahmen laufend prüfen – gilt noch / beobachten / überholt.
   const PREM_STATUS = { ok: "🟢 gilt", watch: "🟡 beobachten", broken: "🔴 überholt" };
@@ -446,6 +524,13 @@
     const box = $("#praemissen-box"); if (!box) return;
     if (!state.kontrolle.premises) state.kontrolle.premises = {};
     const factors = (state.szenario.factors || []).slice();
+    // Status verwaister Prämissen (Faktor in der Szenario-Analyse gelöscht) aufräumen
+    const valid = new Set(factors);
+    let pruned = false;
+    Object.keys(state.kontrolle.premises).forEach((k) => {
+      if (!valid.has(k)) { delete state.kontrolle.premises[k]; pruned = true; }
+    });
+    if (pruned) save();
     if (!factors.length) {
       box.innerHTML = '<p class="prem-empty">Noch keine Einflussfaktoren – in der <a href="#" data-goto="szenario">Szenario-Analyse</a> erfassen. Sie werden hier zur Prämissenkontrolle.</p>';
       return;
@@ -492,8 +577,8 @@
     });
   }
   /* Aus den Analyse-Werkzeugen abgeleitete SWOT-Einträge:
-     Wertkette (+/–) → Stärken/Schwächen, PESTEL (+/–) → Chancen/Risiken,
-     Five Forces stark (≥4) → Risiko, schwach (≤2) → Chance. */
+     Wertkette (+/–) → Stärken/Schwächen, VRIO (Vorteil/Nachteil) → Stärken/Schwächen,
+     PESTEL (+/–) → Chancen/Risiken, Five Forces stark (≥4) → Risiko, schwach (≤2) → Chance. */
   const VC_ALL = VC_SUPPORT.concat(VC_PRIMARY);
   function derivedSwot() {
     const S = [], W = [], O = [], T = [];
@@ -501,6 +586,11 @@
       if (!it || typeof it !== "object") return;
       if (it.sign > 0) S.push(it.text); else if (it.sign < 0) W.push(it.text);
     }));
+    (state.vrio || []).forEach((r) => {
+      const imp = vrioImplication(r);
+      if (imp.rank >= 2) S.push(`${r.name} (VRIO: ${imp.label})`);
+      else if (imp.rank === 0) W.push(`${r.name} (VRIO: Wettbewerbsnachteil)`);
+    });
     PESTEL_CATS.forEach((c) => (state.pestel[c.key] || []).forEach((it) => {
       if (!it || typeof it !== "object") return;
       if (it.sign > 0) O.push(it.text); else if (it.sign < 0) T.push(it.text);
@@ -663,8 +753,7 @@
   const RADAR_LABEL = { rivalry: "Rivalität", newEntrants: "Neue Anbieter", suppliers: "Lieferanten", buyers: "Abnehmer", substitutes: "Substitute" };
   function drawForcesRadar() {
     const canvas = $("#forces-radar"); if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width, H = canvas.height;
+    const { ctx, W, H } = canvas2d(canvas);
     ctx.clearRect(0, 0, W, H);
     const cx = W / 2, cy = H / 2 + 4, R = Math.min(W, H) / 2 - 78;
     const muted = cssVar("--muted"), grid = cssVar("--grid"), series = cssVar("--series-1"), surface = cssVar("--surface-1");
@@ -724,8 +813,7 @@
   }
   function drawStakeholder() {
     const canvas = $("#stk-canvas"); if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width, H = canvas.height;
+    const { ctx, W, H } = canvas2d(canvas);
     const pad = { l: 64, r: 24, t: 24, b: 52 };
     const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
     const ink = cssVar("--text-primary"), muted = cssVar("--muted"), grid = cssVar("--grid"), surface = cssVar("--surface-1"), series = cssVar("--series-1");
@@ -803,8 +891,7 @@
   }
   function drawBCG() {
     const canvas = $("#bcg-canvas"); if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width, H = canvas.height;
+    const { ctx, W, H } = canvas2d(canvas);
     const pad = { l: 64, r: 24, t: 24, b: 52 };
     const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
     const ink = cssVar("--text-primary"), muted = cssVar("--muted"), grid = cssVar("--grid"), surface = cssVar("--surface-1"), series = cssVar("--series-1");
@@ -1019,7 +1106,7 @@
   }
   function drawWaterfall() {
     const c = $("#kz-waterfall"); if (!c) return;
-    const ctx = c.getContext("2d"); const W = c.width, H = c.height;
+    const { ctx, W, H } = canvas2d(c);
     ctx.clearRect(0, 0, W, H);
     const m = kzMetrics();
     const muted = cssVar("--muted"), ink = cssVar("--text-primary"), grid = cssVar("--grid"),
@@ -1127,8 +1214,7 @@
   }
   function drawWettbewerb() {
     const canvas = $("#wb-canvas"); if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width, H = canvas.height;
+    const { ctx, W, H } = canvas2d(canvas);
     const pad = { l: 60, r: 24, t: 24, b: 58 }, plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
     const ink = cssVar("--text-primary"), muted = cssVar("--muted"), grid = cssVar("--grid"), surface = cssVar("--surface-1");
     ctx.clearRect(0, 0, W, H);
@@ -1815,6 +1901,16 @@
         + chartImg("#wb-canvas", drawWettbewerb)));
     }
 
+    // VRIO-Check (Resource-based View)
+    if (state.vrio.length) {
+      const vrioRows = state.vrio.map((r) => {
+        const imp = vrioImplication(r);
+        return `<tr><td>${esc(r.name)}</td>${VRIO_CRITERIA.map((c) => `<td>${r[c.key] ? "✓" : "–"}</td>`).join("")}<td>${imp.label}</td></tr>`;
+      }).join("");
+      parts.push(section("VRIO-Check (Ressourcen & Fähigkeiten)",
+        `<table class="dossier-table"><thead><tr><th>Ressource</th><th>V</th><th>R</th><th>I</th><th>O</th><th>Implikation</th></tr></thead><tbody>${vrioRows}</tbody></table>`));
+    }
+
     // Wertkette
     parts.push(section("Wertkette",
       `<h3 class="dossier-sub">Unterstützungsaktivitäten</h3><div class="dossier-grid">${
@@ -1947,6 +2043,7 @@
     { v: "forces", label: "Five Forces", has: () => FORCES.some((f) => state.forces[f.key].v !== 3 || (state.forces[f.key].note || "").trim()) },
     { v: "wettbewerb", label: "Wettbewerbsumfeld", has: () => state.wettbewerb.competitors.length > 0 },
     { v: "wertkette", label: "Wertkette", has: () => listHas(state.valuechain) },
+    { v: "ansaetze", label: "VRIO-Check", has: () => state.vrio.length > 0 },
     { v: "szenario", label: "Szenario-Analyse", has: () => !!(state.szenario.frage || (state.szenario.factors || []).length || state.szenario.a || state.szenario.b) },
     { v: "swot", label: "SWOT", has: () => listHas(state.swot) },
     { v: "bcg", label: "BCG-Portfolio", has: () => state.bcg.length > 0 },
@@ -1998,6 +2095,11 @@
       { name: "Wir", x: 6, y: 8, group: "Premium" }, { name: "Anbieter A", x: 7, y: 8, group: "Premium" },
       { name: "Anbieter B", x: 3, y: 4, group: "Discount" }, { name: "Anbieter C", x: 4, y: 3, group: "Discount" },
       { name: "Nischenanbieter", x: 9, y: 9, group: "Spezialist" }] };
+    s.vrio = [
+      { name: "Marke & Reputation", v: 1, r: 1, i: 1, o: 1 },
+      { name: "Eigene KI-Modelle", v: 1, r: 1, i: 0, o: 1 },
+      { name: "Standard-ERP-System", v: 1, r: 0, i: 0, o: 1 },
+      { name: "Veraltete Legacy-Infrastruktur", v: 0, r: 0, i: 0, o: 0 }];
     s.valuechain.operations = [{ text: "Skalierbare, effiziente Produktion", sign: 1 }];
     s.valuechain.marketing = [{ text: "Starke Marke", sign: 1 }];
     s.valuechain.service = [{ text: "Überlasteter Kundensupport", sign: -1 }];
@@ -2062,7 +2164,7 @@
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "strategy-toolkit-projekt.json";
+    a.href = url; a.download = "strategy-toolkit-projekt-" + new Date().toISOString().slice(0, 10) + ".json";
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   });
@@ -2119,6 +2221,7 @@
     $$("#ansoff-root .list-card").forEach((el, i) => el.classList.add("ansoff-cell-" + i));
     renderKpi();
     renderPraemissen();
+    renderVrio();
     buildBSC();
     initListTool("#abell-root", state.abell, ABELL_CATS, { onChange: renderAbellAnchors });
     renderAbellAnchors();
@@ -2141,6 +2244,7 @@
   wireSwotForms();
   wireWettbewerb();
   wireKpi();
+  wireVrio();
   wireSzenario();
   wireKennzahlen();
   wireFallstudie();

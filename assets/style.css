@@ -218,7 +218,8 @@ input[type=text], input[type=number] {
 /* BCG */
 .bcg-layout { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(240px,1fr); gap: 20px; align-items: start; }
 .bcg-chart-box { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; overflow-x: auto; }
-#bcg-canvas { width: 100%; height: auto; display: block; }
+/* Canvas skaliert mit dem Container; die Backing-Store-Größe steuert app.js (HiDPI) */
+.bcg-chart-box canvas { width: 100%; height: auto; display: block; }
 .bcg-form { display: grid; gap: 8px; background: var(--surface-1); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
 .bcg-form label { display: grid; gap: 4px; font-size: .85rem; color: var(--text-secondary); }
@@ -708,6 +709,21 @@ button:active { transform: translateY(1px); }
   .ansoff, .porter-grid { grid-template-columns: 1fr; grid-template-rows: none; grid-template-areas: none; }
   .ansoff .list-card { grid-area: auto !important; }
 }
+
+/* VRIO-Check (2.2 Resource-based View) */
+#vrio-tool { scroll-margin-top: 84px; }
+.vrio-table .vrio-crit { white-space: normal; font-size: .8rem; }
+.vrio-toggle { cursor: pointer; font: inherit; font-size: .8rem; font-weight: 600; border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px 10px; background: var(--surface-1); color: var(--muted); white-space: nowrap; }
+.vrio-toggle:hover { border-color: var(--series-1); }
+.vrio-toggle.yes { border-color: var(--good); color: var(--good);
+  background: color-mix(in srgb, var(--good) 10%, var(--surface-1)); }
+.vrio-imp { display: inline-block; font-size: .78rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.vrio-0 { background: color-mix(in srgb, var(--critical) 14%, transparent); color: var(--critical); }
+.vrio-1 { background: var(--grid); color: var(--muted); }
+.vrio-2 { background: color-mix(in srgb, var(--warning) 18%, transparent); color: color-mix(in srgb, var(--warning) 70%, var(--text-primary)); }
+.vrio-3 { background: color-mix(in srgb, var(--serious) 16%, transparent); color: var(--serious); }
+.vrio-4 { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); }
 
 /* Wettbewerbsumfeld – Strategische-Gruppen-Karte */
 .wb-axes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
