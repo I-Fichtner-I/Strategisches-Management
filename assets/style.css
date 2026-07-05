@@ -471,10 +471,8 @@ details.kb[open] > summary::before { transform: rotate(90deg); }
 .fs-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .fs-section .field-label { display: block; margin-bottom: 14px; }
 .fs-en { color: var(--muted); font-weight: 400; font-size: .82rem; font-style: italic; }
-#fs-sections textarea, #fs-ki { width: 100%; min-height: 90px; resize: vertical; font: inherit; margin-top: 6px;
+#fs-sections textarea { width: 100%; min-height: 90px; resize: vertical; font: inherit; margin-top: 6px;
   padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--page); color: var(--text-primary); }
-.fs-counter { margin: 8px 0 0; padding: 12px 14px; background: var(--surface-1); border: 1px solid var(--border);
-  border-radius: var(--radius); font-size: .95rem; }
 .fs-report-text { white-space: normal; font-size: .9rem; color: var(--text-secondary); margin: 0 0 10px; }
 
 @media (max-width: 720px) {

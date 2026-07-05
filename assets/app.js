@@ -80,7 +80,7 @@
     szenario: { frage: "", factors: [], a: "", b: "" },
     kennzahlen: { ebit: "", da: "", umsatz: "", nopat: "", kapital: "", wacc: "" },
     fallstudie: {
-      company: "", titel: "", gruppe: "", ki: "", sources: [],
+      company: "", titel: "", gruppe: "",
       sections: { einleitung: "", ueberblick: "", extern: "", intern: "", swotopt: "", diskussion: "", fazit: "" },
     },
     strategiewahl: {
@@ -217,7 +217,7 @@
     fallstudie: {
       def: "Ein <strong>Fallstudien-Report</strong> analysiert die aktuelle Lage, das Umfeld und die Strategie eines gewählten Unternehmens und diskutiert diese kritisch – mit den passenden Methoden dieses Toolkits.",
       vorgehen: ["Unternehmen wählen und einen Überblick verschaffen", "Externe Analyse (PESTEL, Five Forces) und interne Analyse (Wertkette, Ressourcen)", "In SWOT/Portfolio bündeln und strategische Optionen ableiten", "Bestehende Strategie kritisch diskutieren", "Ergebnisse strukturiert dokumentieren"],
-      leitfragen: ["Sind Fachbegriffe präzise definiert?", "Sind alle Quellen korrekt zitiert (wörtlich & sinngemäß)?", "Ist der Text klar strukturiert und aufs Wesentliche fokussiert?", "Ist die KI-Nutzung dokumentiert und sind Aussagen belegt?"],
+      leitfragen: ["Sind Fachbegriffe präzise definiert?", "Ist der Text klar strukturiert und aufs Wesentliche fokussiert?", "Führt der rote Faden von der Analyse nachvollziehbar zur Empfehlung?"],
     },
   };
 
@@ -1523,10 +1523,6 @@
     { key: "diskussion", label: "6 · Kritische Diskussion der Strategie", en: "Critical discussion of the strategy" },
     { key: "fazit", label: "7 · Fazit", en: "Conclusion" },
   ];
-  const WORDS_PER_PAGE = 450;
-
-  function countWords(s) { return ((s || "").trim().match(/\S+/g) || []).length; }
-
   function fsProfileText(c) {
     return `${c.name} (${c.legal}, Sitz: ${c.hq}) ist in der Branche ${c.sector} tätig. `
       + `Geschäftsfelder: ${c.fields.join(", ")}. Märkte: ${c.markets}. `
@@ -1562,32 +1558,23 @@
       lab.innerHTML = `${s.label} <span class="fs-en">${s.en}</span>`;
       const ta = document.createElement("textarea");
       ta.id = "fs-sec-" + s.key;
-      ta.addEventListener("input", () => { state.fallstudie.sections[s.key] = ta.value; save(); updateFsCounter(); });
+      ta.addEventListener("input", () => { state.fallstudie.sections[s.key] = ta.value; save(); });
       lab.appendChild(ta); wrap.appendChild(lab); root.appendChild(wrap);
     });
     root.dataset.built = "1";
   }
 
-  function updateFsCounter() {
-    const words = FS_SECTIONS.reduce((sum, s) => sum + countWords(state.fallstudie.sections[s.key]), 0);
-    const pages = words === 0 ? 0 : Math.max(1, Math.round(words / WORDS_PER_PAGE));
-    $("#fs-counter").innerHTML = `≈ <strong>${pages}</strong> Seiten · ${words} Wörter`;
-  }
-
   function wireFallstudie() {
     $("#fs-titel").addEventListener("input", (e) => { state.fallstudie.titel = e.target.value; save(); });
     $("#fs-gruppe").addEventListener("input", (e) => { state.fallstudie.gruppe = e.target.value; save(); });
-    $("#fs-ki").addEventListener("input", (e) => { state.fallstudie.ki = e.target.value; save(); });
     buildFsSections();
   }
 
   function setFallstudieValues() {
     $("#fs-titel").value = state.fallstudie.titel || "";
     $("#fs-gruppe").value = state.fallstudie.gruppe || "";
-    $("#fs-ki").value = state.fallstudie.ki || "";
     FS_SECTIONS.forEach((s) => { const ta = $("#fs-sec-" + s.key); if (ta) ta.value = state.fallstudie.sections[s.key] || ""; });
     renderFsCompanyDisplay();
-    updateFsCounter();
   }
 
   /* ---------- Selbsttest: Lernkarten & Quiz ---------- */
@@ -1897,18 +1884,14 @@
 
     // Fallstudien-Report
     const fs = state.fallstudie;
-    const fsWords = FS_SECTIONS.reduce((sum, s) => sum + countWords(fs.sections[s.key]), 0);
-    const fsHasContent = fs.company || fs.titel || fsWords > 0;
+    const fsHasContent = fs.company || fs.titel || Object.values(fs.sections).some((x) => String(x).trim() !== "");
     if (fsHasContent) {
       const meta = `${fs.titel ? `<p class="dossier-kpi">Titel: <strong>${esc(fs.titel)}</strong></p>` : ""}`
         + `${fs.company ? `<p class="dossier-kpi">Unternehmen: <strong>${esc(fs.company)}</strong></p>` : ""}`
         + `${fs.gruppe ? `<p class="dossier-kpi">Gruppe: ${esc(fs.gruppe)}</p>` : ""}`;
       const body = FS_SECTIONS.map((s) => fs.sections[s.key]
         ? `<h3 class="dossier-sub">${s.label}</h3><p class="fs-report-text">${esc(fs.sections[s.key]).replace(/\n/g, "<br>")}</p>` : "").join("");
-      const src = (fs.sources && fs.sources.length) ? `<h3 class="dossier-sub">Quellenverzeichnis</h3>${ulOf(fs.sources)}` : "";
-      const ki = fs.ki ? `<h3 class="dossier-sub">Dokumentation der KI-Nutzung</h3><p class="fs-report-text">${esc(fs.ki).replace(/\n/g, "<br>")}</p>` : "";
-      const cnt = `<p class="dossier-kpi">Umfang: ≈ ${fsWords === 0 ? 0 : Math.max(1, Math.round(fsWords / WORDS_PER_PAGE))} Seiten · ${fsWords} Wörter</p>`;
-      parts.push(section("Fallstudien-Report", meta + cnt + body + src + ki));
+      parts.push(section("Fallstudien-Report", meta + body));
     }
 
     // Abell
@@ -2104,7 +2087,7 @@
     { v: "bmc", label: "Business Model Canvas", has: () => listHas(state.bmc) },
     { v: "bsc", label: "Balanced Scorecard", has: () => listHas(state.bsc) },
     { v: "kontrolle", label: "Frühwarn-/KPI-Tracker", has: () => state.kontrolle.indicators.length > 0 },
-    { v: "dossier", label: "Fallstudien-Report", has: () => { const f = state.fallstudie; return !!(f.company || f.titel || (f.sources || []).length || f.ki || Object.values(f.sections).some((x) => String(x).trim() !== "")); } },
+    { v: "dossier", label: "Fallstudien-Report", has: () => { const f = state.fallstudie; return !!(f.company || f.titel || Object.values(f.sections).some((x) => String(x).trim() !== "")); } },
   ];
   function renderDashboard() {
     const grid = $("#dash-grid"); if (!grid) return;
@@ -2192,7 +2175,7 @@
       { name: "Marktanteil DACH", target: "15 %", actual: "12 %", dir: "hoch", status: "amber" },
       { name: "Fluktuationsrate", target: "< 8 %", actual: "11 %", dir: "niedrig", status: "red" }],
       premises: {}, dismissed: [] };
-    s.fallstudie = { company: "SAP SE", titel: "Strategische Analyse eines Unternehmens", gruppe: "", ki: "", sources: ["Geschäftsbericht 2024"],
+    s.fallstudie = { company: "SAP SE", titel: "Strategische Analyse eines Unternehmens", gruppe: "",
       sections: { einleitung: "Diese Fallstudie analysiert Lage, Umfeld und Strategie des gewählten Unternehmens.", ueberblick: "", extern: "", intern: "", swotopt: "", diskussion: "", fazit: "" } };
     return s;
   }
@@ -2226,8 +2209,7 @@
     const s = sampleState();
     const short = companyShortName(c);
     s.fallstudie = {
-      company: c.name, titel: `Strategische Analyse der ${c.name}`, gruppe: "", ki: "",
-      sources: [`Geschäftsbericht ${c.fy}`],
+      company: c.name, titel: `Strategische Analyse der ${c.name}`, gruppe: "",
       sections: {
         einleitung: `Diese Fallstudie analysiert Lage, Umfeld und Strategie der ${c.name}.`,
         ueberblick: fsProfileText(c), extern: "", intern: "", swotopt: "", diskussion: "", fazit: "",
@@ -2278,7 +2260,7 @@
 
   // Nach Reset/Import: dynamische Container leeren und neu aufbauen.
   function fullRebuild() {
-    ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#fs-sources", "#ansoff-root"]
+    ["#pestel-root", "#vc-support", "#vc-primary", "#bmc-root", "#abell-root", "#szenario-root", "#ansoff-root"]
       .forEach((sel) => { const el = $(sel); if (el) el.innerHTML = ""; });
     initAll();
   }
@@ -2362,7 +2344,6 @@
     setSzenarioValues();
     setKennzahlenValues();
     populateCompanySelect();
-    initListTool("#fs-sources", state.fallstudie, [{ key: "sources", label: "Quellenverzeichnis" }]);
     setFallstudieValues();
     renderStrategiewahl();
     renderKnowledge();

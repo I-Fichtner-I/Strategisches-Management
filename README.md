@@ -78,7 +78,7 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 | **BCG-Portfolio** | Zusammenführung | Geschäftseinheiten nach Marktwachstum und relativem Marktanteil positionieren (Blasengröße = Umsatz): Stars / Question Marks / Cash Cows / Dogs. |
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
 | **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
-| **Fallstudien-Report** *(im Strategie-Dossier)* | Analyse & Anwendung | Berichts-Arbeitsbereich direkt im Dossier: gegliederte Struktur nach wissenschaftlichen Standards, Quellenverzeichnis, KI-Nutzungs-Doku und **Umfangszähler** (Seiten/Wörter). Das Unternehmen (Bibliothek mit **20 Unternehmensprofilen**, echte Eckdaten) wird über „Beispiel-Datensatz laden" gewählt. |
+| **Fallstudien-Report** *(im Strategie-Dossier)* | Analyse & Anwendung | Berichts-Arbeitsbereich direkt im Dossier: Titel, Autor:innen und gegliederte Struktur nach wissenschaftlichen Standards (Einleitung bis Fazit). Das Unternehmen (Bibliothek mit **20 Unternehmensprofilen**, echte Eckdaten) wird über „Beispiel-Datensatz laden" gewählt. |
 | **Selbsttest** | Wiederholung | Lernkarten und ein Multiple-Choice-Quiz mit Sofort-Feedback. |
 | **Strategie-Dossier** | Gesamt­dokument | Fasst alle Werkzeuge in einem druckfertigen Bericht zusammen – inkl. eingebetteter Diagramme und automatischer Einordnung (Stakeholder-Strategie, BCG-Kategorie, Branchenattraktivität). Per „Als PDF exportieren" als PDF sicherbar. |
 
