@@ -93,7 +93,7 @@
     },
     wettbewerb: { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [] },
     ansoff: emptyLists(["durchdringung", "marktentwicklung", "produktentwicklung", "diversifikation"]),
-    kontrolle: { indicators: [] },
+    kontrolle: { indicators: [], premises: {} },
     learn: { known: [] },
   });
 
@@ -268,8 +268,10 @@
     if (name === "wettbewerb") drawWettbewerb();
     if (name === "kennzahlen") { drawWaterfall(); renderKzCompare(); }
     if (name === "strategiewahl") renderStrategiewahl();
-    if (name === "kontrolle") renderKpi();
+    if (name === "kontrolle") { renderKpi(); renderPraemissen(); }
     if (name === "bsc") buildBSC();
+    if (name === "bmc") buildBMCTool();
+    if (name === "forces" || name === "bcg" || name === "wettbewerb") renderAbellAnchors();
     if (name === "prozess") renderDashboard();
     if (name === "dossier") buildDossier();
     updatePager(name);
@@ -313,6 +315,7 @@
     opts = opts || {};
     const root = $(rootSel);
     if (!root) return;
+    root.innerHTML = ""; // idempotent: erneutes Aufrufen baut sauber neu auf
     const isGrid = root.dataset.grid === "1";
     const sentiment = !!opts.sentiment;
     cats.forEach((cat) => {
@@ -328,11 +331,35 @@
       h.innerHTML = cat.label;
       const ul = document.createElement("ul");
       ul.className = "item-list";
+      const sugBox = document.createElement("div");
+      sugBox.className = "list-suggest";
       const form = document.createElement("form");
       form.className = "add-form";
       form.innerHTML = '<input type="text" placeholder="Hinzufügen …" /><button type="submit">+</button>';
 
+      const renderSug = () => {
+        sugBox.innerHTML = "";
+        if (!opts.suggest) return;
+        const have = new Set(store[cat.key].map((x) => (sentiment ? x.text : x)));
+        const seen = new Set();
+        const avail = (opts.suggest(cat.key) || [])
+          .map((s) => (s || "").trim())
+          .filter((s) => s && !have.has(s) && !seen.has(s) && seen.add(s)).slice(0, 8);
+        if (!avail.length) return;
+        avail.forEach((s) => {
+          const chip = document.createElement("button");
+          chip.type = "button"; chip.className = "sw-chip"; chip.textContent = "+ " + s;
+          chip.title = "Übernehmen";
+          chip.addEventListener("click", () => {
+            store[cat.key].push(sentiment ? { text: s, sign: 0 } : s);
+            save(); render(); if (opts.onChange) opts.onChange();
+          });
+          sugBox.appendChild(chip);
+        });
+      };
+
       const render = () => {
+        renderSug();
         ul.innerHTML = "";
         store[cat.key].forEach((item, i) => {
           const text = sentiment ? item.text : item;
@@ -368,10 +395,73 @@
         store[cat.key].push(sentiment ? { text: v, sign: 0 } : v);
         inp.value = ""; save(); render(); if (opts.onChange) opts.onChange();
       });
-      card.append(h, ul, form);
+      card.append(h, ul, sugBox, form);
       root.appendChild(card);
       render();
     });
+  }
+
+  // Business Model Canvas mit Werkzeug-Verzahnung: Bausteine aus Abell, Wertkette
+  // und Stakeholdern befüllbar (Übernahme-Chips).
+  function bmcSuggest(key) {
+    const vc = (cats) => cats.flatMap((c) => (state.valuechain[c.key] || []).map((x) => x.text)).filter(Boolean);
+    switch (key) {
+      case "segments": return state.abell.groups || [];
+      case "value": return state.abell.functions || [];
+      case "activities": return vc(VC_PRIMARY);
+      case "resources": return vc(VC_SUPPORT);
+      case "partners": return (state.stakeholders || []).map((s) => s.name);
+      default: return [];
+    }
+  }
+  function buildBMCTool() { initListTool("#bmc-root", state.bmc, BMC_BLOCKS, { suggest: bmcSuggest }); }
+
+  // Abell-Marktanker: die definierte Marktabgrenzung (Wer/Was/Wie) verankert die
+  // Branchen- und Portfolioanalyse (Brief 3.4: Abell-Schema definiert das SGF).
+  function abellMarketSummary() {
+    const g = (state.abell.groups || []).join(", ");
+    const f = (state.abell.functions || []).join(", ");
+    const t = (state.abell.technologies || []).join(", ");
+    if (!g && !f && !t) return null;
+    const seg = [];
+    if (g) seg.push(`<strong>Wer:</strong> ${escapeHtml(g)}`);
+    if (f) seg.push(`<strong>Was:</strong> ${escapeHtml(f)}`);
+    if (t) seg.push(`<strong>Wie:</strong> ${escapeHtml(t)}`);
+    return seg.join(" · ");
+  }
+  function renderAbellAnchors() {
+    const sum = abellMarketSummary();
+    $$("[data-abell-anchor]").forEach((el) => {
+      el.hidden = false;
+      el.innerHTML = sum
+        ? `<span class="anchor-label">Betrachteter Markt (Abell)</span> ${sum}`
+        : `<span class="anchor-label">Markt noch nicht abgegrenzt</span> <a href="#" data-goto="abell">In der Abell-Marktabgrenzung definieren →</a>`;
+    });
+  }
+
+  // Prämissenkontrolle (Brief 6.3): die Einflussfaktoren der Szenario-Analyse als
+  // Planungsannahmen laufend prüfen – gilt noch / beobachten / überholt.
+  const PREM_STATUS = { ok: "🟢 gilt", watch: "🟡 beobachten", broken: "🔴 überholt" };
+  function renderPraemissen() {
+    const box = $("#praemissen-box"); if (!box) return;
+    if (!state.kontrolle.premises) state.kontrolle.premises = {};
+    const factors = (state.szenario.factors || []).slice();
+    if (!factors.length) {
+      box.innerHTML = '<p class="prem-empty">Noch keine Einflussfaktoren – in der <a href="#" data-goto="szenario">Szenario-Analyse</a> erfassen. Sie werden hier zur Prämissenkontrolle.</p>';
+      return;
+    }
+    box.innerHTML = `<table class="bcg-table prem-table"><thead><tr><th>Prämisse (Einflussfaktor)</th><th>Status</th></tr></thead><tbody>${
+      factors.map((f, i) => {
+        const st = state.kontrolle.premises[f] || "ok";
+        return `<tr><td>${escapeHtml(f)}</td><td><button type="button" class="prem-btn prem-${st}" data-i="${i}">${PREM_STATUS[st]}</button></td></tr>`;
+      }).join("")
+    }</tbody></table>`;
+    $$(".prem-btn", box).forEach((b) => b.addEventListener("click", () => {
+      const f = factors[+b.dataset.i];
+      const cur = state.kontrolle.premises[f] || "ok";
+      state.kontrolle.premises[f] = cur === "ok" ? "watch" : cur === "watch" ? "broken" : "ok";
+      save(); renderPraemissen();
+    }));
   }
 
   /* ---------- SWOT ---------- */
@@ -1593,12 +1683,66 @@
   }
   function forceLevel(v) { return v >= 4 ? "stark" : v <= 2 ? "schwach" : "mittel"; }
 
+  // Konsistenz-Check: die Werkzeuge validieren sich gegenseitig (Meta-Verzahnung).
+  function computeConsistency() {
+    const out = [];
+    const add = (sev, text) => out.push({ sev, text });
+    const d = derivedSwot();
+
+    if (!abellMarketSummary())
+      add("info", "Der relevante Markt ist nicht abgegrenzt (Abell) – Branchen- und Portfolioanalyse ohne definierten Bezug.");
+    if (!PESTEL_CATS.some((c) => (state.pestel[c.key] || []).length))
+      add("info", "PESTEL ist leer – keine Chancen/Risiken aus der globalen Umwelt.");
+    if (!VC_ALL.some((c) => (state.valuechain[c.key] || []).length))
+      add("info", "Die Wertkette ist leer – keine Stärken/Schwächen aus der internen Analyse.");
+
+    const fvals = FORCES.map((f) => state.forces[f.key].v);
+    const favg = fvals.reduce((a, b) => a + b, 0) / fvals.length;
+    const forcesTouched = fvals.some((v) => Math.round(v * 10) / 10 !== 3);
+    const allThreats = state.swot.threats.concat(d.threats);
+    if (forcesTouched && favg >= 3.5 && !allThreats.length)
+      add("warn", "Geringe Branchenattraktivität, aber keine Risiken in der SWOT erfasst – Analyse prüfen.");
+
+    (state.ziele || []).forEach((z) => {
+      const cnt = SMART.filter((c) => smartMet(z, c)).length;
+      if (cnt < 5) add("info", `Ziel „${z.ziel}“ ist erst ${cnt}/5 SMART.`);
+    });
+
+    const best = swBest();
+    const bscFilled = BSC_VIEWS.some((p) => (state.bsc[p.key] || []).length);
+    if (best && !bscFilled)
+      add("warn", `Gewählte Strategie „${best.name}“ ist noch nicht in der Balanced Scorecard umgesetzt.`);
+    if (!best && state.strategiewahl.options.length)
+      add("info", "Strategieoptionen vorhanden, aber keine klare Wahl – Kriterien/Bewertung prüfen.");
+
+    const bscKpis = [...new Set(BSC_VIEWS.flatMap((p) => (state.bsc[p.key] || []).map((r) => (r.kennzahl || "").trim()).filter(Boolean)))];
+    const tracker = new Set((state.kontrolle.indicators || []).map((i) => i.name));
+    const missing = bscKpis.filter((k) => !tracker.has(k));
+    if (missing.length)
+      add("info", `${missing.length} BSC-Kennzahl(en) noch nicht im Frühwarn-Tracker.`);
+
+    const broken = Object.values(state.kontrolle.premises || {}).filter((v) => v === "broken").length;
+    if (broken)
+      add("warn", `${broken} Prämisse(n) als „überholt“ markiert – Strategie überprüfen (Prämissenkontrolle).`);
+
+    return out;
+  }
+  const CONSISTENCY_ICON = { warn: "⚠️", info: "ℹ️", ok: "✅" };
+  function consistencyHtml() {
+    const items = computeConsistency();
+    if (!items.length)
+      return `<ul class="consistency-list"><li class="cons-ok">${CONSISTENCY_ICON.ok} Keine Auffälligkeiten – die Analyse ist in sich schlüssig.</li></ul>`;
+    return `<ul class="consistency-list">${items.map((it) =>
+      `<li class="cons-${it.sev}">${CONSISTENCY_ICON[it.sev]} ${escapeHtml(it.text)}</li>`).join("")}</ul>`;
+  }
+
   function buildDossier() {
     const root = $("#dossier-root");
     const esc = escapeHtml;
     const parts = [];
     const now = new Date().toLocaleDateString("de-DE", { year: "numeric", month: "long", day: "numeric" });
     parts.push(`<header class="dossier-head"><h1>Strategie-Dossier</h1><p class="dossier-date">Erstellt am ${now}</p></header>`);
+    parts.push(`<section class="dossier-sec consistency-panel"><h2>Konsistenz-Check</h2>${consistencyHtml()}</section>`);
 
     let secNo = 0;
     const section = (title, inner) => { secNo++; return `<section class="dossier-sec"><h2>${secNo} · ${title}</h2>${inner}</section>`; };
@@ -1827,6 +1971,8 @@
       b.addEventListener("click", () => navTo(d.v));
       grid.appendChild(b);
     });
+    const cons = $("#dash-consistency");
+    if (cons) cons.innerHTML = `<h4 class="dash-cons-head">Konsistenz-Check</h4>${consistencyHtml()}`;
   }
   function sampleState() {
     const s = defaultState();
@@ -1968,12 +2114,14 @@
       { sentiment: true, pos: "Stärke", neg: "Schwäche", onChange: refreshSwotDerived });
     initListTool("#vc-primary", state.valuechain, VC_PRIMARY,
       { sentiment: true, pos: "Stärke", neg: "Schwäche", onChange: refreshSwotDerived });
-    initListTool("#bmc-root", state.bmc, BMC_BLOCKS);
+    buildBMCTool();
     initListTool("#ansoff-root", state.ansoff, ANSOFF_CELLS);
     $$("#ansoff-root .list-card").forEach((el, i) => el.classList.add("ansoff-cell-" + i));
     renderKpi();
+    renderPraemissen();
     buildBSC();
-    initListTool("#abell-root", state.abell, ABELL_CATS);
+    initListTool("#abell-root", state.abell, ABELL_CATS, { onChange: renderAbellAnchors });
+    renderAbellAnchors();
     renderZiele();
     initListTool("#szenario-root", state.szenario, SZENARIO_CATS);
     setSzenarioValues();

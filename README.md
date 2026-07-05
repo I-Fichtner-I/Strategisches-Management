@@ -8,22 +8,26 @@ und lässt sich direkt über **GitHub Pages** veröffentlichen.
 
 ## Der strategische Managementprozess
 
-Alle Werkzeuge folgen den sechs idealtypischen Phasen des strategischen
-Managementprozesses. Die **strategische Kontrolle und Frühaufklärung** wirkt dabei
-nicht nur am Ende, sondern **prozessbegleitend** – die Ergebnisse fließen laufend
-in die Zielplanung zurück (Regelkreis).
+Die Werkzeuge folgen den idealtypischen Phasen des strategischen
+Managementprozesses. Die **strategische Kontrolle und Frühaufklärung** ist dabei
+keine bloße Schlussphase, sondern läuft **prozessbegleitend** neben allen Phasen
+mit und speist die Ergebnisse laufend in die Zielplanung zurück (Regelkreis).
 
 ```mermaid
 flowchart LR
-    P1["1 · Zielplanung<br/><i>Abell · Stakeholder · SMART-Ziele</i>"]
-    P2["2 · Analyse &amp; Prognose<br/><i>PESTEL · Five Forces · Szenario · Wertkette · SWOT · Portfolio</i>"]
-    P3["3 · Strategiekonzeption<br/><i>Strategietypen</i>"]
-    P4["4 · Bewertung &amp; Entscheidung<br/><i>Strategiewahl (Nutzwertanalyse)</i>"]
-    P5["5 · Implementierung<br/><i>Business Model Canvas · Balanced Scorecard</i>"]
-    P6["6 · Kontrolle &amp; Frühaufklärung<br/><i>Frühwarn- &amp; KPI-Tracker</i>"]
-    P1 --> P2 --> P3 --> P4 --> P5 --> P6
-    P6 -. "Rückkopplung / prozessbegleitend" .-> P1
+    P1["1 · Zielplanung"] --> P2["2 · Analyse & Prognose"] --> P3["3 · Strategiekonzeption"] --> P4["4 · Bewertung & Entscheidung"] --> P5["5 · Implementierung"]
+    P5 -.->|Rückkopplung| P1
+    K["Strategische Kontrolle & Frühaufklärung · prozessbegleitend"] -.-> P1 & P2 & P3 & P4 & P5
 ```
+
+| Phase | Werkzeuge |
+|-------|-----------|
+| 1 · Zielplanung | Abell · Stakeholder · SMART-Ziele |
+| 2 · Analyse & Prognose | PESTEL · Five Forces · Szenario · Wertkette · SWOT · Portfolio |
+| 3 · Strategiekonzeption | Strategietypen |
+| 4 · Bewertung & Entscheidung | Strategiewahl (Nutzwertanalyse) |
+| 5 · Implementierung | Business Model Canvas · Balanced Scorecard |
+| *prozessbegleitend* | Frühwarn- & KPI-Tracker · Prämissenkontrolle |
 
 ## Werkzeuge
 

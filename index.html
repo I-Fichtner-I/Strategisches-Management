@@ -91,6 +91,7 @@
           <div class="dash-actions"><button type="button" id="btn-example" class="ghost">Beispiel-Datensatz laden</button></div>
           <div class="dash-bar"><span id="dash-bar-fill"></span></div>
           <div class="dash-grid" id="dash-grid"></div>
+          <div class="dash-consistency" id="dash-consistency"></div>
         </div>
       </details>
       <details class="kb" id="help-panel">
@@ -107,7 +108,7 @@
         </div>
       </details>
       <figure class="procflow" aria-label="Phasen des strategischen Managementprozesses">
-        <figcaption class="procflow-cap">Der strategische Managementprozess in sechs Phasen</figcaption>
+        <figcaption class="procflow-cap">Der strategische Managementprozess</figcaption>
         <ol class="procflow-track">
           <li class="procphase">
             <span class="procphase-no">1</span>
@@ -134,13 +135,15 @@
             <h3 class="procphase-title">Implementierung</h3>
             <p class="procphase-tools"><a href="#" data-goto="bmc">Business&nbsp;Model&nbsp;Canvas</a> · <a href="#" data-goto="bsc">Balanced&nbsp;Scorecard</a></p>
           </li>
-          <li class="procphase">
-            <span class="procphase-no">6</span>
-            <h3 class="procphase-title">Kontrolle &amp; Frühaufklärung</h3>
-            <p class="procphase-tools"><a href="#" data-goto="kontrolle">Frühwarn-&nbsp;&amp;&nbsp;KPI-Tracker</a></p>
-          </li>
         </ol>
-        <p class="procflow-loop"><span class="procflow-loop-inner">↺ Strategische Kontrolle &amp; Frühaufklärung – prozessbegleitend über alle Phasen</span></p>
+        <div class="procflow-control">
+          <span class="procflow-control-no">6</span>
+          <div class="procflow-control-body">
+            <strong>Strategische Kontrolle &amp; Frühaufklärung</strong>
+            <span class="procflow-control-tag">läuft prozessbegleitend</span>
+            <p>Begleitet <em>alle</em> Phasen laufend (Prämissen-, Durchführungskontrolle, schwache Signale) und speist die Ergebnisse zurück in die Zielplanung – der Regelkreis. <a href="#" data-goto="kontrolle">Frühwarn-&nbsp;&amp;&nbsp;KPI-Tracker</a></p>
+          </div>
+        </div>
       </figure>
       <div class="tool-cards">
         <button class="tool-card" data-goto="abell"><h3>Abell-Marktabgrenzung</h3><p>Den relevanten Markt über Kundengruppen, -funktionen und Technologien definieren.</p></button>
@@ -247,6 +250,7 @@
         Kräfte insgesamt, desto <strong>geringer</strong> die Branchenattraktivität.</p>
       </div>
       <div class="kb-slot" data-kb="forces"></div>
+      <div class="tool-anchor" data-abell-anchor hidden></div>
       <div class="forces-layout">
         <div class="forces" id="forces-list"></div>
         <div class="forces-radar-box">
@@ -395,6 +399,7 @@
         Marktwachstum 10&nbsp;%, relativer Marktanteil 1,0.</p>
       </div>
       <div class="kb-slot" data-kb="bcg"></div>
+      <div class="tool-anchor" data-abell-anchor hidden></div>
       <div class="bcg-layout">
         <div class="bcg-chart-box">
           <canvas id="bcg-canvas" width="640" height="520" role="img"
@@ -547,6 +552,7 @@
         <h2>4.1.3 Wettbewerbsumfeld</h2>
         <p class="lead">Die engere Betrachtung der direkten Konkurrenz innerhalb der Branche.</p>
       </div>
+      <div class="tool-anchor" data-abell-anchor hidden></div>
       <article class="know"><h3>Konkurrenzanalyse</h3><p>Identifikation der relevanten Wettbewerber und Erstellung von Konkurrentenprofilen (Ziele, Annahmen, Strategie, Fähigkeiten), um deren Verhalten zu antizipieren.</p></article>
       <article class="know"><h3>Strategische Gruppen</h3><p>Unternehmen mit ähnlicher Strategie innerhalb einer Branche bilden eine strategische Gruppe. Mobilitätsbarrieren erschweren den Wechsel; die Rivalität ist innerhalb einer Gruppe meist am stärksten.</p></article>
       <article class="know"><h3>Abgrenzung</h3><p>Das Wettbewerbsumfeld ist enger gefasst als die globale Umwelt (PESTEL) und die Branchenstruktur (Five Forces) – der Blick richtet sich auf konkrete Rivalen.</p></article>
@@ -646,6 +652,11 @@
       <article class="know"><h3>Arten der strategischen Kontrolle</h3><p><strong>Prämissenkontrolle</strong> (Gelten die Planungsannahmen noch?), <strong>Durchführungskontrolle</strong> (Wird der Plan erreicht?) und <strong>strategische Überwachung</strong> (ungerichtetes Beobachten des Umfelds).</p></article>
       <article class="know"><h3>Frühaufklärung</h3><p>Frühwarn- und Frühaufklärungssysteme erfassen <strong>schwache Signale</strong> (Ansoff), um Chancen und Risiken zu erkennen, bevor sie voll wirksam werden.</p></article>
       <article class="know"><h3>Instrumente</h3><p>Die <em>Balanced Scorecard</em> dient zugleich als Kontrollinstrument (Soll-Ist-Vergleich der Kennzahlen); <em>Szenarien</em> liefern Referenzpunkte für die Prämissenkontrolle.</p></article>
+
+      <h3 class="sub">Prämissenkontrolle</h3>
+      <p class="lead">Gelten die Planungsannahmen noch? Die <strong>Einflussfaktoren</strong> aus der
+      Szenario-Analyse werden hier als Prämissen geführt – Status per Klick wechseln.</p>
+      <div id="praemissen-box"></div>
 
       <h3 class="sub">Frühwarn- &amp; KPI-Tracker</h3>
       <p class="lead">Steuerungsgrößen und Frühwarnindikatoren mit Soll-Ist-Vergleich überwachen. Die
