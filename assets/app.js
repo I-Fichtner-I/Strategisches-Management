@@ -94,7 +94,7 @@
     wettbewerb: { xLabel: "Preisniveau", yLabel: "Qualität / Leistung", competitors: [] },
     ansoff: emptyLists(["durchdringung", "marktentwicklung", "produktentwicklung", "diversifikation"]),
     vrio: [],
-    kontrolle: { indicators: [], premises: {} },
+    kontrolle: { indicators: [], premises: {}, dismissed: [] },
     learn: { known: [] },
   });
 
@@ -286,7 +286,7 @@
     if (name === "wettbewerb") drawWettbewerb();
     if (name === "kennzahlen") { drawWaterfall(); renderKzCompare(); }
     if (name === "strategiewahl") renderStrategiewahl();
-    if (name === "kontrolle") { renderKpi(); renderPraemissen(); }
+    if (name === "kontrolle") { syncKpiFromBsc(); renderKpi(); renderPraemissen(); }
     if (name === "bsc") buildBSC();
     if (name === "bmc") buildBMCTool();
     if (name === "forces" || name === "bcg" || name === "wettbewerb") renderAbellAnchors();
@@ -991,6 +991,8 @@
         };
         if (!row.ziel) return;
         state.bsc[p.key].push(row); save(); e.target.reset(); render();
+        // Kennzahl sofort in den Frühwarn-Tracker übernehmen (6.2 → 6.3)
+        if (syncKpiFromBsc()) renderKpi();
       });
       root.appendChild(card);
       render();
@@ -1265,6 +1267,37 @@
   /* ---------- Frühwarn- & KPI-Tracker (6.3) ---------- */
   const KPI_STATUS = { green: "🟢 im Plan", amber: "🟡 beobachten", red: "🔴 kritisch" };
   const KPI_DIR = { hoch: "↑ höher besser", niedrig: "↓ niedriger besser" };
+  // BSC-Kennzahlen werden automatisch als Frühwarn-Indikatoren übernommen
+  // (Verzahnung 6.2 → 6.3) und sind danach im Tracker frei anpassbar.
+  // Bewusst entfernte Indikatoren landen in "dismissed" und werden nicht erneut angelegt.
+  function bscKpiList() {
+    const out = [];
+    BSC_VIEWS.forEach((p) => (state.bsc[p.key] || []).forEach((row) => {
+      const name = (row.kennzahl || "").trim();
+      if (name) out.push({ name, target: (row.zielwert || "").trim() });
+    }));
+    return out;
+  }
+  function kpiDismissed() {
+    if (!Array.isArray(state.kontrolle.dismissed)) state.kontrolle.dismissed = [];
+    return state.kontrolle.dismissed;
+  }
+  function undismissKpi(name) {
+    const d = kpiDismissed(); const i = d.indexOf(name);
+    if (i >= 0) { d.splice(i, 1); }
+  }
+  function syncKpiFromBsc() {
+    const have = new Set(state.kontrolle.indicators.map((i) => i.name));
+    const dismissed = new Set(kpiDismissed());
+    let added = false;
+    bscKpiList().forEach((c) => {
+      if (have.has(c.name) || dismissed.has(c.name)) return;
+      state.kontrolle.indicators.push({ name: c.name, target: c.target, actual: "", dir: "hoch", status: "green", src: "bsc" });
+      have.add(c.name); added = true;
+    });
+    if (added) save();
+    return added;
+  }
   // Frühwarn-Indikatoren aus SMART-Zielen (Kontrollfunktion: Soll-Ist) und aus
   // BSC-Kennzahlen (Zielwert) vorschlagen – schließt den Ziel-Kennzahl-Kontroll-Kreis.
   function kpiCandidates() {
@@ -1290,6 +1323,7 @@
       : "";
     $$(".sw-chip", box).forEach((b) => b.addEventListener("click", () => {
       const c = avail[+b.dataset.i];
+      undismissKpi(c.name);
       state.kontrolle.indicators.push({ name: c.name, target: c.target || "", actual: "", dir: "hoch", status: "green" });
       save(); renderKpi();
     }));
@@ -1299,13 +1333,29 @@
     const tb = $("#kpi-tbody"); if (!tb) return; tb.innerHTML = "";
     state.kontrolle.indicators.forEach((ind, i) => {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${escapeHtml(ind.name)}</td><td>${escapeHtml(ind.target || "")}</td>`
-        + `<td>${escapeHtml(ind.actual || "")}</td><td>${KPI_DIR[ind.dir] || ""}</td>`
-        + `<td><span class="kpi-badge kpi-${ind.status}">${KPI_STATUS[ind.status] || ""}</span></td>`;
+      const opts = (map, cur) => Object.keys(map).map((k) =>
+        `<option value="${k}"${cur === k ? " selected" : ""}>${map[k]}</option>`).join("");
+      tr.innerHTML = `<td>${escapeHtml(ind.name)}${ind.src === "bsc" ? ' <span class="kpi-src" title="Automatisch aus der Balanced Scorecard übernommen – Werte hier frei anpassbar">BSC</span>' : ""}</td>`
+        + `<td><input type="text" data-f="target" value="${escapeHtml(ind.target || "")}" placeholder="Zielwert" aria-label="Zielwert für ${escapeHtml(ind.name)}" /></td>`
+        + `<td><input type="text" data-f="actual" value="${escapeHtml(ind.actual || "")}" placeholder="Ist-Wert" aria-label="Ist-Wert für ${escapeHtml(ind.name)}" /></td>`
+        + `<td><select data-f="dir" aria-label="Zielrichtung">${opts(KPI_DIR, ind.dir)}</select></td>`
+        + `<td><select data-f="status" class="kpi-status-sel kpi-${ind.status}" aria-label="Ampel-Status">${opts(KPI_STATUS, ind.status)}</select></td>`;
+      $$("input[data-f], select[data-f]", tr).forEach((el) => {
+        el.addEventListener(el.tagName === "SELECT" ? "change" : "input", () => {
+          ind[el.dataset.f] = el.value; save();
+          if (el.dataset.f === "status") el.className = "kpi-status-sel kpi-" + el.value;
+        });
+      });
       const td = document.createElement("td");
       const btn = document.createElement("button");
       btn.type = "button"; btn.textContent = "×"; btn.setAttribute("aria-label", "Entfernen");
-      btn.addEventListener("click", () => { state.kontrolle.indicators.splice(i, 1); save(); renderKpi(); });
+      btn.addEventListener("click", () => {
+        // Aus der BSC stammende Kennzahl beim Löschen merken, sonst würde sie
+        // bei der nächsten Synchronisation sofort wieder angelegt.
+        if (bscKpiList().some((c) => c.name === ind.name) && !kpiDismissed().includes(ind.name))
+          state.kontrolle.dismissed.push(ind.name);
+        state.kontrolle.indicators.splice(i, 1); save(); renderKpi();
+      });
       td.appendChild(btn); tr.appendChild(td); tb.appendChild(tr);
     });
   }
@@ -1318,6 +1368,7 @@
         actual: String(fd.get("actual") || "").trim(), dir: fd.get("dir") || "hoch", status: fd.get("status") || "green",
       };
       if (!ind.name) return;
+      undismissKpi(ind.name);
       state.kontrolle.indicators.push(ind); save(); e.target.reset(); renderKpi();
     });
   }
@@ -1801,9 +1852,12 @@
     if (!best && state.strategiewahl.options.length)
       add("info", "Strategieoptionen vorhanden, aber keine klare Wahl – Kriterien/Bewertung prüfen.");
 
+    // BSC-Kennzahlen werden automatisch in den Tracker übernommen; hier bleiben
+    // nur bewusst entfernte (dismissed) übrig – die sind kein Konsistenzproblem.
     const bscKpis = [...new Set(BSC_VIEWS.flatMap((p) => (state.bsc[p.key] || []).map((r) => (r.kennzahl || "").trim()).filter(Boolean)))];
     const tracker = new Set((state.kontrolle.indicators || []).map((i) => i.name));
-    const missing = bscKpis.filter((k) => !tracker.has(k));
+    const dismissed = new Set(state.kontrolle.dismissed || []);
+    const missing = bscKpis.filter((k) => !tracker.has(k) && !dismissed.has(k));
     if (missing.length)
       add("info", `${missing.length} BSC-Kennzahl(en) noch nicht im Frühwarn-Tracker.`);
 
@@ -2135,10 +2189,11 @@
     s.bsc.customer = [{ ziel: "Zufriedenheit erhöhen", kennzahl: "NPS", zielwert: "> 40", massnahme: "Support verbessern" }];
     s.bsc.process = [{ ziel: "Time-to-Market senken", kennzahl: "Releasezyklus", zielwert: "−20 %", massnahme: "CI/CD einführen" }];
     s.bsc.learning = [{ ziel: "Kompetenzen aufbauen", kennzahl: "Schulungstage/Jahr", zielwert: "5", massnahme: "Weiterbildungsprogramm" }];
+    // Eigene Indikatoren; die vier BSC-Kennzahlen kommen automatisch per Sync dazu.
     s.kontrolle = { indicators: [
       { name: "Marktanteil DACH", target: "15 %", actual: "12 %", dir: "hoch", status: "amber" },
-      { name: "Kundenzufriedenheit (NPS)", target: "> 40", actual: "45", dir: "hoch", status: "green" },
-      { name: "Fluktuationsrate", target: "< 8 %", actual: "11 %", dir: "niedrig", status: "red" }] };
+      { name: "Fluktuationsrate", target: "< 8 %", actual: "11 %", dir: "niedrig", status: "red" }],
+      premises: {}, dismissed: [] };
     s.fallstudie = { company: "SAP SE", titel: "Strategische Analyse eines Unternehmens", gruppe: "", ki: "", sources: ["Geschäftsbericht 2024"],
       sections: { einleitung: "Diese Fallstudie analysiert Lage, Umfeld und Strategie des gewählten Unternehmens.", ueberblick: "", extern: "", intern: "", swotopt: "", diskussion: "", fazit: "" } };
     return s;
@@ -2219,6 +2274,7 @@
     buildBMCTool();
     initListTool("#ansoff-root", state.ansoff, ANSOFF_CELLS);
     $$("#ansoff-root .list-card").forEach((el, i) => el.classList.add("ansoff-cell-" + i));
+    syncKpiFromBsc();
     renderKpi();
     renderPraemissen();
     renderVrio();

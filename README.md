@@ -77,6 +77,11 @@ PESTEL   (＋/–)  ──┤
 Five Forces      ──┘
 ```
 
+Zusätzlich werden **Kennzahlen aus der Balanced Scorecard automatisch in den
+Frühwarn- & KPI-Tracker übernommen** (erkennbar am Badge *BSC*). Zielwert,
+Ist-Wert, Zielrichtung und Ampel-Status lassen sich anschließend direkt in der
+Tracker-Tabelle bearbeiten; entfernte Kennzahlen werden nicht erneut angelegt.
+
 ## Nutzung
 
 Lokal: `index.html` im Browser öffnen.

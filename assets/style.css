@@ -682,6 +682,16 @@ button:active { transform: translateY(1px); }
   background: var(--page); color: var(--text-primary); font: inherit; }
 .kpi-badge { font-size: .85rem; white-space: nowrap; font-weight: 600; }
 .kpi-badge.kpi-green { color: var(--good); } .kpi-badge.kpi-amber { color: var(--warning); } .kpi-badge.kpi-red { color: var(--critical); }
+/* Inline-Bearbeitung im Tracker + Herkunfts-Badge für automatisch übernommene BSC-Kennzahlen */
+.kpi-table td:first-child { white-space: nowrap; }
+.kpi-table input[type=text] { min-width: 84px; padding: 5px 8px; font-size: .85rem; }
+.kpi-table select { padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--page); color: var(--text-primary); font: inherit; font-size: .85rem; }
+.kpi-status-sel { font-weight: 600; }
+.kpi-status-sel.kpi-green { color: var(--good); } .kpi-status-sel.kpi-amber { color: var(--warning); } .kpi-status-sel.kpi-red { color: var(--critical); }
+.kpi-src { display: inline-block; font-size: .64rem; font-weight: 700; letter-spacing: .04em;
+  color: var(--series-1); background: color-mix(in srgb, var(--series-1) 12%, transparent);
+  border-radius: 999px; padding: 1px 7px; vertical-align: middle; margin-left: 6px; }
 
 /* Ansoff- & Porter-Matrix (5.1) */
 .ansoff-block, .porter-block { max-width: 780px; }
