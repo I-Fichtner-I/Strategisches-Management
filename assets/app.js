@@ -254,7 +254,6 @@
     { v: "bmc", t: "6.1 Business Model Canvas" },
     { v: "bsc", t: "6.2 Balanced Scorecard" },
     { v: "kontrolle", t: "6.3 Kontrolle & Frühaufklärung" },
-    { v: "fallstudie", t: "Fallstudien-Report" },
     { v: "quiz", t: "Selbsttest" },
     { v: "glossar", t: "Glossar" },
     { v: "dossier", t: "Strategie-Dossier" },
@@ -1536,41 +1535,20 @@
   }
 
   function populateCompanySelect() {
-    ["#fs-company-select", "#example-company"].forEach((s) => {
-      const sel = $(s);
-      if (!sel || sel.dataset.filled) return;
-      COMPANIES.forEach((c) => {
-        const o = document.createElement("option");
-        o.value = c.name; o.textContent = c.name; sel.appendChild(o);
-      });
-      sel.dataset.filled = "1";
+    const sel = $("#example-company");
+    if (!sel || sel.dataset.filled) return;
+    COMPANIES.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c.name; o.textContent = c.name; sel.appendChild(o);
     });
+    sel.dataset.filled = "1";
   }
 
-  function renderFsProfile() {
-    const box = $("#fs-profile");
-    const c = COMPANIES.find((x) => x.name === state.fallstudie.company);
-    if (!c) { box.innerHTML = ""; return; }
-    box.innerHTML = `
-      <div class="fs-profile-head"><h3>${escapeHtml(c.name)}</h3>
-        <button type="button" id="fs-apply" class="primary-btn">Als Unternehmensüberblick übernehmen</button></div>
-      <dl class="fs-dl">
-        <div><dt>Rechtsform</dt><dd>${escapeHtml(c.legal)}</dd></div>
-        <div><dt>Sitz</dt><dd>${escapeHtml(c.hq)}</dd></div>
-        <div><dt>Branche</dt><dd>${escapeHtml(c.sector)}</dd></div>
-        <div><dt>Geschäftsfelder</dt><dd>${c.fields.map(escapeHtml).join(", ")}</dd></div>
-        <div><dt>Märkte</dt><dd>${escapeHtml(c.markets)}</dd></div>
-        <div><dt>Umsatz</dt><dd>${escapeHtml(c.revenue)} <span class="fs-fy">(${escapeHtml(c.fy)})</span></dd></div>
-        <div><dt>Mitarbeitende</dt><dd>${escapeHtml(c.employees)}</dd></div>
-        <div><dt>Strategie</dt><dd>${escapeHtml(c.strategy)}</dd></div>
-      </dl>
-      <p class="fs-note">Kennzahlen sind gerundete Näherungswerte – im Bericht mit aktuellem Geschäftsbericht belegen und zitieren.</p>`;
-    $("#fs-apply").addEventListener("click", () => {
-      const text = fsProfileText(c);
-      const ta = $("#fs-sec-ueberblick");
-      if (ta.value.trim() && !confirm("Den vorhandenen Unternehmensüberblick überschreiben?")) return;
-      ta.value = text; state.fallstudie.sections.ueberblick = text; save(); updateFsCounter();
-    });
+  // Das Unternehmen wird über "Beispiel-Datensatz laden" (Startseite) gesetzt;
+  // im Dossier-Editor wird es nur noch angezeigt.
+  function renderFsCompanyDisplay() {
+    const disp = $("#fs-company-display");
+    if (disp) disp.textContent = state.fallstudie.company || "– noch keines gewählt –";
   }
 
   function buildFsSections() {
@@ -1597,8 +1575,6 @@
   }
 
   function wireFallstudie() {
-    const sel = $("#fs-company-select");
-    sel.addEventListener("change", () => { state.fallstudie.company = sel.value; save(); renderFsProfile(); });
     $("#fs-titel").addEventListener("input", (e) => { state.fallstudie.titel = e.target.value; save(); });
     $("#fs-gruppe").addEventListener("input", (e) => { state.fallstudie.gruppe = e.target.value; save(); });
     $("#fs-ki").addEventListener("input", (e) => { state.fallstudie.ki = e.target.value; save(); });
@@ -1606,12 +1582,11 @@
   }
 
   function setFallstudieValues() {
-    $("#fs-company-select").value = state.fallstudie.company || "";
     $("#fs-titel").value = state.fallstudie.titel || "";
     $("#fs-gruppe").value = state.fallstudie.gruppe || "";
     $("#fs-ki").value = state.fallstudie.ki || "";
     FS_SECTIONS.forEach((s) => { const ta = $("#fs-sec-" + s.key); if (ta) ta.value = state.fallstudie.sections[s.key] || ""; });
-    renderFsProfile();
+    renderFsCompanyDisplay();
     updateFsCounter();
   }
 
@@ -2129,7 +2104,7 @@
     { v: "bmc", label: "Business Model Canvas", has: () => listHas(state.bmc) },
     { v: "bsc", label: "Balanced Scorecard", has: () => listHas(state.bsc) },
     { v: "kontrolle", label: "Frühwarn-/KPI-Tracker", has: () => state.kontrolle.indicators.length > 0 },
-    { v: "fallstudie", label: "Fallstudien-Report", has: () => { const f = state.fallstudie; return !!(f.company || f.titel || (f.sources || []).length || f.ki || Object.values(f.sections).some((x) => String(x).trim() !== "")); } },
+    { v: "dossier", label: "Fallstudien-Report", has: () => { const f = state.fallstudie; return !!(f.company || f.titel || (f.sources || []).length || f.ki || Object.values(f.sections).some((x) => String(x).trim() !== "")); } },
   ];
   function renderDashboard() {
     const grid = $("#dash-grid"); if (!grid) return;
