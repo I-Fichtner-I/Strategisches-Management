@@ -28,22 +28,23 @@
         <div class="nav-group">
           <button class="nav-item is-active" data-view="prozess">1 · Einführung in das Strategische Management</button>
         </div>
-        <div class="nav-group">
-          <p class="nav-head">2 · Ansätze des Strategischen Managements</p>
+        <details class="nav-group">
+          <summary class="nav-head">2 · Ansätze des Strategischen Managements</summary>
           <button class="nav-item" data-view="ansaetze" data-anchor="mbv">2.1 Marktorientierter Ansatz (MBV)</button>
           <button class="nav-item" data-view="ansaetze" data-anchor="rbv">2.2 Ressourcenbasierter Ansatz (RBV)</button>
           <button class="nav-item" data-view="ansaetze" data-anchor="kbv">2.3 Wissensbasierter Ansatz (KBV)</button>
           <button class="nav-item" data-view="ansaetze" data-anchor="vbv">2.4 Wertorientierter Ansatz (VBV)</button>
-        </div>
-        <div class="nav-group">
-          <p class="nav-head">3 · Strategische Zielplanung</p>
+          <button class="nav-item" data-view="ansaetze" data-anchor="vrio-tool">VRIO-Check (Ressourcen)</button>
+        </details>
+        <details class="nav-group">
+          <summary class="nav-head">3 · Strategische Zielplanung</summary>
           <button class="nav-item" data-view="stakeholder">3.1 Stakeholder des Unternehmens</button>
           <button class="nav-item" data-view="ziele">3.2 Zielhierarchie & Zielfunktionen</button>
           <button class="nav-item" data-view="kennzahlen">3.3 Finanzielle Ziele</button>
           <button class="nav-item" data-view="abell">3.4 Geschäftsfelder (Abell)</button>
-        </div>
-        <div class="nav-group">
-          <p class="nav-head">4 · Strategische Analyse und Prognose</p>
+        </details>
+        <details class="nav-group">
+          <summary class="nav-head">4 · Strategische Analyse und Prognose</summary>
           <button class="nav-item" data-view="pestel">4.1.1 Globale Umwelt (PESTEL)</button>
           <button class="nav-item" data-view="forces">4.1.2 Branchenstruktur (Five Forces)</button>
           <button class="nav-item" data-view="wettbewerb">4.1.3 Wettbewerbsumfeld</button>
@@ -51,25 +52,25 @@
           <button class="nav-item" data-view="swot">4.3 Simultane Analyse (SWOT)</button>
           <button class="nav-item" data-view="bcg">4.3 Portfolio (BCG)</button>
           <button class="nav-item" data-view="szenario">Prognose (Szenario-Analyse)</button>
-        </div>
-        <div class="nav-group">
-          <p class="nav-head">5 · Strategieformulierung und -bewertung</p>
+        </details>
+        <details class="nav-group">
+          <summary class="nav-head">5 · Strategieformulierung und -bewertung</summary>
           <button class="nav-item" data-view="strategietypen">5.1 Typen von Strategien</button>
           <button class="nav-item" data-view="strategiewahl">5.2 Bewertung & Auswahl von Strategien</button>
-        </div>
-        <div class="nav-group">
-          <p class="nav-head">6 · Entwicklung, Implementierung & Kontrolle</p>
+        </details>
+        <details class="nav-group">
+          <summary class="nav-head">6 · Entwicklung, Implementierung & Kontrolle</summary>
           <button class="nav-item" data-view="bmc">6.1 Business Model Canvas</button>
           <button class="nav-item" data-view="bsc">6.2 Umsetzung (Balanced Scorecard)</button>
           <button class="nav-item" data-view="kontrolle">6.3 Kontrolle & Frühaufklärung</button>
-        </div>
-        <div class="nav-group">
-          <p class="nav-head">Werkzeuge & Export</p>
+        </details>
+        <details class="nav-group">
+          <summary class="nav-head">Werkzeuge &amp; Export</summary>
           <button class="nav-item" data-view="fallstudie">Fallstudien-Report</button>
           <button class="nav-item" data-view="quiz">Selbsttest</button>
           <button class="nav-item" data-view="glossar">Glossar</button>
           <button class="nav-item" data-view="dossier">Strategie-Dossier</button>
-        </div>
+        </details>
       </nav>
     </aside>
 
@@ -98,7 +99,7 @@
         <summary>So nutzt du das Toolkit</summary>
         <div class="kb-body">
           <ul>
-            <li>Oben über die <strong>Reiter</strong> zwischen den Werkzeugen wechseln – geordnet nach dem Management-Prozess.</li>
+            <li>Links in der <strong>Kapitel-Navigation</strong> ein Überkapitel aufklappen und das Unterkapitel wählen – oder unten in der <strong>Kapitelübersicht</strong> direkt einsteigen.</li>
             <li>In jedem Werkzeug <strong>„Theorie &amp; Leitfragen"</strong> aufklappen; bei <em>Five&nbsp;Forces</em> jede Kraft über ihre einzelnen <strong>Treiber</strong> einstellen.</li>
             <li>Eingaben werden <strong>automatisch im Browser gespeichert</strong> – beim nächsten Öffnen sind sie wieder da (gerätegebunden).</li>
             <li>In <em>PESTEL</em> und <em>Wertkette</em> Einträge per Symbol als ＋/– markieren – sie fließen automatisch in die <em>SWOT</em> und die TOWS-Normstrategien.</li>
@@ -145,19 +146,63 @@
           </div>
         </div>
       </figure>
-      <div class="tool-cards">
-        <button class="tool-card" data-goto="abell"><h3>Abell-Marktabgrenzung</h3><p>Den relevanten Markt über Kundengruppen, -funktionen und Technologien definieren.</p></button>
-        <button class="tool-card" data-goto="stakeholder"><h3>Stakeholder-Matrix</h3><p>Anspruchsgruppen nach Macht und Interesse positionieren und passend steuern.</p></button>
-        <button class="tool-card" data-goto="ziele"><h3>SMART-Ziele</h3><p>Ziele formulieren und automatisch auf die SMART-Kriterien prüfen.</p></button>
-        <button class="tool-card" data-goto="pestel"><h3>PESTEL-Analyse</h3><p>Die globale Umwelt in sechs Einflussfeldern systematisch erfassen.</p></button>
-        <button class="tool-card" data-goto="forces"><h3>Porters Five Forces</h3><p>Branchenattraktivität bewerten – je Kraft über einzelne Treiber.</p></button>
-        <button class="tool-card" data-goto="wertkette"><h3>Wertkette</h3><p>Primär- und Unterstützungsaktivitäten des Unternehmens analysieren.</p></button>
-        <button class="tool-card" data-goto="szenario"><h3>Szenario-Analyse</h3><p>Alternative Zukunftsszenarien strukturiert entwickeln.</p></button>
-        <button class="tool-card" data-goto="kennzahlen"><h3>Strategische Kennzahlen</h3><p>EBITDA-Marge und EVA berechnen; wert- vs. traditionell einordnen.</p></button>
-        <button class="tool-card" data-goto="swot"><h3>SWOT-Analyse</h3><p>Analyse-Ergebnisse bündeln – inkl. abgeleiteter TOWS-Normstrategien.</p></button>
-        <button class="tool-card" data-goto="bcg"><h3>BCG-Portfolio</h3><p>Geschäftseinheiten nach Wachstum und Marktanteil positionieren.</p></button>
-        <button class="tool-card" data-goto="bmc"><h3>Business Model Canvas</h3><p>Das Geschäftsmodell in neun Bausteinen entwickeln.</p></button>
-        <button class="tool-card" data-goto="bsc"><h3>Balanced Scorecard</h3><p>Strategie über vier Perspektiven in Ziele und Kennzahlen übersetzen.</p></button>
+      <h3 class="sub">Kapitel im Überblick</h3>
+      <div class="chap-list">
+        <details class="chap" name="chap">
+          <summary><span class="chap-no">2</span><span class="chap-title">Ansätze des Strategischen Managements</span><span class="chap-hint">4 Ansätze · VRIO-Check</span></summary>
+          <div class="chap-links">
+            <a href="#" data-goto="ansaetze" data-anchor="mbv"><strong>2.1 Marktorientierter Ansatz (MBV)</strong><span>Wettbewerbsvorteile aus der Branchenposition (outside-in).</span></a>
+            <a href="#" data-goto="ansaetze" data-anchor="rbv"><strong>2.2 Ressourcenbasierter Ansatz (RBV)</strong><span>Vorteile aus einzigartigen Ressourcen &amp; Kernkompetenzen (inside-out).</span></a>
+            <a href="#" data-goto="ansaetze" data-anchor="kbv"><strong>2.3 Wissensbasierter Ansatz (KBV)</strong><span>Wissen als wichtigste strategische Ressource.</span></a>
+            <a href="#" data-goto="ansaetze" data-anchor="vbv"><strong>2.4 Wertorientierter Ansatz (VBV)</strong><span>Steuerung nach Wertschaffung über den Kapitalkosten.</span></a>
+            <a href="#" data-goto="ansaetze" data-anchor="vrio-tool"><strong>VRIO-Check</strong><span>Ressourcen prüfen – Vorteile fließen automatisch in die SWOT.</span></a>
+          </div>
+        </details>
+        <details class="chap" name="chap">
+          <summary><span class="chap-no">3</span><span class="chap-title">Strategische Zielplanung</span><span class="chap-hint">Stakeholder · Ziele · Kennzahlen · Abell</span></summary>
+          <div class="chap-links">
+            <a href="#" data-goto="stakeholder"><strong>3.1 Stakeholder-Matrix</strong><span>Anspruchsgruppen nach Macht und Interesse positionieren und steuern.</span></a>
+            <a href="#" data-goto="ziele"><strong>3.2 SMART-Ziele &amp; Zielhierarchie</strong><span>Ziele geführt formulieren und automatisch prüfen.</span></a>
+            <a href="#" data-goto="kennzahlen"><strong>3.3 Finanzielle Ziele (Kennzahlen)</strong><span>EBITDA-Marge und EVA berechnen; wert- vs. traditionell einordnen.</span></a>
+            <a href="#" data-goto="abell"><strong>3.4 Geschäftsfelder (Abell)</strong><span>Den relevanten Markt über Wer/Was/Wie abgrenzen.</span></a>
+          </div>
+        </details>
+        <details class="chap" name="chap">
+          <summary><span class="chap-no">4</span><span class="chap-title">Strategische Analyse und Prognose</span><span class="chap-hint">Umwelt · Unternehmen · SWOT · Portfolio</span></summary>
+          <div class="chap-links">
+            <a href="#" data-goto="pestel"><strong>4.1.1 Globale Umwelt (PESTEL)</strong><span>Einflussfaktoren in sechs Feldern erfassen (＋/– → SWOT).</span></a>
+            <a href="#" data-goto="forces"><strong>4.1.2 Branchenstruktur (Five Forces)</strong><span>Branchenattraktivität über die Treiber der fünf Kräfte bewerten.</span></a>
+            <a href="#" data-goto="wettbewerb"><strong>4.1.3 Wettbewerbsumfeld</strong><span>Strategische Gruppen der direkten Konkurrenz kartieren.</span></a>
+            <a href="#" data-goto="wertkette"><strong>4.2 Wertkette</strong><span>Primär- und Unterstützungsaktivitäten analysieren (＋/– → SWOT).</span></a>
+            <a href="#" data-goto="swot"><strong>4.3 Simultane Analyse (SWOT)</strong><span>Analyse-Ergebnisse bündeln – inkl. TOWS-Normstrategien.</span></a>
+            <a href="#" data-goto="bcg"><strong>4.3 Portfolio (BCG)</strong><span>Geschäftseinheiten nach Wachstum und Marktanteil positionieren.</span></a>
+            <a href="#" data-goto="szenario"><strong>Prognose (Szenario-Analyse)</strong><span>Kontrastierende Zukunftsbilder strukturiert entwickeln.</span></a>
+          </div>
+        </details>
+        <details class="chap" name="chap">
+          <summary><span class="chap-no">5</span><span class="chap-title">Strategieformulierung und -bewertung</span><span class="chap-hint">Strategietypen · Nutzwertanalyse</span></summary>
+          <div class="chap-links">
+            <a href="#" data-goto="strategietypen"><strong>5.1 Typen von Strategien</strong><span>Strategieebenen, Porter-Strategien und Ansoff-Matrix.</span></a>
+            <a href="#" data-goto="strategiewahl"><strong>5.2 Bewertung &amp; Auswahl</strong><span>Optionen per Nutzwertanalyse gewichten und entscheiden.</span></a>
+          </div>
+        </details>
+        <details class="chap" name="chap">
+          <summary><span class="chap-no">6</span><span class="chap-title">Entwicklung, Implementierung &amp; Kontrolle</span><span class="chap-hint">BMC · BSC · Frühaufklärung</span></summary>
+          <div class="chap-links">
+            <a href="#" data-goto="bmc"><strong>6.1 Business Model Canvas</strong><span>Das Geschäftsmodell in neun Bausteinen entwickeln.</span></a>
+            <a href="#" data-goto="bsc"><strong>6.2 Balanced Scorecard</strong><span>Strategie in Ziele, Kennzahlen und Maßnahmen übersetzen.</span></a>
+            <a href="#" data-goto="kontrolle"><strong>6.3 Kontrolle &amp; Frühaufklärung</strong><span>Prämissenkontrolle und Frühwarn-Tracker (BSC-Kennzahlen automatisch).</span></a>
+          </div>
+        </details>
+        <details class="chap" name="chap">
+          <summary><span class="chap-no">✦</span><span class="chap-title">Werkzeuge &amp; Export</span><span class="chap-hint">Fallstudie · Selbsttest · Glossar · Dossier</span></summary>
+          <div class="chap-links">
+            <a href="#" data-goto="fallstudie"><strong>Fallstudien-Report</strong><span>Bericht mit Firmenbibliothek, Gliederung und Umfangszähler.</span></a>
+            <a href="#" data-goto="quiz"><strong>Selbsttest</strong><span>Lernkarten und Quiz mit Sofort-Feedback.</span></a>
+            <a href="#" data-goto="glossar"><strong>Glossar</strong><span>Zentrale Begriffe nachschlagen und durchsuchen.</span></a>
+            <a href="#" data-goto="dossier"><strong>Strategie-Dossier</strong><span>Alle Ergebnisse als druckfertiges Gesamtdokument (PDF).</span></a>
+          </div>
+        </details>
       </div>
     </section>
 

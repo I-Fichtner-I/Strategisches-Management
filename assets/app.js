@@ -261,7 +261,12 @@
   ];
   function setNavActive(el) {
     $$("#nav .nav-item").forEach((i) => { i.classList.remove("is-active"); i.removeAttribute("aria-current"); });
-    if (el) { el.classList.add("is-active"); el.setAttribute("aria-current", "page"); }
+    if (el) {
+      el.classList.add("is-active"); el.setAttribute("aria-current", "page");
+      // Überkapitel des aktiven Eintrags aufklappen (übrige bleiben, wie sie sind)
+      const grp = el.closest("details.nav-group");
+      if (grp) grp.open = true;
+    }
   }
   function navTo(view) {
     showView(view);
@@ -326,8 +331,11 @@
     const g = e.target.closest("[data-goto]");
     if (g) {
       e.preventDefault();
-      showView(g.dataset.goto);
-      setNavActive($(`#nav .nav-item[data-view="${g.dataset.goto}"]`));
+      showView(g.dataset.goto, g.dataset.anchor);
+      const sel = g.dataset.anchor
+        ? `#nav .nav-item[data-view="${g.dataset.goto}"][data-anchor="${g.dataset.anchor}"]`
+        : `#nav .nav-item[data-view="${g.dataset.goto}"]`;
+      setNavActive($(sel) || $(`#nav .nav-item[data-view="${g.dataset.goto}"]`));
       closeSidebarOnMobile();
     }
   });
