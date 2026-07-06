@@ -2205,6 +2205,11 @@
     { growth: 2, share: 0.6, revenue: 8 },
     { growth: 8, share: 1.1, revenue: 18 },
   ];
+  // Branchen-Vorlage (assets/sectors.js) für ein Unternehmen nachschlagen.
+  function sectorTemplate(c) {
+    const key = (window.TOOLKIT_SECTOR_OF || {})[c.name];
+    return (key && (window.TOOLKIT_SECTOR_TEMPLATES || {})[key]) || null;
+  }
   function companyState(c) {
     const s = sampleState();
     const short = companyShortName(c);
@@ -2240,8 +2245,14 @@
       { name: `Kompetenzen im Feld „${c.fields[0]}“`, v: 1, r: 1, i: 0, o: 1 },
       { name: "Standardisierte IT-Systeme", v: 1, r: 0, i: 0, o: 1 },
     ];
-    s.strategiewahl.options = [{ name: `[Ist-Strategie] ${c.strategy}`, scores: [5, 4, 4] }]
-      .concat(s.strategiewahl.options);
+    // Branchenneutrale Optionen statt der SaaS-lastigen generischen Beispiele
+    s.strategiewahl.options = [
+      { name: `[Ist-Strategie] ${c.strategy}`, scores: [5, 4, 4] },
+      { name: "Differenzierung über Innovation & Qualität", scores: [4, 4, 3] },
+      { name: "Kostenführerschaft durch Effizienzprogramm", scores: [3, 4, 4] },
+      { name: "Expansion in neue Märkte/Segmente", scores: [4, 3, 2] },
+    ];
+    s.bsc.process = [{ ziel: "Effizienz der Kernprozesse steigern", kennzahl: "Kosten je Einheit", zielwert: "−10 %", massnahme: "Prozess- & Automatisierungsprogramm" }];
     s.kontrolle.indicators[0].name = `Marktanteil ${s.bcg[0] ? s.bcg[0].name : "Kernsegment"}`;
     const u = parseRevenueMio(c.revenue);
     if (u) {
@@ -2249,6 +2260,57 @@
         ebit: String(Math.round(u * 0.12)), da: String(Math.round(u * 0.05)), umsatz: String(u),
         nopat: String(Math.round(u * 0.085)), kapital: String(Math.round(u * 0.7)), wacc: "8",
       };
+    }
+    // Branchen-Vorlage: PESTEL, Five Forces, Wertkette, SWOT, Szenario, Ansoff,
+    // Stakeholder und BMC mit branchentypischen Übungsinhalten überschreiben.
+    const asItems = (arr) => (arr || []).map(([text, sign]) => ({ text, sign }));
+    const tpl = sectorTemplate(c);
+    if (tpl) {
+      s.pestel = emptyLists(PESTEL_CATS.map((x) => x.key));
+      Object.keys(tpl.pestel || {}).forEach((k) => { s.pestel[k] = asItems(tpl.pestel[k]); });
+      FORCES.forEach((f) => {
+        const t = (tpl.forces || {})[f.key];
+        if (!t) return;
+        // Treiber so setzen, dass sich exakt die Ziel-Stärke der Kraft ergibt
+        s.forces[f.key] = { v: t[0], note: t[1] || "", drivers: f.drivers.map((d) => (d[1] === "hoch" ? t[0] : 6 - t[0])) };
+      });
+      s.valuechain = emptyLists(VC_ALL.map((x) => x.key));
+      Object.keys(tpl.valuechain || {}).forEach((k) => { s.valuechain[k] = asItems(tpl.valuechain[k]); });
+      if (tpl.swot) {
+        s.swot.strengths = (tpl.swot.strengths || []).slice();
+        s.swot.weaknesses = (tpl.swot.weaknesses || []).slice();
+        s.swot.opportunities = []; s.swot.threats = [];
+      }
+      if (tpl.szenario) {
+        s.szenario.factors = tpl.szenario.factors.slice();
+        s.szenario.a = tpl.szenario.a; s.szenario.b = tpl.szenario.b;
+      }
+      if (tpl.ansoff) Object.keys(tpl.ansoff).forEach((k) => { s.ansoff[k] = tpl.ansoff[k].slice(); });
+      if (tpl.stakeholders) s.stakeholders = tpl.stakeholders.map((x) => ({ name: x[0], power: x[1], interest: x[2] }));
+      if (tpl.bmc) {
+        s.bmc = emptyLists(BMC_BLOCKS.map((x) => x.key));
+        Object.keys(tpl.bmc).forEach((k) => { s.bmc[k] = tpl.bmc[k].slice(); });
+      }
+    }
+    // Unternehmensindividuelle Ebene (assets/company-data.js) über der
+    // Branchen-Vorlage: firmenspezifische SWOT, VRIO-Ressourcen, reale
+    // Wettbewerber, zusätzliche PESTEL-Faktoren und BCG-Positionen.
+    const ov = (window.TOOLKIT_COMPANY_DATA || {})[c.name];
+    if (ov) {
+      if (ov.pestel) Object.keys(ov.pestel).forEach((k) => {
+        s.pestel[k] = (s.pestel[k] || []).concat(asItems(ov.pestel[k]));
+      });
+      if (ov.swot) {
+        s.swot.strengths = ov.swot.strengths.slice();
+        s.swot.weaknesses = ov.swot.weaknesses.slice();
+      }
+      if (ov.vrio) s.vrio = ov.vrio.map((x) => ({ name: x[0], v: x[1], r: x[2], i: x[3], o: x[4] }));
+      if (ov.wettbewerb) s.wettbewerb = {
+        xLabel: ov.wettbewerb.x, yLabel: ov.wettbewerb.y,
+        competitors: ov.wettbewerb.wer.map((x) => ({ name: x[0], x: x[1], y: x[2], group: x[3] })),
+      };
+      if (ov.bcg) s.bcg = s.bcg.map((u, i) =>
+        ov.bcg[i] ? { name: u.name, growth: ov.bcg[i][0], share: ov.bcg[i][1], revenue: ov.bcg[i][2] } : u);
     }
     return s;
   }
