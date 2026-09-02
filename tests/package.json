@@ -1,0 +1,12 @@
+{
+  "name": "strategy-toolkit-tests",
+  "private": true,
+  "type": "module",
+  "description": "Browser-Tests für das Strategy Toolkit. Die Anwendung selbst bleibt abhängigkeitsfrei.",
+  "scripts": {
+    "test": "node browser.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.62.1"
+  }
+}

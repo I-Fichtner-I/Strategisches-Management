@@ -79,6 +79,7 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
 | **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
 | **Fallstudien-Report** *(im Strategie-Dossier)* | Analyse & Anwendung | Berichts-Arbeitsbereich direkt im Dossier: Titel, Autor:innen und gegliederte Struktur nach wissenschaftlichen Standards (Einleitung bis Fazit). Das Unternehmen (Bibliothek mit **20 Unternehmensprofilen**, echte Eckdaten) wird über „Beispiel-Datensatz laden" gewählt. |
+| **Analyse-Coach** | *während aller Phasen* | Prüft die **methodische Qualität** der eigenen Analyse und meldet typische Schwächen direkt im jeweiligen Werkzeug – z. B. eine SWOT nur aus Stärken, fünf gleich stark bewertete Wettbewerbskräfte, eine Balanced Scorecard mit nur einer Perspektive oder eine Strategiewahl, deren Rang 1 und 2 weniger als 5 % auseinanderliegen. |
 | **Selbsttest** | Wiederholung | Lernkarten und ein Multiple-Choice-Quiz mit Sofort-Feedback. |
 | **Strategie-Dossier** | Gesamt­dokument | Fasst alle Werkzeuge in einem druckfertigen Bericht zusammen – inkl. eingebetteter Diagramme und automatischer Einordnung (Stakeholder-Strategie, BCG-Kategorie, Branchenattraktivität). Per „Als PDF exportieren" als PDF sicherbar. |
 
@@ -106,6 +107,17 @@ Frühwarn- & KPI-Tracker übernommen** (erkennbar am Badge *BSC*). Zielwert,
 Ist-Wert, Zielrichtung und Ampel-Status lassen sich anschließend direkt in der
 Tracker-Tabelle bearbeiten; entfernte Kennzahlen werden nicht erneut angelegt.
 
+### Analyse-Coach
+
+Das Toolkit prüft nicht nur, **ob** ein Werkzeug befüllt ist (das zeigt das
+Fortschritts-Panel), sondern **wie**. In jedem Werkzeug erscheint bei Bedarf ein
+Kasten „Hinweise zu dieser Analyse" mit methodischen Rückmeldungen – etwa wenn
+PESTEL-Einträge kein Vorzeichen tragen, alle Geschäftseinheiten im selben
+BCG-Feld liegen oder Scorecard-Zeilen ohne Kennzahl bleiben. Die Hinweise sind
+Denkanstöße, keine Fehlermeldungen; sie erscheinen nicht im PDF-Export. Der
+werkzeugübergreifende **Konsistenz-Check** auf der Startseite und im Dossier
+zeigt weiterhin alle Befunde gemeinsam.
+
 ### Beispieldaten
 
 Über **„Beispiel-Datensatz laden"** (Startseite, unten im Panel „Fortschritt &
@@ -119,6 +131,10 @@ Angaben; die Analyse-Einträge und Kennzahlen-Verhältnisse sind fiktive
 
 Lokal: `index.html` im Browser öffnen.
 
+Jede Ansicht hat eine eigene Adresse (`…/index.html#swot`, `…#bcg`). Damit
+funktionieren Lesezeichen, der Zurück-Button des Browsers und das Teilen eines
+Links auf ein bestimmtes Werkzeug.
+
 Online (GitHub Pages): In den Repository-Einstellungen unter **Settings → Pages**
 als Quelle den Branch mit diesem Stand und den Ordner `/root` wählen. Die Seite ist
 danach unter `https://<user>.github.io/Strategisches-Management/` erreichbar.
@@ -129,8 +145,27 @@ danach unter `https://<user>.github.io/Strategisches-Management/` erreichbar.
 ├── index.html          Oberfläche & Navigation
 ├── assets/
 │   ├── style.css       Gestaltung (inkl. Dark Mode)
-│   └── app.js          Logik: SWOT, Five Forces, BCG-Portfolio
+│   ├── app.js          Logik: SWOT, Five Forces, BCG-Portfolio
+│   ├── companies.js    20 Firmenprofile für die Beispieldaten
+│   ├── sectors.js      Branchen-Vorlagen der Beispieldaten
+│   └── company-data.js unternehmensindividuelle Beispieldaten
+├── tests/              Browser-Tests (optional, siehe unten)
 └── README.md
 ```
 
 ---
+
+## Tests
+
+Die Anwendung selbst bleibt abhängigkeitsfrei – die Tests liegen getrennt in
+`tests/` und laufen gegen die echte `index.html` in Chromium:
+
+```bash
+cd tests
+npm install
+npm test
+```
+
+Geprüft werden Routing und Deep-Links, das entprellte Speichern, die
+Import-Validierung, jede Regel des Analyse-Coachs sowie die Druckausgabe
+(A4, mehrseitig).
