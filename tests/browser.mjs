@@ -525,6 +525,167 @@ const browser = await chromium.launch({ executablePath: chromiumPath(), args: ['
   }
 }
 
+/* ---------- Zeitstände & Vergleich ----------
+   Der Vergleich beantwortet die Leitfrage der strategischen Kontrolle. Geprüft
+   wird das Sichern über die Oberfläche, jede der drei Änderungsarten
+   (hinzugekommen / entfallen / geändert) und das Wiederherstellen. */
+{
+  // Seite mit vorgegebenem Arbeitsstand UND vorgegebenen Zeitständen öffnen.
+  async function openWithSnaps(jetzt, snaps, hash) {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
+    const cur = JSON.stringify(Object.assign({}, BASE, jetzt));
+    const list = JSON.stringify(snaps.map((s, i) => ({
+      id: 'snap' + i, ts: s.ts || '2026-03-01T10:00:00.000Z', label: s.label || ('Stand ' + (i + 1)),
+      state: Object.assign({}, BASE, s.state),
+    })));
+    await ctx.addInitScript(
+      `try{localStorage.setItem('strategy-toolkit-v1', ${JSON.stringify(cur)});`
+      + `localStorage.setItem('strategy-toolkit-snapshots-v1', ${JSON.stringify(list)})}catch(e){}`);
+    const page = await ctx.newPage();
+    const errs = [];
+    page.on('pageerror', (e) => errs.push(e.message));
+    page.on('dialog', (d) => d.accept());
+    await page.goto(FILE + (hash ? '#' + hash : ''));
+    await page.waitForTimeout(260);
+    return { ctx, page, errs };
+  }
+  const zeigeVergleich = async (page) => {
+    await page.click('#snap-list button[data-act="diff"]');
+    await page.waitForTimeout(220);
+    return page.locator('#snap-diff').innerText();
+  };
+
+  /* Sichern über die Oberfläche */
+  {
+    const { ctx, page, errs } = await openWith(
+      { swot: { strengths: ['Starke Marke'], weaknesses: [], opportunities: [], threats: [] } },
+      'kontrolle');
+    check('Ohne Zeitstand erscheint ein Hinweis',
+      (await page.locator('#snap-list .snap-empty').count()) === 1);
+    await page.fill('#snap-form input[name="label"]', 'Nach der Umweltanalyse');
+    await page.click('#snap-form button[type="submit"]');
+    await page.waitForTimeout(260);
+    const eintrag = await page.locator('#snap-list li').count();
+    const name = await page.locator('#snap-list .snap-name').first().innerText();
+    check('Ein Zeitstand lässt sich sichern und erscheint in der Liste',
+      eintrag === 1 && name === 'Nach der Umweltanalyse', `${eintrag} Einträge / ${name}`);
+    check('Der frisch gesicherte Stand meldet keine Abweichung',
+      (await page.locator('#snap-diff').innerText()).includes('nichts geändert'));
+    check('Das Sichern wirft keine Fehler', errs.length === 0, errs.join(' | '));
+    await ctx.close();
+  }
+
+  /* Hinzugekommene Einträge */
+  {
+    const { ctx, page } = await openWithSnaps(
+      { swot: { strengths: ['Starke Marke', 'Neues Patent'], weaknesses: [], opportunities: [], threats: [] } },
+      [{ state: { swot: { strengths: ['Starke Marke'], weaknesses: [], opportunities: [], threats: [] } } }],
+      'kontrolle');
+    const txt = await zeigeVergleich(page);
+    check('Der Vergleich zeigt hinzugekommene Einträge',
+      txt.includes('Neues Patent') && /1 Eintrag hinzugekommen/.test(txt),
+      txt.replace(/\n/g, ' | ').slice(0, 160));
+    await ctx.close();
+  }
+
+  /* Entfallene Einträge */
+  {
+    const { ctx, page } = await openWithSnaps(
+      { pestel: Object.assign({}, BASE.pestel, { political: [] }) },
+      [{ state: { pestel: Object.assign({}, BASE.pestel, {
+        political: [{ text: 'Subventionen laufen weiter', sign: 1 }] }) } }],
+      'kontrolle');
+    const txt = await zeigeVergleich(page);
+    check('Der Vergleich zeigt entfallene Einträge',
+      txt.includes('Subventionen laufen weiter') && /1 Eintrag entfallen/.test(txt),
+      txt.replace(/\n/g, ' | ').slice(0, 160));
+    await ctx.close();
+  }
+
+  /* Geänderte Werte: eine verschobene Anspruchsgruppe ist eine Änderung,
+     keine Löschung mit Neuanlage. */
+  {
+    const { ctx, page } = await openWithSnaps(
+      { stakeholders: [{ name: 'Investor:innen', power: 5, interest: 4 }] },
+      [{ state: { stakeholders: [{ name: 'Investor:innen', power: 3, interest: 4 }] } }],
+      'kontrolle');
+    const txt = await zeigeVergleich(page);
+    check('Eine verschobene Anspruchsgruppe erscheint als Änderung',
+      /Macht 3, Interesse 4 → Macht 5, Interesse 4/.test(txt) && /1 Wert geändert/.test(txt),
+      txt.replace(/\n/g, ' | ').slice(0, 200));
+    check('Sie erscheint nicht als Löschung plus Neuanlage',
+      /0 Einträge hinzugekommen/.test(txt) && /0 Einträge entfallen/.test(txt)
+      && !/[+−]\s*Anspruchsgruppen/.test(txt));
+    await ctx.close();
+  }
+
+  /* Geänderte Bewertung einer Wettbewerbskraft */
+  {
+    const { ctx, page } = await openWithSnaps({ forces: forcesAt(5) }, [{ state: {} }], 'kontrolle');
+    const txt = await zeigeVergleich(page);
+    check('Eine neu bewertete Wettbewerbskraft erscheint als Änderung',
+      /3\.0 → 5\.0/.test(txt), txt.replace(/\n/g, ' | ').slice(0, 200));
+    await ctx.close();
+  }
+
+  /* Unveränderter Stand */
+  {
+    const gleich = { swot: { strengths: ['Starke Marke'], weaknesses: [], opportunities: [], threats: [] } };
+    const { ctx, page } = await openWithSnaps(gleich, [{ state: gleich }], 'kontrolle');
+    const txt = await zeigeVergleich(page);
+    check('Ein unveränderter Stand meldet keine Abweichung',
+      txt.includes('nichts geändert'), txt.replace(/\n/g, ' | ').slice(0, 140));
+    await ctx.close();
+  }
+
+  /* Wiederherstellen */
+  {
+    const { ctx, page } = await openWithSnaps(
+      { swot: { strengths: ['Aktuell'], weaknesses: [], opportunities: [], threats: [] } },
+      [{ label: 'Früherer Stand',
+         state: { swot: { strengths: ['Von damals'], weaknesses: [], opportunities: [], threats: [] } } }],
+      'kontrolle');
+    await page.click('#snap-list button[data-act="restore"]');
+    await page.waitForTimeout(400);
+    const gespeichert = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('strategy-toolkit-v1')).swot.strengths.join(','));
+    await page.goto(FILE + '#swot');
+    await page.waitForTimeout(250);
+    const angezeigt = await page.locator('[data-list="strengths"] li').allInnerTexts();
+    check('Ein Zeitstand lässt sich wiederherstellen',
+      gespeichert === 'Von damals' && angezeigt.join(',').includes('Von damals'),
+      `gespeichert: ${gespeichert} / angezeigt: ${angezeigt.join(',')}`);
+    await ctx.close();
+  }
+
+  /* Löschen */
+  {
+    const { ctx, page } = await openWithSnaps({}, [{ label: 'Weg damit', state: {} }], 'kontrolle');
+    await page.click('#snap-list button[data-act="del"]');
+    await page.waitForTimeout(260);
+    check('Ein Zeitstand lässt sich löschen',
+      (await page.locator('#snap-list .snap-empty').count()) === 1
+      && (await page.evaluate(() => JSON.parse(
+        localStorage.getItem('strategy-toolkit-snapshots-v1') || '[]').length)) === 0);
+    await ctx.close();
+  }
+
+  /* Obergrenze: alte Stände fallen hinten heraus, statt den Speicher zu füllen */
+  {
+    const viele = Array.from({ length: 14 }, (_, i) => ({ label: 'Stand ' + i, state: {} }));
+    const { ctx, page } = await openWithSnaps({}, viele, 'kontrolle');
+    await page.fill('#snap-form input[name="label"]', 'Neuester');
+    await page.click('#snap-form button[type="submit"]');
+    await page.waitForTimeout(280);
+    const n = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('strategy-toolkit-snapshots-v1')).length);
+    const erster = await page.locator('#snap-list .snap-name').first().innerText();
+    check('Die Zahl der Zeitstände ist gedeckelt', n === 12, n + ' gespeichert');
+    check('Der neueste Stand steht oben', erster === 'Neuester', erster);
+    await ctx.close();
+  }
+}
+
 await browser.close();
 fs.rmSync(TMP, { recursive: true, force: true });
 console.log(`\n${pass} bestanden, ${fail} fehlgeschlagen`);

@@ -51,7 +51,7 @@ die Ergebnisse laufend in die Zielplanung zurück (Regelkreis).
 | 3 · Strategiekonzeption | Unternehmen gesamt · Geschäftsbereiche · Funktionsbereiche | Strategietypen (Porter · Ansoff) |
 | 4 · Bewertung der Strategiealternativen und Auswahl | Gewichtete Kriterien · Rangfolge · Entscheidung | Strategiewahl (Nutzwertanalyse) |
 | 5 · Strategieimplementierung | Maßnahmenplanung · Budgetierung | Business Model Canvas · Balanced Scorecard |
-| *während aller Phasen* | Strategische Kontrolle & Frühaufklärung | Frühwarn- & KPI-Tracker · Prämissenkontrolle |
+| *während aller Phasen* | Strategische Kontrolle & Frühaufklärung | Frühwarn- & KPI-Tracker · Prämissenkontrolle · Zeitstände & Vergleich |
 
 ## Werkzeuge
 
@@ -79,6 +79,7 @@ Die Werkzeuge folgen dem strategischen Management-Prozess – von der
 | **Business Model Canvas** | Umsetzung | Das Geschäftsmodell in neun Bausteinen entwickeln. |
 | **Balanced Scorecard** | Umsetzung & Kontrolle | Die Strategie über vier Perspektiven in Ziele, Kennzahlen, Zielwerte und Maßnahmen übersetzen. |
 | **Fallstudien-Report** *(im Strategie-Dossier)* | Analyse & Anwendung | Berichts-Arbeitsbereich direkt im Dossier: Titel, Autor:innen und gegliederte Struktur nach wissenschaftlichen Standards (Einleitung bis Fazit). Das Unternehmen (Bibliothek mit **20 Unternehmensprofilen**, echte Eckdaten) wird über „Beispiel-Datensatz laden" gewählt. |
+| **Zeitstände & Vergleich** | *während aller Phasen* | Die gesamte Analyse zu einem Zeitpunkt einfrieren und später vergleichen: Was ist hinzugekommen, was entfallen, welche Bewertungen haben sich geändert? Beantwortet die Leitfrage der Prämissenkontrolle – gelten die Annahmen von damals noch? |
 | **Analyse-Coach** | *während aller Phasen* | Prüft die **methodische Qualität** der eigenen Analyse und meldet typische Schwächen direkt im jeweiligen Werkzeug – z. B. eine SWOT nur aus Stärken, fünf gleich stark bewertete Wettbewerbskräfte, eine Balanced Scorecard mit nur einer Perspektive oder eine Strategiewahl, deren Rang 1 und 2 weniger als 5 % auseinanderliegen. |
 | **Selbsttest** | Wiederholung | Lernkarten und ein Multiple-Choice-Quiz mit Sofort-Feedback. |
 | **Strategie-Dossier** | Gesamt­dokument | Fasst alle Werkzeuge in einem druckfertigen Bericht zusammen – inkl. eingebetteter Diagramme und automatischer Einordnung (Stakeholder-Strategie, BCG-Kategorie, Branchenattraktivität). Per „Als PDF exportieren" als PDF sicherbar. |
@@ -106,6 +107,29 @@ Zusätzlich werden **Kennzahlen aus der Balanced Scorecard automatisch in den
 Frühwarn- & KPI-Tracker übernommen** (erkennbar am Badge *BSC*). Zielwert,
 Ist-Wert, Zielrichtung und Ampel-Status lassen sich anschließend direkt in der
 Tracker-Tabelle bearbeiten; entfernte Kennzahlen werden nicht erneut angelegt.
+
+### Zeitstände & Vergleich
+
+Unter **6.3 Kontrolle & Frühaufklärung** lässt sich der komplette Arbeitsstand als
+**Zeitstand** sichern – etwa am Ende einer Prozessphase oder vor einer
+Überarbeitung. Der Vergleich mit dem heutigen Stand zeigt gruppiert nach Werkzeug:
+
+```
+2 Einträge hinzugekommen · 1 Eintrag entfallen · 6 Werte geändert
+
+3.1 STAKEHOLDER
+  ≠ Investor:innen: Macht 3, Interesse 4 → Macht 5, Interesse 4
+4.1.1 PESTEL
+  − Ökonomisch: ＋ Stabile Konjunktur erwartet
+  + Ökonomisch: – Konjunktur schwächt sich ab
+```
+
+Damit läuft die **strategische Kontrolle begleitend statt als Schlussphase** – wie
+es der Regelkreis oben vorsieht. Benannte Datensätze (Anspruchsgruppen,
+Geschäftseinheiten, Wettbewerber, Ressourcen) werden dabei über ihren Namen
+verfolgt: Eine verschobene Position erscheint als *Änderung*, nicht als Löschung
+mit Neuanlage. Zeitstände liegen im Browser (localStorage), die jüngsten zwölf
+werden aufbewahrt.
 
 ### Analyse-Coach
 
@@ -168,7 +192,8 @@ npm test
 
 Geprüft werden Routing und Deep-Links, das entprellte Speichern, die
 Import-Validierung, jede Regel des Analyse-Coachs (samt Gegenproben, dass er im
-frühen Zwischenstand schweigt), die Darstellung des Konsistenz-Checks sowie die
+frühen Zwischenstand schweigt), die Darstellung des Konsistenz-Checks, die
+Zeitstände samt Vergleich, Wiederherstellen und Obergrenze sowie die
 Druckausgabe (A4, mehrseitig).
 
 Besonderes Gewicht liegt auf den **fachlichen Rechenkernen** – EBITDA und

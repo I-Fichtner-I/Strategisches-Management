@@ -372,7 +372,7 @@
     if (name === "wettbewerb") drawWettbewerb();
     if (name === "kennzahlen") { drawWaterfall(); renderKzCompare(); }
     if (name === "strategiewahl") renderStrategiewahl();
-    if (name === "kontrolle") { syncKpiFromBsc(); renderKpi(); renderPraemissen(); }
+    if (name === "kontrolle") { syncKpiFromBsc(); renderKpi(); renderPraemissen(); renderSnapshots(); }
     if (name === "bsc") buildBSC();
     if (name === "bmc") buildBMCTool();
     if (name === "forces" || name === "bcg" || name === "wettbewerb") renderAbellAnchors();
@@ -2348,6 +2348,236 @@
     catch (e) { return ""; }
   }
 
+  /* ---------- Zeitstände & Vergleich (Prämissen- und Durchführungskontrolle) ----------
+     Ein Zeitstand hält die gesamte Analyse fest. Der Vergleich mit dem heutigen
+     Stand beantwortet die Leitfrage der strategischen Kontrolle: Gelten die
+     Annahmen von damals noch? Damit läuft die Kontrolle nicht als Schlussphase,
+     sondern begleitend – wie im Regelkreis vorgesehen. */
+  const SNAP_KEY = "strategy-toolkit-snapshots-v1";
+  const SNAP_MAX = 12;
+  const SWOT_LABEL = { strengths: "Stärken", weaknesses: "Schwächen",
+                       opportunities: "Chancen", threats: "Risiken" };
+  const KZ_LABEL = { ebit: "EBIT", da: "Abschreibungen", umsatz: "Umsatz",
+                     nopat: "NOPAT", kapital: "Investiertes Kapital", wacc: "WACC" };
+  let snapCompareId = null;
+
+  const snapLabel = (s) => String((s && s.label) || "").trim() || "Ohne Bezeichnung";
+  const snapWhen = (ts) => {
+    const d = new Date(ts);
+    return isNaN(d) ? "" : d.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  };
+
+  function loadSnaps() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(SNAP_KEY) || "[]");
+      return Array.isArray(arr) ? arr.filter((s) => s && s.id && s.ts && s.state) : [];
+    } catch (e) { return []; }
+  }
+  // Bei vollem Speicher die ältesten Stände opfern, statt das Sichern scheitern zu lassen.
+  function storeSnaps(list) {
+    let arr = list.slice(-SNAP_MAX);
+    for (;;) {
+      try { localStorage.setItem(SNAP_KEY, JSON.stringify(arr)); return arr; }
+      catch (e) {
+        if (!arr.length) { try { localStorage.removeItem(SNAP_KEY); } catch (e2) {} return []; }
+        arr = arr.slice(1);
+      }
+    }
+  }
+
+  /* Vergleichbare Darstellung eines Stands. Bewusst zweigeteilt:
+     - items  = benannte Einträge, die hinzukommen oder wegfallen können
+     - values = Ausprägungen zu einem Namen, die sich ändern können
+     Dadurch erscheint eine verschobene Anspruchsgruppe als Änderung und nicht
+     als Löschung plus Neuanlage. */
+  const snapText = (x) => (x && typeof x === "object")
+    ? ((x.sign > 0 ? "＋ " : x.sign < 0 ? "– " : "") + (x.text || ""))
+    : String(x == null ? "" : x);
+
+  function snapFacts(st) {
+    const items = [], values = [];
+    const arr = (o, k) => (o && Array.isArray(o[k])) ? o[k] : [];
+    const list = (view, group, a, fmt) => (a || []).forEach((x) => {
+      const t = (fmt || snapText)(x);
+      if (t) items.push({ view, group, text: t });
+    });
+    const named = (view, group, a, name, value) => (a || []).forEach((x) => {
+      const n = String(name(x) || "").trim();
+      if (!n) return;
+      items.push({ view, group, text: n });
+      values.push({ view, label: n, value: String(value(x)) });
+    });
+    const val = (view, label, v) =>
+      values.push({ view, label, value: (v == null || v === "") ? "–" : String(v) });
+
+    ABELL_CATS.forEach((c) => list("abell", c.label, arr(st.abell, c.key)));
+    SWOT_FIELDS.forEach((f) => list("swot", SWOT_LABEL[f], arr(st.swot, f)));
+    PESTEL_CATS.forEach((c) => list("pestel", c.label, arr(st.pestel, c.key)));
+    VC_ALL.forEach((c) => list("wertkette", c.label, arr(st.valuechain, c.key)));
+    BMC_BLOCKS.forEach((c) => list("bmc", c.label, arr(st.bmc, c.key)));
+    ANSOFF_CELLS.forEach((c) => list("strategietypen", c.label, arr(st.ansoff, c.key)));
+    list("szenario", "Einflussfaktoren", arr(st.szenario, "factors"));
+
+    named("stakeholder", "Anspruchsgruppen", st.stakeholders,
+      (x) => x.name, (x) => `Macht ${x.power}, Interesse ${x.interest}`);
+    named("bcg", "Geschäftseinheiten", st.bcg,
+      (x) => x.name, (x) => `${x.growth} % Wachstum · ${x.share}× Marktanteil · Umsatz ${x.revenue}`);
+    named("ansaetze", "Ressourcen", st.vrio,
+      (x) => x.name, (x) => vrioImplication(x).label);
+    named("wettbewerb", "Wettbewerber", (st.wettbewerb || {}).competitors,
+      (x) => x.name, (x) => `${x.x}/${x.y}${x.group ? " · " + x.group : ""}`);
+    named("ziele", "Ziele", st.ziele,
+      (x) => x.ziel, (x) => SMART.filter((c) => smartMet(x, c)).length + "/5 SMART");
+    named("strategiewahl", "Optionen", (st.strategiewahl || {}).options,
+      (x) => x.name, (x) => (x.scores || []).join(" · "));
+    named("kontrolle", "Kennzahlen", (st.kontrolle || {}).indicators,
+      (x) => x.name,
+      (x) => `Ziel ${x.target || "–"} · Ist ${x.actual || "–"} · ${KPI_STATUS[x.status] || "–"}`);
+    BSC_VIEWS.forEach((p) => arr(st.bsc, p.key).forEach((r) => {
+      const n = String(r.ziel || "").trim() || "(ohne Ziel)";
+      items.push({ view: "bsc", group: p.label, text: n });
+      values.push({ view: "bsc", label: `${p.label}: ${n}`,
+        value: `${r.kennzahl || "ohne Kennzahl"} · Ziel ${r.zielwert || "–"}` });
+    }));
+
+    const prem = (st.kontrolle || {}).premises || {};
+    Object.keys(prem).forEach((k) => val("kontrolle", "Prämisse: " + k, PREM_STATUS[prem[k]]));
+    FORCES.forEach((f) => {
+      const v = ((st.forces || {})[f.key] || {}).v;
+      val("forces", f.short, (typeof v === "number" ? v : 3).toFixed(1));
+    });
+    Object.keys(KZ_LABEL).forEach((k) => val("kennzahlen", KZ_LABEL[k], (st.kennzahlen || {})[k]));
+    [["a", "Szenario A"], ["b", "Szenario B"]].forEach((pair) => {
+      const t = String((st.szenario || {})[pair[0]] || "").trim();
+      if (t) val("szenario", pair[1], t.length > 90 ? t.slice(0, 90) + " …" : t);
+    });
+    return { items, values };
+  }
+
+  function snapDiff(before, after) {
+    const A = snapFacts(before), B = snapFacts(after);
+    const ik = (x) => x.view + " | " + x.group + " | " + x.text;
+    const vk = (x) => x.view + " | " + x.label;
+    const aI = new Set(A.items.map(ik)), bI = new Set(B.items.map(ik));
+    const aV = new Map(A.values.map((x) => [vk(x), x.value]));
+    return {
+      added: B.items.filter((x) => !aI.has(ik(x))),
+      removed: A.items.filter((x) => !bI.has(ik(x))),
+      changed: B.values.filter((x) => aV.has(vk(x)) && aV.get(vk(x)) !== x.value)
+        .map((x) => ({ view: x.view, label: x.label, from: aV.get(vk(x)), to: x.value })),
+    };
+  }
+
+  function renderSnapDiff(snap) {
+    const box = $("#snap-diff");
+    if (!box) return;
+    if (!snap) { box.hidden = true; box.innerHTML = ""; return; }
+    const d = snapDiff(snap.state, state);
+    const head = `<div class="snap-diff-head"><h4>Vergleich mit „${escapeHtml(snapLabel(snap))}“`
+      + `<span class="snap-when">${escapeHtml(snapWhen(snap.ts))}</span></h4>`
+      + `<button type="button" class="snap-close" aria-label="Vergleich schließen">×</button></div>`;
+    if (!d.added.length && !d.removed.length && !d.changed.length) {
+      box.hidden = false;
+      box.innerHTML = head + `<p class="snap-none">Seit diesem Zeitstand hat sich nichts geändert `
+        + `– die Prämissen gelten unverändert.</p>`;
+      return;
+    }
+    const line = (cls, mark, text) =>
+      `<li class="${cls}"><span class="snap-mark">${mark}</span>${text}</li>`;
+    const groups = PAGES.map((pg) => pg.v).map((v) => {
+      const a = d.added.filter((x) => x.view === v);
+      const r = d.removed.filter((x) => x.view === v);
+      const c = d.changed.filter((x) => x.view === v);
+      if (!a.length && !r.length && !c.length) return "";
+      return `<div class="snap-group"><h5>${escapeHtml(VIEW_LABEL[v] || v)}</h5><ul class="snap-changes">`
+        + a.map((x) => line("snap-add", "+", `${escapeHtml(x.group)}: ${escapeHtml(x.text)}`)).join("")
+        + r.map((x) => line("snap-del", "−", `${escapeHtml(x.group)}: ${escapeHtml(x.text)}`)).join("")
+        + c.map((x) => line("snap-chg", "≠",
+            `${escapeHtml(x.label)}: ${escapeHtml(x.from)} → ${escapeHtml(x.to)}`)).join("")
+        + `</ul></div>`;
+    }).join("");
+    box.hidden = false;
+    box.innerHTML = head + `<p class="snap-summary">`
+      + `<span class="snap-add">${plural(d.added.length, "Eintrag", "Einträge")} hinzugekommen</span> · `
+      + `<span class="snap-del">${plural(d.removed.length, "Eintrag", "Einträge")} entfallen</span> · `
+      + `<span class="snap-chg">${plural(d.changed.length, "Wert", "Werte")} geändert</span></p>`
+      + groups;
+  }
+
+  function renderSnapshots() {
+    const box = $("#snap-list");
+    if (!box) return;
+    const list = loadSnaps();
+    if (!list.some((s) => s.id === snapCompareId)) snapCompareId = null;
+    if (!list.length) {
+      box.innerHTML = '<p class="snap-empty">Noch kein Zeitstand gesichert.</p>';
+      renderSnapDiff(null);
+      return;
+    }
+    box.innerHTML = `<ul class="snap-list">${list.slice().reverse().map((s) => {
+      const aktiv = s.id === snapCompareId;
+      return `<li${aktiv ? ' class="is-active"' : ""}>`
+        + `<span class="snap-name">${escapeHtml(snapLabel(s))}</span>`
+        + `<span class="snap-when">${escapeHtml(snapWhen(s.ts))}</span>`
+        + `<span class="snap-actions">`
+        + `<button type="button" data-act="diff" data-id="${escapeHtml(s.id)}" aria-pressed="${aktiv}">`
+        + `${aktiv ? "Vergleich schließen" : "Vergleichen"}</button>`
+        + `<button type="button" data-act="restore" data-id="${escapeHtml(s.id)}">Wiederherstellen</button>`
+        + `<button type="button" data-act="del" data-id="${escapeHtml(s.id)}" `
+        + `aria-label="Zeitstand „${escapeHtml(snapLabel(s))}“ löschen">×</button>`
+        + `</span></li>`;
+    }).join("")}</ul>`;
+    renderSnapDiff(list.find((s) => s.id === snapCompareId) || null);
+  }
+
+  function wireSnapshots() {
+    const form = $("#snap-form");
+    if (form) form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = form.querySelector('input[name="label"]');
+      const list = loadSnaps();
+      list.push({
+        id: "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+        ts: new Date().toISOString(),
+        label: input ? input.value.trim() : "",
+        state: JSON.parse(JSON.stringify(state)),
+      });
+      const kept = storeSnaps(list);
+      if (input) input.value = "";
+      snapCompareId = kept.length ? kept[kept.length - 1].id : null;
+      renderSnapshots();
+    });
+    const box = $("#snap-list");
+    if (box) box.addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-act]");
+      if (!b) return;
+      const list = loadSnaps();
+      const snap = list.find((s) => s.id === b.dataset.id);
+      if (!snap) return;
+      if (b.dataset.act === "diff") {
+        snapCompareId = snapCompareId === snap.id ? null : snap.id;
+        renderSnapshots();
+      } else if (b.dataset.act === "restore") {
+        if (!confirm(`Den Zeitstand „${snapLabel(snap)}“ wiederherstellen? `
+          + "Die aktuellen Eingaben werden dabei ersetzt.")) return;
+        state = deepMerge(defaultState(), migrate(JSON.parse(JSON.stringify(snap.state))));
+        snapCompareId = null;
+        saveNow();
+        fullRebuild();
+        navTo("kontrolle");
+      } else if (b.dataset.act === "del") {
+        if (!confirm(`Den Zeitstand „${snapLabel(snap)}“ löschen?`)) return;
+        storeSnaps(list.filter((s) => s.id !== snap.id));
+        if (snapCompareId === snap.id) snapCompareId = null;
+        renderSnapshots();
+      }
+    });
+    const diff = $("#snap-diff");
+    if (diff) diff.addEventListener("click", (e) => {
+      if (e.target.closest(".snap-close")) { snapCompareId = null; renderSnapshots(); }
+    });
+  }
+
   /* ---------- Fortschritts-Dashboard & Beispiel-Datensatz ---------- */
   const listHas = (obj) => Object.keys(obj || {}).some((k) => Array.isArray(obj[k]) && obj[k].length);
   const DASH = [
@@ -2679,6 +2909,7 @@
     syncKpiFromBsc();
     renderKpi();
     renderPraemissen();
+    renderSnapshots();
     renderVrio();
     buildBSC();
     initListTool("#abell-root", state.abell, ABELL_CATS, { onChange: renderAbellAnchors });
@@ -2701,6 +2932,7 @@
   wireSwotForms();
   wireWettbewerb();
   wireKpi();
+  wireSnapshots();
   wireVrio();
   wireSzenario();
   wireKennzahlen();
