@@ -167,5 +167,13 @@ npm test
 ```
 
 Geprüft werden Routing und Deep-Links, das entprellte Speichern, die
-Import-Validierung, jede Regel des Analyse-Coachs sowie die Druckausgabe
-(A4, mehrseitig).
+Import-Validierung, jede Regel des Analyse-Coachs (samt Gegenproben, dass er im
+frühen Zwischenstand schweigt), die Darstellung des Konsistenz-Checks sowie die
+Druckausgabe (A4, mehrseitig).
+
+Besonderes Gewicht liegt auf den **fachlichen Rechenkernen** – EBITDA und
+EBITDA-Marge, Kapitalkosten und EVA, die Branchenattraktivität aus den Five
+Forces, die Zuordnung der vier TOWS-Normstrategien, die VRIO-Prüfreihenfolge
+nach Barney, das gewichtete Mittel der Nutzwertanalyse samt K.-o.-Kriterium,
+die SMART-Zählung und der automatische Datenfluss in die SWOT. Ein stiller
+Fehler an diesen Stellen würde nicht auffallen, aber Falsches vermitteln.

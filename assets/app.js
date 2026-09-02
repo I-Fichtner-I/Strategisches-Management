@@ -1884,6 +1884,9 @@
   function forceLevel(v) { return v >= 4 ? "stark" : v <= 2 ? "schwach" : "mittel"; }
 
   // Konsistenz-Check: die Werkzeuge validieren sich gegenseitig (Meta-Verzahnung).
+  // Ein/Mehrzahl korrekt setzen – die Befunde landen im Dossier und damit im
+  // Abgabedokument, „1 Kennzahl(en)“ liest sich dort schlecht.
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   function computeConsistency() {
     const out = [];
     // view = Werkzeug, zu dem der Befund gehört (null = werkzeugübergreifend).
@@ -1923,11 +1926,11 @@
     const dismissed = new Set(state.kontrolle.dismissed || []);
     const missing = bscKpis.filter((k) => !tracker.has(k) && !dismissed.has(k));
     if (missing.length)
-      add("info", `${missing.length} BSC-Kennzahl(en) noch nicht im Frühwarn-Tracker.`, "kontrolle");
+      add("info", `${plural(missing.length, "BSC-Kennzahl ist", "BSC-Kennzahlen sind")} noch nicht im Frühwarn-Tracker.`, "kontrolle");
 
     const broken = Object.values(state.kontrolle.premises || {}).filter((v) => v === "broken").length;
     if (broken)
-      add("warn", `${broken} Prämisse(n) als „überholt“ markiert – Strategie überprüfen (Prämissenkontrolle).`, "kontrolle");
+      add("warn", `${plural(broken, "Prämisse ist", "Prämissen sind")} als „überholt“ markiert – Strategie überprüfen (Prämissenkontrolle).`, "kontrolle");
 
     /* ---- Methodische Qualität je Werkzeug ----
        Die folgenden Regeln prüfen nicht, OB ein Werkzeug befüllt ist (das leistet
@@ -1936,14 +1939,14 @@
 
     // Abell: eine Marktabgrenzung braucht alle drei Dimensionen.
     const abellDims = ABELL_CATS.filter((c) => (state.abell[c.key] || []).length);
-    if (abellDims.length && abellDims.length < ABELL_CATS.length)
+    if (abellDims.length >= 2 && abellDims.length < ABELL_CATS.length)
       add("info", `Abell ist erst in ${abellDims.length} von 3 Dimensionen gefüllt – der Markt ist damit nicht eindeutig abgegrenzt.`, "abell");
 
     // PESTEL: Abdeckung der Felder und gesetzte Vorzeichen.
     const pesAll = PESTEL_CATS.flatMap((c) => state.pestel[c.key] || []);
     const pesEmpty = PESTEL_CATS.filter((c) => !(state.pestel[c.key] || []).length);
-    if (pesAll.length && pesEmpty.length)
-      add("info", `${pesEmpty.length} von 6 PESTEL-Feldern ohne Eintrag (${pesEmpty.map((c) => c.label).join(", ")}).`, "pestel");
+    if (PESTEL_CATS.length - pesEmpty.length >= 3 && pesEmpty.length)
+      add("info", `${plural(pesEmpty.length, "PESTEL-Feld ist", "PESTEL-Felder sind")} von 6 noch ohne Eintrag (${pesEmpty.map((c) => c.label).join(", ")}).`, "pestel");
     if (pesAll.length >= 3 && !pesAll.some((it) => it && it.sign))
       add("warn", "Kein PESTEL-Eintrag ist als Chance (＋) oder Risiko (–) markiert – ohne Vorzeichen fließt nichts in die SWOT.", "pestel");
 
@@ -1965,18 +1968,20 @@
       const noNote = FORCES.filter((f) => Math.round(state.forces[f.key].v * 10) / 10 !== 3
         && !(state.forces[f.key].note || "").trim());
       if (noNote.length)
-        add("info", `${noNote.length} Kraft/Kräfte ohne Begründung (${noNote.map((f) => f.short).join(", ")}) – die Bewertung bleibt unbelegt.`, "forces");
+        add("info", `${plural(noNote.length, "Kraft ist", "Kräfte sind")} ohne Begründung bewertet (${noNote.map((f) => f.short).join(", ")}) – die Einschätzung bleibt unbelegt.`, "forces");
     }
 
     // SWOT: Gleichgewicht von Innen-/Außensicht und von Positiv/Negativ.
     const swCount = (k) => (state.swot[k] || []).length + (d[k] || []).length;
     const intern = swCount("strengths") + swCount("weaknesses");
     const extern = swCount("opportunities") + swCount("threats");
-    if (intern + extern >= 4) {
+    // Die Schieflage wird erst ab vierfachem Übergewicht gemeldet: wer PESTEL vor
+    // der Wertkette ausfüllt, hat einen normalen Zwischenstand und kein Problem.
+    if (intern + extern >= 6) {
       if (!extern) add("warn", "Die SWOT enthält nur interne Punkte – Chancen und Risiken der Umwelt fehlen vollständig.", "swot");
       else if (!intern) add("warn", "Die SWOT enthält nur externe Punkte – Stärken und Schwächen des Unternehmens fehlen.", "swot");
-      else if (intern >= 3 * extern) add("info", `Die Innensicht dominiert (${intern} interne gegenüber ${extern} externen Punkten).`, "swot");
-      else if (extern >= 3 * intern) add("info", `Die Außensicht dominiert (${extern} externe gegenüber ${intern} internen Punkten).`, "swot");
+      else if (intern >= 4 * extern) add("info", `Die Innensicht dominiert deutlich (${intern} interne gegenüber ${extern} externen Punkten).`, "swot");
+      else if (extern >= 4 * intern) add("info", `Die Außensicht dominiert deutlich (${extern} externe gegenüber ${intern} internen Punkten).`, "swot");
     }
     if (swCount("strengths") >= 3 && !swCount("weaknesses"))
       add("warn", "Nur Stärken, keine Schwächen – ein Selbstbild ganz ohne blinde Flecken ist unwahrscheinlich.", "swot");
@@ -2026,8 +2031,8 @@
     const bmcFilled = BMC_BLOCKS.filter((c) => (state.bmc[c.key] || []).length);
     if (bmcFilled.length && !(state.bmc.value || []).length)
       add("warn", "Das Wertangebot ist leer – es ist der Bezugspunkt aller übrigen Bausteine.", "bmc");
-    if (bmcFilled.length && bmcFilled.length < BMC_BLOCKS.length)
-      add("info", `${BMC_BLOCKS.length - bmcFilled.length} von ${BMC_BLOCKS.length} Bausteinen sind noch leer.`, "bmc");
+    if (bmcFilled.length >= BMC_BLOCKS.length / 2 && bmcFilled.length < BMC_BLOCKS.length)
+      add("info", `${plural(BMC_BLOCKS.length - bmcFilled.length, "Baustein ist", "Bausteine sind")} von ${BMC_BLOCKS.length} noch leer.`, "bmc");
 
     // Balanced Scorecard: vier Perspektiven und messbare Zeilen.
     const bscViewsFilled = BSC_VIEWS.filter((v) => (state.bsc[v.key] || []).length);
@@ -2036,7 +2041,7 @@
     const bscUnmeasured = BSC_VIEWS.flatMap((v) => state.bsc[v.key] || [])
       .filter((r) => !String(r.kennzahl || "").trim() || !String(r.zielwert || "").trim()).length;
     if (bscUnmeasured)
-      add("info", `${bscUnmeasured} Scorecard-Zeile(n) ohne Kennzahl oder Zielwert – nicht messbar und damit nicht steuerbar.`, "bsc");
+      add("info", `${plural(bscUnmeasured, "Scorecard-Zeile ist", "Scorecard-Zeilen sind")} ohne Kennzahl oder Zielwert – nicht messbar und damit nicht steuerbar.`, "bsc");
 
     // Strategiewahl: Gewichtung und Robustheit der Rangfolge.
     if (state.strategiewahl.options.length >= 2) {
@@ -2052,7 +2057,7 @@
     const kpiOpen = (state.kontrolle.indicators || [])
       .filter((i) => !String(i.target || "").trim() || !String(i.actual || "").trim()).length;
     if (kpiOpen)
-      add("info", `${kpiOpen} Kennzahl(en) ohne Ziel- oder Ist-Wert – der Ampelstatus ist damit nicht belastbar.`, "kontrolle");
+      add("info", `${plural(kpiOpen, "Kennzahl ist", "Kennzahlen sind")} ohne Ziel- oder Ist-Wert – der Ampelstatus ist damit nicht belastbar.`, "kontrolle");
 
     // Kennzahlen: der EVA braucht alle drei Größen.
     const evaFields = ["nopat", "kapital", "wacc"];
@@ -2063,12 +2068,43 @@
     return out;
   }
   const CONSISTENCY_ICON = { warn: "⚠️", info: "ℹ️", ok: "✅" };
-  function consistencyHtml() {
+  const VIEW_LABEL = PAGES.reduce((m, pg) => ((m[pg.v] = pg.t), m), {});
+  const consItem = (it) =>
+    `<li class="cons-${it.sev}">${CONSISTENCY_ICON[it.sev]} ${escapeHtml(it.text)}</li>`;
+  const consList = (items) => `<ul class="consistency-list">${items.map(consItem).join("")}</ul>`;
+  const consOk = `<ul class="consistency-list"><li class="cons-ok">${CONSISTENCY_ICON.ok} Keine Auffälligkeiten – die Analyse ist in sich schlüssig.</li></ul>`;
+
+  /* Zwei Darstellungen derselben Befunde:
+     "dashboard" – Warnungen sofort sichtbar, Hinweise eingeklappt, damit die
+                   Startseite nicht zur Textwand wird.
+     "dossier"   – vollständig und nach Werkzeug gruppiert, als Qualitätsanhang
+                   des Berichts. */
+  function consistencyHtml(mode) {
     const items = computeConsistency();
-    if (!items.length)
-      return `<ul class="consistency-list"><li class="cons-ok">${CONSISTENCY_ICON.ok} Keine Auffälligkeiten – die Analyse ist in sich schlüssig.</li></ul>`;
-    return `<ul class="consistency-list">${items.map((it) =>
-      `<li class="cons-${it.sev}">${CONSISTENCY_ICON[it.sev]} ${escapeHtml(it.text)}</li>`).join("")}</ul>`;
+    if (!items.length) return consOk;
+
+    if (mode === "dossier") {
+      const order = PAGES.map((pg) => pg.v);
+      const groups = [];
+      const push = (view, list) => { if (list.length) groups.push({ view, list }); };
+      push(null, items.filter((it) => !it.view));
+      order.forEach((v) => push(v, items.filter((it) => it.view === v)));
+      return groups.map((g) =>
+        `<div class="cons-group"><h3 class="cons-group-head">${
+          g.view ? escapeHtml(VIEW_LABEL[g.view] || g.view) : "Werkzeugübergreifend"
+        }</h3>${consList(g.list)}</div>`).join("");
+    }
+
+    const warns = items.filter((it) => it.sev === "warn");
+    const infos = items.filter((it) => it.sev !== "warn");
+    let html = warns.length ? consList(warns) : "";
+    if (infos.length) {
+      const n = infos.length;
+      html += `<details class="cons-more"${warns.length ? "" : " open"}>`
+        + `<summary>${n} ${n === 1 ? "weiterer Hinweis" : "weitere Hinweise"}`
+        + `${warns.length ? "" : " zur Analyse"}</summary>${consList(infos)}</details>`;
+    }
+    return html;
   }
 
   /* Analyse-Coach: zeigt die Befunde zum gerade geöffneten Werkzeug direkt dort an,
@@ -2096,11 +2132,14 @@
     if (!el) return;
     let items = [];
     try { items = computeConsistency().filter((it) => it.view === view); } catch (e) { items = []; }
-    if (!items.length) { el.hidden = true; el.innerHTML = ""; return; }
-    el.hidden = false;
-    el.innerHTML = `<h3 class="coach-head">Hinweise zu dieser Analyse</h3>`
-      + `<ul class="consistency-list">${items.map((it) =>
-          `<li class="cons-${it.sev}">${CONSISTENCY_ICON[it.sev]} ${escapeHtml(it.text)}</li>`).join("")}</ul>`;
+    const html = items.length
+      ? `<h3 class="coach-head">Hinweise zu dieser Analyse</h3>${consList(items)}` : "";
+    // Nur bei tatsächlicher Änderung neu schreiben: der Bereich ist aria-live,
+    // ein Neuaufbau bei jedem Speichern würde die Liste erneut vorgelesen.
+    if (el.dataset.html === html) return;
+    el.dataset.html = html;
+    el.innerHTML = html;
+    el.hidden = !items.length;
   }
 
   function buildDossier() {
@@ -2109,7 +2148,7 @@
     const parts = [];
     const now = new Date().toLocaleDateString("de-DE", { year: "numeric", month: "long", day: "numeric" });
     parts.push(`<header class="dossier-head"><h1>Strategie-Dossier</h1><p class="dossier-date">Erstellt am ${now}</p></header>`);
-    parts.push(`<section class="dossier-sec consistency-panel"><h2>Konsistenz-Check</h2>${consistencyHtml()}</section>`);
+    parts.push(`<section class="dossier-sec consistency-panel"><h2>Konsistenz-Check</h2>${consistencyHtml("dossier")}</section>`);
 
     let secNo = 0;
     const section = (title, inner) => { secNo++; return `<section class="dossier-sec"><h2>${secNo} · ${title}</h2>${inner}</section>`; };
@@ -2346,7 +2385,7 @@
       grid.appendChild(b);
     });
     const cons = $("#dash-consistency");
-    if (cons) cons.innerHTML = `<h4 class="dash-cons-head">Konsistenz-Check</h4>${consistencyHtml()}`;
+    if (cons) cons.innerHTML = `<h4 class="dash-cons-head">Konsistenz-Check</h4>${consistencyHtml("dashboard")}`;
   }
   function sampleState() {
     const s = defaultState();

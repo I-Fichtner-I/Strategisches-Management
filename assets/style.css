@@ -677,6 +677,20 @@ button:active { transform: translateY(1px); }
 .consistency-list .cons-ok { border-left: 3px solid var(--good);
   background: color-mix(in srgb, var(--good) 7%, var(--surface-1)); }
 .dash-consistency { margin-top: 16px; }
+/* Konsistenz-Check: eingeklappte Hinweise (Startseite) und Gruppen (Dossier) */
+.cons-more { margin-top: 6px; }
+.cons-more > summary { cursor: pointer; font-size: .85rem; color: var(--text-secondary);
+  padding: 6px 2px; list-style: none; }
+.cons-more > summary::-webkit-details-marker { display: none; }
+.cons-more > summary::before { content: "▸"; display: inline-block; width: 1em;
+  color: var(--muted); transition: transform .15s ease; }
+.cons-more[open] > summary::before { transform: rotate(90deg); }
+.cons-more > summary:hover { color: var(--text-primary); }
+.cons-more > .consistency-list { margin-top: 6px; }
+.cons-group + .cons-group { margin-top: 12px; }
+.cons-group-head { margin: 0 0 6px; font-size: .8rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+
 /* Analyse-Coach: Hinweise zum gerade geöffneten Werkzeug */
 .coach-panel { margin: 0 0 18px; padding: 12px 14px; border: 1px solid var(--border);
   border-radius: 10px; background: var(--surface-2); }
@@ -885,6 +899,7 @@ button:active { transform: translateY(1px); }
   .dossier-block, .dossier-chart, .consistency-list li, figure, tr, li {
     break-inside: avoid; page-break-inside: avoid;
   }
+  .cons-group { break-inside: avoid; page-break-inside: avoid; }
   thead { display: table-header-group; }
   tfoot { display: table-footer-group; }
   p, li { orphans: 3; widows: 3; }
