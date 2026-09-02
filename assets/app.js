@@ -4,6 +4,9 @@
   "use strict";
 
   const STORE_KEY = "strategy-toolkit-v1";
+  // Version des gespeicherten Datenmodells. Wird mit jedem Stand mitgeschrieben,
+  // damit spätere Strukturänderungen migriert statt stillschweigend verworfen werden.
+  const SCHEMA_VERSION = 1;
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
@@ -61,6 +64,7 @@
   ];
 
   const defaultState = () => ({
+    schemaVersion: SCHEMA_VERSION,
     swot: emptyLists(["strengths", "weaknesses", "opportunities", "threats"]),
     forces: {
       rivalry: { v: 3, note: "", drivers: [3, 3, 3, 3, 3] },
@@ -100,11 +104,31 @@
 
   let state = load();
 
+  // Migrationen: Eintrag n hebt einen Stand von Schema n auf n+1. Rein additive
+  // Änderungen deckt bereits deepMerge ab; hier stehen nur echte Umbauten.
+  const MIGRATIONS = [
+    (data) => data, // 0 (unversioniert) -> 1
+  ];
+  function migrate(data) {
+    let v = Number.isInteger(data.schemaVersion) ? data.schemaVersion : 0;
+    while (v < SCHEMA_VERSION && MIGRATIONS[v]) { data = MIGRATIONS[v](data) || data; v++; }
+    data.schemaVersion = SCHEMA_VERSION;
+    return data;
+  }
+  // Grobprüfung einer Projektdatei: ein Objekt, dessen Schlüssel zum bekannten
+  // Schema passen. Verhindert, dass beliebiges JSON den Arbeitsstand überschreibt.
+  function isProjectData(obj) {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) return false;
+    const known = Object.keys(defaultState());
+    return Object.keys(obj).filter((k) => known.indexOf(k) >= 0).length >= 3;
+  }
   function load() {
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (!raw) return defaultState();
-      return deepMerge(defaultState(), JSON.parse(raw));
+      const parsed = JSON.parse(raw);
+      if (!isProjectData(parsed)) return defaultState();
+      return deepMerge(defaultState(), migrate(parsed));
     } catch (e) { return defaultState(); }
   }
   function deepMerge(base, over) {
@@ -117,7 +141,34 @@
     }
     return over === undefined ? base : (typeof over === "object" ? out : over);
   }
-  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+  // Speichern ist entprellt: Tippen schreibt nicht bei jedem Zeichen den kompletten
+  // Stand in den localStorage. Nach spätestens SAVE_MAX_WAIT wird trotzdem
+  // geschrieben, damit auch langes Tippen ohne Pause gesichert ist.
+  const SAVE_DELAY = 400, SAVE_MAX_WAIT = 2500;
+  let saveTimer = null, savePendingSince = 0;
+  function writeStore() {
+    try { state.schemaVersion = SCHEMA_VERSION; localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function saveNow() {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    savePendingSince = 0;
+    writeStore();
+    const v = activeViewName();
+    if (v) renderCoach(v);
+  }
+  function save() {
+    const now = Date.now();
+    if (!savePendingSince) savePendingSince = now;
+    if (now - savePendingSince >= SAVE_MAX_WAIT) { saveNow(); return; }
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, SAVE_DELAY);
+  }
+  // Ungesicherte Eingaben dürfen beim Verlassen der Seite nicht verloren gehen.
+  window.addEventListener("beforeunload", saveNow);
+  window.addEventListener("pagehide", saveNow);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") saveNow();
+  });
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, (c) =>
@@ -267,10 +318,41 @@
       if (grp) grp.open = true;
     }
   }
-  function navTo(view) {
-    showView(view);
-    setNavActive($(`#nav .nav-item[data-view="${view}"]`));
+  /* Routing über den URL-Hash: #<view> bzw. #<view>/<anker>.
+     Damit funktionieren Zurück-Button, Neuladen und geteilte Links. Gerendert
+     wird ausschließlich über renderRoute(); navTo() setzt zusätzlich den Hash,
+     der hashchange-Handler fängt Browser-Navigation ab. */
+  let currentRoute = "";
+  const routeKey = (view, anchor) => view + (anchor ? "/" + anchor : "");
+  function routeFromHash() {
+    const raw = decodeURIComponent(String(location.hash || "").replace(/^#/, ""));
+    if (!raw) return null;
+    const parts = raw.split("/");
+    const view = parts[0], anchor = parts[1];
+    if (!view || !document.getElementById("view-" + view)) return null;
+    return { view, anchor: anchor || undefined };
   }
+  function navItemFor(view, anchor) {
+    return (anchor && $(`#nav .nav-item[data-view="${view}"][data-anchor="${anchor}"]`))
+      || $(`#nav .nav-item[data-view="${view}"]`);
+  }
+  function renderRoute(view, anchor) {
+    currentRoute = routeKey(view, anchor);
+    showView(view, anchor);
+    setNavActive(navItemFor(view, anchor));
+  }
+  function navTo(view, anchor) {
+    const key = routeKey(view, anchor);
+    if (location.hash.replace(/^#/, "") !== key) location.hash = "#" + key;
+    renderRoute(view, anchor);
+  }
+  function applyRoute() {
+    const r = routeFromHash();
+    const key = r ? routeKey(r.view, r.anchor) : "prozess";
+    if (key === currentRoute) return;
+    renderRoute(r ? r.view : "prozess", r ? r.anchor : undefined);
+  }
+  window.addEventListener("hashchange", applyRoute);
   function updatePager(name) {
     const idx = PAGES.findIndex((p) => p.v === name);
     const prev = $("#pager-prev"), next = $("#pager-next");
@@ -296,6 +378,7 @@
     if (name === "forces" || name === "bcg" || name === "wettbewerb") renderAbellAnchors();
     if (name === "prozess") renderDashboard();
     if (name === "dossier") buildDossier();
+    renderCoach(name);
     updatePager(name);
     if (anchor) {
       const el = document.getElementById(anchor);
@@ -313,8 +396,7 @@
   $("#nav").addEventListener("click", (e) => {
     const btn = e.target.closest(".nav-item");
     if (!btn) return;
-    setNavActive(btn);
-    showView(btn.dataset.view, btn.dataset.anchor);
+    navTo(btn.dataset.view, btn.dataset.anchor);
     closeSidebarOnMobile();
   });
   const navToggle = $("#nav-toggle");
@@ -330,11 +412,7 @@
     const g = e.target.closest("[data-goto]");
     if (g) {
       e.preventDefault();
-      showView(g.dataset.goto, g.dataset.anchor);
-      const sel = g.dataset.anchor
-        ? `#nav .nav-item[data-view="${g.dataset.goto}"][data-anchor="${g.dataset.anchor}"]`
-        : `#nav .nav-item[data-view="${g.dataset.goto}"]`;
-      setNavActive($(sel) || $(`#nav .nav-item[data-view="${g.dataset.goto}"]`));
+      navTo(g.dataset.goto, g.dataset.anchor);
       closeSidebarOnMobile();
     }
   });
@@ -1806,36 +1884,40 @@
   function forceLevel(v) { return v >= 4 ? "stark" : v <= 2 ? "schwach" : "mittel"; }
 
   // Konsistenz-Check: die Werkzeuge validieren sich gegenseitig (Meta-Verzahnung).
+  // Ein/Mehrzahl korrekt setzen – die Befunde landen im Dossier und damit im
+  // Abgabedokument, „1 Kennzahl(en)“ liest sich dort schlecht.
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   function computeConsistency() {
     const out = [];
-    const add = (sev, text) => out.push({ sev, text });
+    // view = Werkzeug, zu dem der Befund gehört (null = werkzeugübergreifend).
+    const add = (sev, text, view) => out.push({ sev, text, view: view || null });
     const d = derivedSwot();
 
     if (!abellMarketSummary())
-      add("info", "Der relevante Markt ist nicht abgegrenzt (Abell) – Branchen- und Portfolioanalyse ohne definierten Bezug.");
+      add("info", "Der relevante Markt ist nicht abgegrenzt (Abell) – Branchen- und Portfolioanalyse ohne definierten Bezug.", "abell");
     if (!PESTEL_CATS.some((c) => (state.pestel[c.key] || []).length))
-      add("info", "PESTEL ist leer – keine Chancen/Risiken aus der globalen Umwelt.");
+      add("info", "PESTEL ist leer – keine Chancen/Risiken aus der globalen Umwelt.", "pestel");
     if (!VC_ALL.some((c) => (state.valuechain[c.key] || []).length))
-      add("info", "Die Wertkette ist leer – keine Stärken/Schwächen aus der internen Analyse.");
+      add("info", "Die Wertkette ist leer – keine Stärken/Schwächen aus der internen Analyse.", "wertkette");
 
     const fvals = FORCES.map((f) => state.forces[f.key].v);
     const favg = fvals.reduce((a, b) => a + b, 0) / fvals.length;
     const forcesTouched = fvals.some((v) => Math.round(v * 10) / 10 !== 3);
     const allThreats = state.swot.threats.concat(d.threats);
     if (forcesTouched && favg >= 3.5 && !allThreats.length)
-      add("warn", "Geringe Branchenattraktivität, aber keine Risiken in der SWOT erfasst – Analyse prüfen.");
+      add("warn", "Geringe Branchenattraktivität, aber keine Risiken in der SWOT erfasst – Analyse prüfen.", "swot");
 
     (state.ziele || []).forEach((z) => {
       const cnt = SMART.filter((c) => smartMet(z, c)).length;
-      if (cnt < 5) add("info", `Ziel „${z.ziel}“ ist erst ${cnt}/5 SMART.`);
+      if (cnt < 5) add("info", `Ziel „${z.ziel}“ ist erst ${cnt}/5 SMART.`, "ziele");
     });
 
     const best = swBest();
     const bscFilled = BSC_VIEWS.some((p) => (state.bsc[p.key] || []).length);
     if (best && !bscFilled)
-      add("warn", `Gewählte Strategie „${best.name}“ ist noch nicht in der Balanced Scorecard umgesetzt.`);
+      add("warn", `Gewählte Strategie „${best.name}“ ist noch nicht in der Balanced Scorecard umgesetzt.`, "bsc");
     if (!best && state.strategiewahl.options.length)
-      add("info", "Strategieoptionen vorhanden, aber keine klare Wahl – Kriterien/Bewertung prüfen.");
+      add("info", "Strategieoptionen vorhanden, aber keine klare Wahl – Kriterien/Bewertung prüfen.", "strategiewahl");
 
     // BSC-Kennzahlen werden automatisch in den Tracker übernommen; hier bleiben
     // nur bewusst entfernte (dismissed) übrig – die sind kein Konsistenzproblem.
@@ -1844,21 +1926,220 @@
     const dismissed = new Set(state.kontrolle.dismissed || []);
     const missing = bscKpis.filter((k) => !tracker.has(k) && !dismissed.has(k));
     if (missing.length)
-      add("info", `${missing.length} BSC-Kennzahl(en) noch nicht im Frühwarn-Tracker.`);
+      add("info", `${plural(missing.length, "BSC-Kennzahl ist", "BSC-Kennzahlen sind")} noch nicht im Frühwarn-Tracker.`, "kontrolle");
 
     const broken = Object.values(state.kontrolle.premises || {}).filter((v) => v === "broken").length;
     if (broken)
-      add("warn", `${broken} Prämisse(n) als „überholt“ markiert – Strategie überprüfen (Prämissenkontrolle).`);
+      add("warn", `${plural(broken, "Prämisse ist", "Prämissen sind")} als „überholt“ markiert – Strategie überprüfen (Prämissenkontrolle).`, "kontrolle");
+
+    /* ---- Methodische Qualität je Werkzeug ----
+       Die folgenden Regeln prüfen nicht, OB ein Werkzeug befüllt ist (das leistet
+       das Fortschritts-Dashboard), sondern WIE. Sie greifen typische methodische
+       Schwächen auf und sind bewusst heuristisch: Denkanstöße, keine Fehler. */
+
+    // Abell: eine Marktabgrenzung braucht alle drei Dimensionen.
+    const abellDims = ABELL_CATS.filter((c) => (state.abell[c.key] || []).length);
+    if (abellDims.length >= 2 && abellDims.length < ABELL_CATS.length)
+      add("info", `Abell ist erst in ${abellDims.length} von 3 Dimensionen gefüllt – der Markt ist damit nicht eindeutig abgegrenzt.`, "abell");
+
+    // PESTEL: Abdeckung der Felder und gesetzte Vorzeichen.
+    const pesAll = PESTEL_CATS.flatMap((c) => state.pestel[c.key] || []);
+    const pesEmpty = PESTEL_CATS.filter((c) => !(state.pestel[c.key] || []).length);
+    if (PESTEL_CATS.length - pesEmpty.length >= 3 && pesEmpty.length)
+      add("info", `${plural(pesEmpty.length, "PESTEL-Feld ist", "PESTEL-Felder sind")} von 6 noch ohne Eintrag (${pesEmpty.map((c) => c.label).join(", ")}).`, "pestel");
+    if (pesAll.length >= 3 && !pesAll.some((it) => it && it.sign))
+      add("warn", "Kein PESTEL-Eintrag ist als Chance (＋) oder Risiko (–) markiert – ohne Vorzeichen fließt nichts in die SWOT.", "pestel");
+
+    // Wertkette: Vorzeichen und Balance von Primär- und Unterstützungsaktivitäten.
+    const vcAll = VC_ALL.flatMap((c) => state.valuechain[c.key] || []);
+    if (vcAll.length >= 3 && !vcAll.some((it) => it && it.sign))
+      add("warn", "Kein Wertketten-Eintrag ist als Stärke (＋) oder Schwäche (–) markiert – ohne Vorzeichen fließt nichts in die SWOT.", "wertkette");
+    const vcPrim = VC_PRIMARY.some((c) => (state.valuechain[c.key] || []).length);
+    const vcSup = VC_SUPPORT.some((c) => (state.valuechain[c.key] || []).length);
+    if (vcPrim !== vcSup)
+      add("info", vcPrim
+        ? "Nur Primäraktivitäten betrachtet – auch Unterstützungsaktivitäten können Wettbewerbsvorteile begründen."
+        : "Nur Unterstützungsaktivitäten betrachtet – die Primäraktivitäten der Wertkette fehlen.", "wertkette");
+
+    // Five Forces: Differenzierung der Kräfte und Belegbarkeit der Bewertung.
+    if (forcesTouched) {
+      if (Math.max.apply(null, fvals) - Math.min.apply(null, fvals) < 0.5)
+        add("warn", "Alle fünf Kräfte sind praktisch gleich stark bewertet – Branchen differenzieren sich in der Regel deutlicher.", "forces");
+      const noNote = FORCES.filter((f) => Math.round(state.forces[f.key].v * 10) / 10 !== 3
+        && !(state.forces[f.key].note || "").trim());
+      if (noNote.length)
+        add("info", `${plural(noNote.length, "Kraft ist", "Kräfte sind")} ohne Begründung bewertet (${noNote.map((f) => f.short).join(", ")}) – die Einschätzung bleibt unbelegt.`, "forces");
+    }
+
+    // SWOT: Gleichgewicht von Innen-/Außensicht und von Positiv/Negativ.
+    const swCount = (k) => (state.swot[k] || []).length + (d[k] || []).length;
+    const intern = swCount("strengths") + swCount("weaknesses");
+    const extern = swCount("opportunities") + swCount("threats");
+    // Die Schieflage wird erst ab vierfachem Übergewicht gemeldet: wer PESTEL vor
+    // der Wertkette ausfüllt, hat einen normalen Zwischenstand und kein Problem.
+    if (intern + extern >= 6) {
+      if (!extern) add("warn", "Die SWOT enthält nur interne Punkte – Chancen und Risiken der Umwelt fehlen vollständig.", "swot");
+      else if (!intern) add("warn", "Die SWOT enthält nur externe Punkte – Stärken und Schwächen des Unternehmens fehlen.", "swot");
+      else if (intern >= 4 * extern) add("info", `Die Innensicht dominiert deutlich (${intern} interne gegenüber ${extern} externen Punkten).`, "swot");
+      else if (extern >= 4 * intern) add("info", `Die Außensicht dominiert deutlich (${extern} externe gegenüber ${intern} internen Punkten).`, "swot");
+    }
+    if (swCount("strengths") >= 3 && !swCount("weaknesses"))
+      add("warn", "Nur Stärken, keine Schwächen – ein Selbstbild ganz ohne blinde Flecken ist unwahrscheinlich.", "swot");
+    if (swCount("opportunities") >= 3 && !swCount("threats"))
+      add("warn", "Nur Chancen, keine Risiken – die Umweltanalyse ist einseitig.", "swot");
+
+    // VRIO: Plausibilität der Bewertung (Seltenheit ist definitionsgemäß selten).
+    if ((state.vrio || []).length >= 3
+      && state.vrio.every((r) => vrioImplication(r).rank === 4))
+      add("warn", `Alle ${state.vrio.length} Ressourcen sind als dauerhafter Wettbewerbsvorteil bewertet – dann wäre keine davon selten.`, "ansaetze");
+
+    // BCG: Streuung über die Quadranten und Finanzierungslogik des Portfolios.
+    if (state.bcg.length >= 3) {
+      const quad = (u) => u.growth >= 10 ? (u.share >= 1 ? "Star" : "Question Mark")
+                                         : (u.share >= 1 ? "Cash Cow" : "Dog");
+      const counts = {};
+      state.bcg.forEach((u) => { const q = quad(u); counts[q] = (counts[q] || 0) + 1; });
+      const fields = Object.keys(counts);
+      if (fields.length === 1)
+        add("warn", `Alle Geschäftseinheiten liegen im Feld „${fields[0]}“ – Wachstumsschwelle (10 %) und relative Marktanteile prüfen.`, "bcg");
+      if ((counts["Question Mark"] || 0) >= 2 && !counts["Cash Cow"])
+        add("info", "Mehrere Question Marks, aber keine Cash Cow – woraus wird der Ausbau finanziert?", "bcg");
+    }
+
+    // Stakeholder: ohne Spreizung liefert die Matrix keine unterschiedlichen Strategien.
+    if (state.stakeholders.length >= 3) {
+      const pw = state.stakeholders.map((x) => x.power), iv = state.stakeholders.map((x) => x.interest);
+      if (Math.max.apply(null, pw) === Math.min.apply(null, pw)
+        && Math.max.apply(null, iv) === Math.min.apply(null, iv))
+        add("info", "Alle Anspruchsgruppen haben dieselbe Macht- und Interessenlage – die Matrix führt so zu einer einzigen Strategie.", "stakeholder");
+    }
+
+    // Wettbewerbsumfeld: strategische Gruppen entstehen erst durch Unterschiede.
+    const comps = state.wettbewerb.competitors || [];
+    if (comps.length >= 3
+      && new Set(comps.map((c) => (c.group || "").trim()).filter(Boolean)).size <= 1)
+      add("info", "Alle Wettbewerber sind derselben oder keiner strategischen Gruppe zugeordnet – ohne Gruppen bleibt die Karte eine Punktwolke.", "wettbewerb");
+
+    // Szenario-Analyse: der Erkenntnisgewinn entsteht aus dem Kontrast.
+    const szA = (state.szenario.a || "").trim(), szB = (state.szenario.b || "").trim();
+    if ((szA || szB) && !(szA && szB))
+      add("warn", "Nur ein Szenario beschrieben – die Methode lebt vom Kontrast zweier Zukünfte.", "szenario");
+    if ((szA || szB) && !(state.szenario.factors || []).length)
+      add("info", "Szenarien ohne Einflussfaktoren – sie sind damit nicht aus Treibern hergeleitet.", "szenario");
+
+    // Business Model Canvas: das Wertangebot ist der Bezugspunkt aller Bausteine.
+    const bmcFilled = BMC_BLOCKS.filter((c) => (state.bmc[c.key] || []).length);
+    if (bmcFilled.length && !(state.bmc.value || []).length)
+      add("warn", "Das Wertangebot ist leer – es ist der Bezugspunkt aller übrigen Bausteine.", "bmc");
+    if (bmcFilled.length >= BMC_BLOCKS.length / 2 && bmcFilled.length < BMC_BLOCKS.length)
+      add("info", `${plural(BMC_BLOCKS.length - bmcFilled.length, "Baustein ist", "Bausteine sind")} von ${BMC_BLOCKS.length} noch leer.`, "bmc");
+
+    // Balanced Scorecard: vier Perspektiven und messbare Zeilen.
+    const bscViewsFilled = BSC_VIEWS.filter((v) => (state.bsc[v.key] || []).length);
+    if (bscViewsFilled.length && bscViewsFilled.length < BSC_VIEWS.length)
+      add("warn", `Nur ${bscViewsFilled.length} von 4 Perspektiven gefüllt – die Ursache-Wirkungs-Kette der Scorecard bleibt unvollständig.`, "bsc");
+    const bscUnmeasured = BSC_VIEWS.flatMap((v) => state.bsc[v.key] || [])
+      .filter((r) => !String(r.kennzahl || "").trim() || !String(r.zielwert || "").trim()).length;
+    if (bscUnmeasured)
+      add("info", `${plural(bscUnmeasured, "Scorecard-Zeile ist", "Scorecard-Zeilen sind")} ohne Kennzahl oder Zielwert – nicht messbar und damit nicht steuerbar.`, "bsc");
+
+    // Strategiewahl: Gewichtung und Robustheit der Rangfolge.
+    if (state.strategiewahl.options.length >= 2) {
+      const ws = state.strategiewahl.criteria.map((c) => Number(c.weight) || 0);
+      if (ws.length >= 2 && Math.max.apply(null, ws) === Math.min.apply(null, ws))
+        add("info", "Alle Kriterien sind gleich gewichtet – die Nutzwertanalyse bildet dann keine Prioritäten ab.", "strategiewahl");
+      const ranked = swTotals().slice().sort((a, b) => b - a);
+      if (ranked[0] > 0 && (ranked[0] - ranked[1]) / ranked[0] < 0.05)
+        add("warn", "Rang 1 und 2 liegen weniger als 5 % auseinander – die Wahl ist nicht robust; Gewichte und Bewertungen auf Sensitivität prüfen.", "strategiewahl");
+    }
+
+    // Frühwarn-Tracker: ohne Ziel- und Ist-Wert trägt der Ampelstatus nichts.
+    const kpiOpen = (state.kontrolle.indicators || [])
+      .filter((i) => !String(i.target || "").trim() || !String(i.actual || "").trim()).length;
+    if (kpiOpen)
+      add("info", `${plural(kpiOpen, "Kennzahl ist", "Kennzahlen sind")} ohne Ziel- oder Ist-Wert – der Ampelstatus ist damit nicht belastbar.`, "kontrolle");
+
+    // Kennzahlen: der EVA braucht alle drei Größen.
+    const evaFields = ["nopat", "kapital", "wacc"];
+    const evaSet = evaFields.filter((f) => String(state.kennzahlen[f] || "").trim() !== "");
+    if (evaSet.length && evaSet.length < evaFields.length)
+      add("info", "Für den EVA fehlen noch Angaben – NOPAT, investiertes Kapital und WACC werden alle drei benötigt.", "kennzahlen");
 
     return out;
   }
   const CONSISTENCY_ICON = { warn: "⚠️", info: "ℹ️", ok: "✅" };
-  function consistencyHtml() {
+  const VIEW_LABEL = PAGES.reduce((m, pg) => ((m[pg.v] = pg.t), m), {});
+  const consItem = (it) =>
+    `<li class="cons-${it.sev}">${CONSISTENCY_ICON[it.sev]} ${escapeHtml(it.text)}</li>`;
+  const consList = (items) => `<ul class="consistency-list">${items.map(consItem).join("")}</ul>`;
+  const consOk = `<ul class="consistency-list"><li class="cons-ok">${CONSISTENCY_ICON.ok} Keine Auffälligkeiten – die Analyse ist in sich schlüssig.</li></ul>`;
+
+  /* Zwei Darstellungen derselben Befunde:
+     "dashboard" – Warnungen sofort sichtbar, Hinweise eingeklappt, damit die
+                   Startseite nicht zur Textwand wird.
+     "dossier"   – vollständig und nach Werkzeug gruppiert, als Qualitätsanhang
+                   des Berichts. */
+  function consistencyHtml(mode) {
     const items = computeConsistency();
-    if (!items.length)
-      return `<ul class="consistency-list"><li class="cons-ok">${CONSISTENCY_ICON.ok} Keine Auffälligkeiten – die Analyse ist in sich schlüssig.</li></ul>`;
-    return `<ul class="consistency-list">${items.map((it) =>
-      `<li class="cons-${it.sev}">${CONSISTENCY_ICON[it.sev]} ${escapeHtml(it.text)}</li>`).join("")}</ul>`;
+    if (!items.length) return consOk;
+
+    if (mode === "dossier") {
+      const order = PAGES.map((pg) => pg.v);
+      const groups = [];
+      const push = (view, list) => { if (list.length) groups.push({ view, list }); };
+      push(null, items.filter((it) => !it.view));
+      order.forEach((v) => push(v, items.filter((it) => it.view === v)));
+      return groups.map((g) =>
+        `<div class="cons-group"><h3 class="cons-group-head">${
+          g.view ? escapeHtml(VIEW_LABEL[g.view] || g.view) : "Werkzeugübergreifend"
+        }</h3>${consList(g.list)}</div>`).join("");
+    }
+
+    const warns = items.filter((it) => it.sev === "warn");
+    const infos = items.filter((it) => it.sev !== "warn");
+    let html = warns.length ? consList(warns) : "";
+    if (infos.length) {
+      const n = infos.length;
+      html += `<details class="cons-more"${warns.length ? "" : " open"}>`
+        + `<summary>${n} ${n === 1 ? "weiterer Hinweis" : "weitere Hinweise"}`
+        + `${warns.length ? "" : " zur Analyse"}</summary>${consList(infos)}</details>`;
+    }
+    return html;
+  }
+
+  /* Analyse-Coach: zeigt die Befunde zum gerade geöffneten Werkzeug direkt dort an,
+     wo gearbeitet wird. Dashboard und Dossier zeigen weiterhin alle Befunde. */
+  function activeViewName() {
+    const el = $(".view.is-active");
+    return el ? el.id.replace(/^view-/, "") : null;
+  }
+  function coachSlot(view) {
+    const sec = document.getElementById("view-" + view);
+    if (!sec) return null;
+    let el = sec.querySelector(".coach-panel");
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "coach-panel no-print";
+      el.setAttribute("aria-live", "polite");
+      const after = sec.querySelector(".kb-slot") || sec.querySelector(".view-head");
+      if (after) after.insertAdjacentElement("afterend", el);
+      else sec.insertBefore(el, sec.firstChild);
+    }
+    return el;
+  }
+  function renderCoach(view) {
+    const el = coachSlot(view);
+    if (!el) return;
+    let items = [];
+    try { items = computeConsistency().filter((it) => it.view === view); } catch (e) { items = []; }
+    const html = items.length
+      ? `<h3 class="coach-head">Hinweise zu dieser Analyse</h3>${consList(items)}` : "";
+    // Nur bei tatsächlicher Änderung neu schreiben: der Bereich ist aria-live,
+    // ein Neuaufbau bei jedem Speichern würde die Liste erneut vorgelesen.
+    if (el.dataset.html === html) return;
+    el.dataset.html = html;
+    el.innerHTML = html;
+    el.hidden = !items.length;
   }
 
   function buildDossier() {
@@ -1867,7 +2148,7 @@
     const parts = [];
     const now = new Date().toLocaleDateString("de-DE", { year: "numeric", month: "long", day: "numeric" });
     parts.push(`<header class="dossier-head"><h1>Strategie-Dossier</h1><p class="dossier-date">Erstellt am ${now}</p></header>`);
-    parts.push(`<section class="dossier-sec consistency-panel"><h2>Konsistenz-Check</h2>${consistencyHtml()}</section>`);
+    parts.push(`<section class="dossier-sec consistency-panel"><h2>Konsistenz-Check</h2>${consistencyHtml("dossier")}</section>`);
 
     let secNo = 0;
     const section = (title, inner) => { secNo++; return `<section class="dossier-sec"><h2>${secNo} · ${title}</h2>${inner}</section>`; };
@@ -2104,7 +2385,7 @@
       grid.appendChild(b);
     });
     const cons = $("#dash-consistency");
-    if (cons) cons.innerHTML = `<h4 class="dash-cons-head">Konsistenz-Check</h4>${consistencyHtml()}`;
+    if (cons) cons.innerHTML = `<h4 class="dash-cons-head">Konsistenz-Check</h4>${consistencyHtml("dashboard")}`;
   }
   function sampleState() {
     const s = defaultState();
@@ -2316,7 +2597,7 @@
   }
 
   /* ---------- Footer-Aktionen ---------- */
-  function exportPdf() { showView("dossier"); window.print(); }
+  function exportPdf() { navTo("dossier"); window.print(); }
   $("#btn-export").addEventListener("click", exportPdf);
   $("#btn-dossier-pdf").addEventListener("click", exportPdf);
 
@@ -2327,7 +2608,7 @@
     initAll();
   }
   $("#btn-reset").addEventListener("click", () => {
-    if (confirm("Wirklich alle Eingaben löschen?")) { state = defaultState(); save(); fullRebuild(); }
+    if (confirm("Wirklich alle Eingaben löschen?")) { state = defaultState(); saveNow(); fullRebuild(); }
   });
 
   // Projekt als JSON exportieren / importieren
@@ -2346,7 +2627,7 @@
     const label = comp ? `die Beispieldaten für „${comp.name}“` : "den Beispiel-Datensatz";
     if (filled > 0 && !confirm(`Aktuelle Eingaben durch ${label} ersetzen?`)) return;
     state = comp ? companyState(comp) : sampleState();
-    save(); fullRebuild(); navTo("prozess");
+    saveNow(); fullRebuild(); navTo("prozess");
   });
   $("#btn-import-json").addEventListener("click", () => $("#import-file").click());
   $("#import-file").addEventListener("change", (e) => {
@@ -2357,8 +2638,9 @@
       try {
         const data = JSON.parse(reader.result);
         if (!data || typeof data !== "object") throw new Error("invalid");
-        state = deepMerge(defaultState(), data); save(); fullRebuild();
-        showView("prozess"); setNavActive($('#nav .nav-item[data-view="prozess"]'));
+        if (!isProjectData(data)) throw new Error("invalid");
+        state = deepMerge(defaultState(), migrate(data)); saveNow(); fullRebuild();
+        navTo("prozess");
       } catch (err) {
         alert("Import fehlgeschlagen: Das ist keine gültige Projektdatei.");
       }
@@ -2428,5 +2710,6 @@
   wireQuiz();
   wireGlossar();
   initAll();
-  updatePager("prozess");
+  // Startansicht aus dem URL-Hash (showView pflegt den Pager selbst).
+  applyRoute();
 })();
