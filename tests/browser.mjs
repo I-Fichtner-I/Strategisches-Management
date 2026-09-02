@@ -781,6 +781,48 @@ const browser = await chromium.launch({ executablePath: chromiumPath(), args: ['
     await ctx.close();
   }
 
+  /* Nutzertext im Vergleich wird escaped – wie überall sonst im Toolkit */
+  {
+    const boese = '<img src=x onerror="window.__xss=1">';
+    const ctx = await browser.newContext();
+    const jetzt = JSON.stringify(Object.assign({}, BASE, {
+      swot: { strengths: [boese], weaknesses: [], opportunities: [], threats: [] },
+      stakeholders: [{ name: boese, power: 5, interest: 4 }] }));
+    const snap = JSON.stringify([{ id: 'x1', ts: '2026-03-01T10:00:00.000Z', label: boese,
+      state: Object.assign({}, BASE, {
+        stakeholders: [{ name: boese, power: 1, interest: 4 }] }) }]);
+    await ctx.addInitScript(
+      `try{localStorage.setItem('strategy-toolkit-v1', ${JSON.stringify(jetzt)});`
+      + `localStorage.setItem('strategy-toolkit-snapshots-v1', ${JSON.stringify(snap)})}catch(e){}`);
+    const page = await ctx.newPage();
+    const errs = [];
+    page.on('pageerror', (e) => errs.push(e.message));
+    await page.goto(FILE + '#kontrolle');
+    await page.waitForTimeout(260);
+    await page.click('#snap-list button[data-act="diff"]');
+    await page.waitForTimeout(260);
+    const ergebnis = await page.evaluate(() => ({
+      xss: !!window.__xss,
+      bilder: document.querySelectorAll('#snap-diff img, #snap-list img').length,
+      text: (document.querySelector('#snap-diff') || {}).textContent || '',
+    }));
+    check('Nutzertext im Vergleich wird escaped, nicht als HTML ausgeführt',
+      !ergebnis.xss && ergebnis.bilder === 0 && ergebnis.text.includes('<img src=x')
+      && errs.length === 0,
+      `xss=${ergebnis.xss} img=${ergebnis.bilder}`);
+    // Auch im Bericht, der als PDF weitergegeben wird
+    await page.goto(FILE + '#dossier');
+    await page.waitForTimeout(400);
+    const imDossier = await page.evaluate(() => ({
+      xss: !!window.__xss,
+      bilder: document.querySelectorAll('.snap-dossier img').length,
+    }));
+    check('Auch im Bericht bleibt der Vergleich escaped',
+      !imDossier.xss && imDossier.bilder === 0 && errs.length === 0,
+      `xss=${imDossier.xss} img=${imDossier.bilder}`);
+    await ctx.close();
+  }
+
   /* Obergrenze: alte Stände fallen hinten heraus, statt den Speicher zu füllen */
   {
     const viele = Array.from({ length: 14 }, (_, i) => ({ label: 'Stand ' + i, state: {} }));
