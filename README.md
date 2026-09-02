@@ -128,8 +128,13 @@ Damit läuft die **strategische Kontrolle begleitend statt als Schlussphase** �
 es der Regelkreis oben vorsieht. Benannte Datensätze (Anspruchsgruppen,
 Geschäftseinheiten, Wettbewerber, Ressourcen) werden dabei über ihren Namen
 verfolgt: Eine verschobene Position erscheint als *Änderung*, nicht als Löschung
-mit Neuanlage. Zeitstände liegen im Browser (localStorage), die jüngsten zwölf
-werden aufbewahrt.
+mit Neuanlage.
+
+Das Ergebnis erscheint auch im **Strategie-Dossier** als Abschnitt
+„Prämissenkontrolle" und ist damit Teil des abgebbaren Berichts. Zeitstände liegen
+im Browser (localStorage), die jüngsten zwölf werden aufbewahrt; vor einer
+Wiederherstellung wird der laufende Stand automatisch als eigener Zeitstand
+gesichert, sodass nichts verloren geht.
 
 ### Analyse-Coach
 

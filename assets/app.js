@@ -2149,6 +2149,7 @@
     const now = new Date().toLocaleDateString("de-DE", { year: "numeric", month: "long", day: "numeric" });
     parts.push(`<header class="dossier-head"><h1>Strategie-Dossier</h1><p class="dossier-date">Erstellt am ${now}</p></header>`);
     parts.push(`<section class="dossier-sec consistency-panel"><h2>Konsistenz-Check</h2>${consistencyHtml("dossier")}</section>`);
+    parts.push(snapDossierHtml());
 
     let secNo = 0;
     const section = (title, inner) => { secNo++; return `<section class="dossier-sec"><h2>${secNo} · ${title}</h2>${inner}</section>`; };
@@ -2468,23 +2469,16 @@
     };
   }
 
-  function renderSnapDiff(snap) {
-    const box = $("#snap-diff");
-    if (!box) return;
-    if (!snap) { box.hidden = true; box.innerHTML = ""; return; }
-    const d = snapDiff(snap.state, state);
-    const head = `<div class="snap-diff-head"><h4>Vergleich mit „${escapeHtml(snapLabel(snap))}“`
-      + `<span class="snap-when">${escapeHtml(snapWhen(snap.ts))}</span></h4>`
-      + `<button type="button" class="snap-close" aria-label="Vergleich schließen">×</button></div>`;
-    if (!d.added.length && !d.removed.length && !d.changed.length) {
-      box.hidden = false;
-      box.innerHTML = head + `<p class="snap-none">Seit diesem Zeitstand hat sich nichts geändert `
-        + `– die Prämissen gelten unverändert.</p>`;
-      return;
-    }
+  const SNAP_UNVERAENDERT =
+    "Seit diesem Zeitstand hat sich nichts geändert – die Prämissen gelten unverändert.";
+  const snapSummaryHtml = (d) => `<p class="snap-summary">`
+    + `<span class="snap-add">${plural(d.added.length, "Eintrag", "Einträge")} hinzugekommen</span> · `
+    + `<span class="snap-del">${plural(d.removed.length, "Eintrag", "Einträge")} entfallen</span> · `
+    + `<span class="snap-chg">${plural(d.changed.length, "Wert", "Werte")} geändert</span></p>`;
+  function snapGroupsHtml(d) {
     const line = (cls, mark, text) =>
       `<li class="${cls}"><span class="snap-mark">${mark}</span>${text}</li>`;
-    const groups = PAGES.map((pg) => pg.v).map((v) => {
+    return PAGES.map((pg) => pg.v).map((v) => {
       const a = d.added.filter((x) => x.view === v);
       const r = d.removed.filter((x) => x.view === v);
       const c = d.changed.filter((x) => x.view === v);
@@ -2496,12 +2490,37 @@
             `${escapeHtml(x.label)}: ${escapeHtml(x.from)} → ${escapeHtml(x.to)}`)).join("")
         + `</ul></div>`;
     }).join("");
+  }
+  // Der Vergleich ist ein Kontrollergebnis und gehört damit in den Bericht.
+  // Bezug ist der ausgewählte Zeitstand, sonst der jüngste.
+  function snapDossierHtml() {
+    const list = loadSnaps();
+    if (!list.length) return "";
+    const ref = list.find((x) => x.id === snapCompareId) || list[list.length - 1];
+    const d = snapDiff(ref.state, state);
+    const inner = (d.added.length || d.removed.length || d.changed.length)
+      ? snapSummaryHtml(d) + snapGroupsHtml(d)
+      : `<p class="snap-none">${SNAP_UNVERAENDERT}</p>`;
+    return `<section class="dossier-sec snap-dossier"><h2>Prämissenkontrolle: `
+      + `Veränderungen seit „${escapeHtml(snapLabel(ref))}“ `
+      + `<span class="snap-when">${escapeHtml(snapWhen(ref.ts))}</span></h2>${inner}</section>`;
+  }
+
+  function renderSnapDiff(snap) {
+    const box = $("#snap-diff");
+    if (!box) return;
+    if (!snap) { box.hidden = true; box.innerHTML = ""; return; }
+    const d = snapDiff(snap.state, state);
+    const head = `<div class="snap-diff-head"><h4>Vergleich mit „${escapeHtml(snapLabel(snap))}“`
+      + `<span class="snap-when">${escapeHtml(snapWhen(snap.ts))}</span></h4>`
+      + `<button type="button" class="snap-close" aria-label="Vergleich schließen">×</button></div>`;
+    if (!d.added.length && !d.removed.length && !d.changed.length) {
+      box.hidden = false;
+      box.innerHTML = head + `<p class="snap-none">${SNAP_UNVERAENDERT}</p>`;
+      return;
+    }
     box.hidden = false;
-    box.innerHTML = head + `<p class="snap-summary">`
-      + `<span class="snap-add">${plural(d.added.length, "Eintrag", "Einträge")} hinzugekommen</span> · `
-      + `<span class="snap-del">${plural(d.removed.length, "Eintrag", "Einträge")} entfallen</span> · `
-      + `<span class="snap-chg">${plural(d.changed.length, "Wert", "Werte")} geändert</span></p>`
-      + groups;
+    box.innerHTML = head + snapSummaryHtml(d) + snapGroupsHtml(d);
   }
 
   function renderSnapshots() {
@@ -2558,8 +2577,16 @@
         snapCompareId = snapCompareId === snap.id ? null : snap.id;
         renderSnapshots();
       } else if (b.dataset.act === "restore") {
-        if (!confirm(`Den Zeitstand „${snapLabel(snap)}“ wiederherstellen? `
-          + "Die aktuellen Eingaben werden dabei ersetzt.")) return;
+        if (!confirm(`Den Zeitstand „${snapLabel(snap)}“ wiederherstellen? Der aktuelle `
+          + "Stand wird zuvor automatisch als eigener Zeitstand gesichert.")) return;
+        // Sicherheitsnetz: Wiederherstellen darf den laufenden Stand nicht
+        // unwiderruflich verwerfen – er wird vorher selbst zum Zeitstand.
+        storeSnaps(list.concat([{
+          id: "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+          ts: new Date().toISOString(),
+          label: "Automatisch gesichert vor Wiederherstellung",
+          state: JSON.parse(JSON.stringify(state)),
+        }]));
         state = deepMerge(defaultState(), migrate(JSON.parse(JSON.stringify(snap.state))));
         snapCompareId = null;
         saveNow();

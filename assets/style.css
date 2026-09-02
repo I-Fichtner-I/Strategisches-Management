@@ -710,6 +710,9 @@ button:active { transform: translateY(1px); }
 .snap-changes .snap-chg { color: var(--text-primary); }
 .snap-changes .snap-chg .snap-mark { color: var(--warning); }
 
+.snap-dossier h2 .snap-when { font-weight: 400; }
+.snap-dossier .snap-group + .snap-group { margin-top: 10px; }
+
 @media (max-width: 640px) {
   .snap-actions { margin-left: 0; width: 100%; }
 }
@@ -936,7 +939,7 @@ button:active { transform: translateY(1px); }
   .dossier-block, .dossier-chart, .consistency-list li, figure, tr, li {
     break-inside: avoid; page-break-inside: avoid;
   }
-  .cons-group { break-inside: avoid; page-break-inside: avoid; }
+  .cons-group, .snap-group { break-inside: avoid; page-break-inside: avoid; }
   thead { display: table-header-group; }
   tfoot { display: table-footer-group; }
   p, li { orphans: 3; widows: 3; }

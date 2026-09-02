@@ -670,6 +670,57 @@ const browser = await chromium.launch({ executablePath: chromiumPath(), args: ['
     await ctx.close();
   }
 
+  /* Wiederherstellen darf den laufenden Stand nicht unwiderruflich verwerfen */
+  {
+    const { ctx, page } = await openWithSnaps(
+      { swot: { strengths: ['Aktueller Stand'], weaknesses: [], opportunities: [], threats: [] } },
+      [{ label: 'Früherer Stand',
+         state: { swot: { strengths: ['Von damals'], weaknesses: [], opportunities: [], threats: [] } } }],
+      'kontrolle');
+    await page.click('#snap-list button[data-act="restore"]');
+    await page.waitForTimeout(420);
+    const gesichert = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('strategy-toolkit-snapshots-v1') || '[]')
+        .map((s) => ({ label: s.label, strengths: (s.state.swot || {}).strengths || [] })));
+    const auto = gesichert.find((s) => /Automatisch gesichert/.test(s.label));
+    check('Vor dem Wiederherstellen wird der laufende Stand automatisch gesichert',
+      !!auto && auto.strengths.join(',') === 'Aktueller Stand',
+      JSON.stringify(gesichert));
+    check('Der wiederhergestellte Stand ist trotzdem aktiv',
+      (await page.evaluate(() => JSON.parse(
+        localStorage.getItem('strategy-toolkit-v1')).swot.strengths.join(','))) === 'Von damals');
+    await ctx.close();
+  }
+
+  /* Der Vergleich gehört als Kontrollergebnis in den Bericht */
+  {
+    const { ctx, page } = await openWithSnaps(
+      { swot: { strengths: ['Starke Marke', 'Neues Patent'], weaknesses: [], opportunities: [], threats: [] },
+        stakeholders: [{ name: 'Investor:innen', power: 5, interest: 4 }] },
+      [{ label: 'Stand nach der Umweltanalyse',
+         state: { swot: { strengths: ['Starke Marke'], weaknesses: [], opportunities: [], threats: [] },
+                  stakeholders: [{ name: 'Investor:innen', power: 3, interest: 4 }] } }],
+      'dossier');
+    const sec = page.locator('.snap-dossier');
+    check('Das Dossier enthält die Prämissenkontrolle', (await sec.count()) === 1);
+    const txt = (await sec.count()) ? await sec.innerText() : '';
+    check('Sie nennt den Bezugs-Zeitstand', txt.includes('Stand nach der Umweltanalyse'), txt.slice(0, 120));
+    check('Sie listet hinzugekommene Einträge und geänderte Werte',
+      txt.includes('Neues Patent') && /Macht 3, Interesse 4 → Macht 5, Interesse 4/.test(txt),
+      txt.replace(/\n/g, ' | ').slice(0, 200));
+    await ctx.close();
+  }
+
+  /* Ohne Zeitstand bleibt der Bericht unverändert */
+  {
+    const { ctx, page } = await openWith(
+      { swot: { strengths: ['Nur ein Eintrag'], weaknesses: [], opportunities: [], threats: [] } },
+      'dossier');
+    check('Ohne Zeitstand erscheint im Bericht kein Vergleich',
+      (await page.locator('.snap-dossier').count()) === 0);
+    await ctx.close();
+  }
+
   /* Obergrenze: alte Stände fallen hinten heraus, statt den Speicher zu füllen */
   {
     const viele = Array.from({ length: 14 }, (_, i) => ({ label: 'Stand ' + i, state: {} }));
