@@ -198,8 +198,8 @@ npm test
 Geprüft werden Routing und Deep-Links, das entprellte Speichern, die
 Import-Validierung, jede Regel des Analyse-Coachs (samt Gegenproben, dass er im
 frühen Zwischenstand schweigt), die Darstellung des Konsistenz-Checks, die
-Zeitstände samt Vergleich, Wiederherstellen und Obergrenze sowie die
-Druckausgabe (A4, mehrseitig).
+Zeitstände samt Vergleich, Wiederherstellen und Obergrenze, das Verhalten bei
+beschädigtem Speicher sowie die Druckausgabe (A4, mehrseitig).
 
 Besonderes Gewicht liegt auf den **fachlichen Rechenkernen** – EBITDA und
 EBITDA-Marge, Kapitalkosten und EVA, die Branchenattraktivität aus den Five

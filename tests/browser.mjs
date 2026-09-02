@@ -721,6 +721,66 @@ const browser = await chromium.launch({ executablePath: chromiumPath(), args: ['
     await ctx.close();
   }
 
+  /* Beschädigter Speicher darf die Kontroll-Ansicht nicht lahmlegen */
+  {
+    const kaputt = [
+      ['Unlesbares JSON', 'das ist kein json {{{'],
+      ['Kein Array', '{"foo":1}'],
+      ['Einträge ohne Pflichtfelder', '[{"label":"halb"},{"id":"x"},null,42]'],
+    ];
+    for (const [name, roh] of kaputt) {
+      const ctx = await browser.newContext();
+      await ctx.addInitScript(
+        `try{localStorage.setItem('strategy-toolkit-snapshots-v1', ${JSON.stringify(roh)})}catch(e){}`);
+      const page = await ctx.newPage();
+      const errs = [];
+      page.on('pageerror', (e) => errs.push(e.message));
+      await page.goto(FILE + '#kontrolle');
+      await page.waitForTimeout(260);
+      const leer = await page.locator('#snap-list .snap-empty').count();
+      const kpi = await page.locator('#kpi-form').isVisible();
+      check(`Beschädigter Speicher · ${name}`, errs.length === 0 && leer === 1 && kpi,
+        errs.join(' | ') || `Hinweis=${leer} Tracker sichtbar=${kpi}`);
+      await ctx.close();
+    }
+  }
+
+  /* Ein Zeitstand aus einem älteren, unvollständigen Schema bleibt vergleichbar */
+  {
+    const ctx = await browser.newContext();
+    const jetzt = JSON.stringify(Object.assign({}, BASE, {
+      swot: { strengths: ['Heute erfasst'], weaknesses: [], opportunities: [], threats: [] } }));
+    // Zeitstand ohne die meisten Schlüssel – so sähe ein Stand vor einer
+    // Schemaerweiterung aus.
+    const alt = JSON.stringify([{ id: 'alt', ts: '2025-11-02T08:00:00.000Z',
+      label: 'Alter Stand', state: { swot: { strengths: [] } } }]);
+    await ctx.addInitScript(
+      `try{localStorage.setItem('strategy-toolkit-v1', ${JSON.stringify(jetzt)});`
+      + `localStorage.setItem('strategy-toolkit-snapshots-v1', ${JSON.stringify(alt)})}catch(e){}`);
+    const page = await ctx.newPage();
+    const errs = [];
+    page.on('pageerror', (e) => errs.push(e.message));
+    page.on('dialog', (d) => d.accept());
+    await page.goto(FILE + '#kontrolle');
+    await page.waitForTimeout(260);
+    await page.click('#snap-list button[data-act="diff"]');
+    await page.waitForTimeout(240);
+    const txt = await page.locator('#snap-diff').innerText();
+    check('Ein unvollständiger Zeitstand bleibt vergleichbar',
+      errs.length === 0 && txt.includes('Heute erfasst'),
+      errs.join(' | ') || txt.replace(/\n/g, ' | ').slice(0, 140));
+    await page.click('#snap-list button[data-act="restore"]');
+    await page.waitForTimeout(420);
+    check('Er lässt sich ohne Fehler wiederherstellen',
+      errs.length === 0 && (await page.evaluate(() => {
+        const st = JSON.parse(localStorage.getItem('strategy-toolkit-v1'));
+        // Die Migration füllt fehlende Bereiche aus dem Standard auf.
+        return st.schemaVersion === 1 && Array.isArray(st.pestel.political)
+          && Array.isArray(st.bsc.financial) && st.swot.strengths.length === 0;
+      })), errs.join(' | '));
+    await ctx.close();
+  }
+
   /* Obergrenze: alte Stände fallen hinten heraus, statt den Speicher zu füllen */
   {
     const viele = Array.from({ length: 14 }, (_, i) => ({ label: 'Stand ' + i, state: {} }));
