@@ -715,6 +715,18 @@
         <thead><tr><th>Indikator</th><th>Ziel</th><th>Ist</th><th>Richtung</th><th>Status</th><th></th></tr></thead>
         <tbody id="kpi-tbody"></tbody>
       </table>
+
+      <h3 class="sub">Zeitst&auml;nde &amp; Vergleich</h3>
+      <p class="lead">Ein <strong>Zeitstand</strong> friert die gesamte Analyse ein. Der Vergleich mit
+      dem heutigen Stand beantwortet die Kernfrage der strategischen Kontrolle:
+      <strong>Gelten die Annahmen von damals noch?</strong> Sinnvolle Zeitpunkte sind das Ende einer
+      Prozessphase, die Abgabe eines Zwischenstands oder der Beginn einer &Uuml;berarbeitung.</p>
+      <form class="kpi-form" id="snap-form">
+        <input type="text" name="label" placeholder="Bezeichnung (z.&nbsp;B. Stand nach der Umweltanalyse)" />
+        <button type="submit">Aktuellen Stand sichern</button>
+      </form>
+      <div id="snap-list"></div>
+      <div id="snap-diff" class="snap-diff" hidden></div>
     </section>
 
     <!-- DOSSIER -->

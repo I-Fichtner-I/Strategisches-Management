@@ -677,6 +677,46 @@ button:active { transform: translateY(1px); }
 .consistency-list .cons-ok { border-left: 3px solid var(--good);
   background: color-mix(in srgb, var(--good) 7%, var(--surface-1)); }
 .dash-consistency { margin-top: 16px; }
+/* Zeitstände & Vergleich (6.3 Kontrolle) */
+.snap-empty, .snap-none { color: var(--muted); font-size: .9rem; margin: 8px 0 0; }
+.snap-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.snap-list li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface-1); }
+.snap-list li.is-active { border-color: var(--series-1);
+  box-shadow: inset 3px 0 0 var(--series-1); }
+.snap-name { font-weight: 600; }
+.snap-when { color: var(--muted); font-size: .82rem; font-weight: 400; }
+.snap-actions { margin-left: auto; display: flex; gap: 6px; }
+.snap-actions button { font-size: .82rem; padding: 4px 10px; }
+
+.snap-diff { margin-top: 14px; padding: 14px 16px; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--surface-2); }
+.snap-diff-head { display: flex; align-items: flex-start; gap: 10px; }
+.snap-diff-head h4 { margin: 0; font-size: .98rem; display: flex; flex-wrap: wrap;
+  align-items: baseline; gap: 8px; }
+.snap-close { margin-left: auto; line-height: 1; padding: 2px 9px; }
+.snap-summary { margin: 8px 0 14px; font-size: .88rem; color: var(--text-secondary); }
+.snap-group + .snap-group { margin-top: 12px; }
+.snap-group h5 { margin: 0 0 5px; font-size: .78rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.snap-changes { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.snap-changes li { font-size: .88rem; display: flex; gap: 8px; align-items: baseline;
+  padding: 3px 0; }
+.snap-mark { flex: none; width: 1.1em; text-align: center; font-weight: 700; }
+.snap-add { color: var(--good); }
+.snap-del { color: var(--critical); }
+.snap-chg { color: var(--text-secondary); }
+.snap-changes .snap-chg { color: var(--text-primary); }
+.snap-changes .snap-chg .snap-mark { color: var(--warning); }
+
+.snap-dossier h2 .snap-when { font-weight: 400; }
+.snap-dossier .snap-group + .snap-group { margin-top: 10px; }
+
+@media (max-width: 640px) {
+  .snap-actions { margin-left: 0; width: 100%; }
+}
+
 /* Konsistenz-Check: eingeklappte Hinweise (Startseite) und Gruppen (Dossier) */
 .cons-more { margin-top: 6px; }
 .cons-more > summary { cursor: pointer; font-size: .85rem; color: var(--text-secondary);
@@ -899,7 +939,7 @@ button:active { transform: translateY(1px); }
   .dossier-block, .dossier-chart, .consistency-list li, figure, tr, li {
     break-inside: avoid; page-break-inside: avoid;
   }
-  .cons-group { break-inside: avoid; page-break-inside: avoid; }
+  .cons-group, .snap-group { break-inside: avoid; page-break-inside: avoid; }
   thead { display: table-header-group; }
   tfoot { display: table-footer-group; }
   p, li { orphans: 3; widows: 3; }
