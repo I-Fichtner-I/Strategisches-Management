@@ -981,8 +981,9 @@ h1 { letter-spacing: -0.028em; }
 .app-header { box-shadow: none; border-bottom: var(--hairline); background: var(--surface-1); }
 .brand-mark {
   background: var(--accent); border-radius: 22%; box-shadow: none;
-  width: 34px; height: 34px; font-size: 1.05rem;
+  width: 34px; height: 34px;
 }
+.brand-mark svg { width: 19px; height: 19px; display: block; }
 .brand-text h1 { font-size: 1.15rem; font-weight: 600; }
 .brand-text .tagline { color: var(--muted); }
 
