@@ -173,6 +173,8 @@ danach unter `https://<user>.github.io/Strategisches-Management/` erreichbar.
 ```
 ├── index.html          Oberfläche & Navigation
 ├── assets/
+│   ├── icon.svg        Seitenzeichen (Favicon & Kopf)
+│   ├── icon-180.png    Kachel für den iOS-Startbildschirm
 │   ├── style.css       Gestaltung (inkl. Dark Mode)
 │   ├── app.js          Logik: SWOT, Five Forces, BCG-Portfolio
 │   ├── companies.js    20 Firmenprofile für die Beispieldaten
