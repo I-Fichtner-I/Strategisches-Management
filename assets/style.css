@@ -1,37 +1,37 @@
 :root {
-  /* dataviz palette roles (light) */
-  --surface-1: #fcfcfb;
-  --surface-2: #f3f2ef;
-  --page: #f9f9f7;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --muted: #898781;
-  --grid: #e1e0d9;
-  --baseline: #c3c2b7;
-  --border: rgba(11,11,11,0.10);
-  --series-1: #2a78d6;
-  --good: #0ca30c;
-  --warning: #eda100;
-  --serious: #eb6834;
-  --critical: #d03b3b;
-  /* SWOT tints */
-  --s: #1baf7a; --w: #eda100; --o: #2a78d6; --t: #e34948;
+  /* Farbrollen (hell) – neutrale Grautöne, ein einziger Akzent */
+  --surface-1: #ffffff;
+  --surface-2: #f5f5f7;
+  --page: #fbfbfd;
+  --text-primary: #1d1d1f;
+  --text-secondary: #424245;
+  --muted: #86868b;
+  --grid: #e8e8ed;
+  --baseline: #d2d2d7;
+  --border: rgba(0,0,0,0.09);
+  --series-1: #0071e3;
+  --good: #1a8f3c;
+  --warning: #e08700;
+  --serious: #e8620a;
+  --critical: #d70015;
+  /* SWOT-Tönungen */
+  --s: #1a8f3c; --w: #e08700; --o: #0071e3; --t: #d70015;
   --radius: 10px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface-1: #191c22;
-    --surface-2: #20242c;
-    --page: #0e1014;
-    --text-primary: #eef1f5;
-    --text-secondary: #b7bdc8;
-    --muted: #838b98;
-    --grid: #262b33;
-    --baseline: #333a44;
-    --border: rgba(255,255,255,0.11);
-    --series-1: #4c93e8;
-    --good: #22b322; --warning: #d99a1a; --serious: #e07145; --critical: #e5484a;
-    --s: #21ad7e; --w: #d99a1a; --o: #4c93e8; --t: #e56a6c;
+    --surface-1: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --page: #000000;
+    --text-primary: #f5f5f7;
+    --text-secondary: #aeaeb2;
+    --muted: #8e8e93;
+    --grid: #2c2c2e;
+    --baseline: #48484a;
+    --border: rgba(255,255,255,0.13);
+    --series-1: #0a84ff;
+    --good: #30d158; --warning: #ff9f0a; --serious: #ff6b22; --critical: #ff453a;
+    --s: #30d158; --w: #ff9f0a; --o: #0a84ff; --t: #ff453a;
   }
 }
 
@@ -93,7 +93,7 @@ a { color: var(--series-1); }
   padding: 20px 14px 14px; box-shadow: var(--shadow-sm); }
 .procphase-no { position: absolute; top: -15px; left: 14px; width: 30px; height: 30px; border-radius: 50%;
   display: grid; place-items: center; font-weight: 700; font-size: .95rem; color: #fff;
-  background: linear-gradient(135deg, var(--series-1), color-mix(in srgb, var(--series-1) 55%, #7b3ff2));
+  background: var(--series-1);
   box-shadow: var(--shadow-sm); }
 .procphase-title { margin: 0 0 7px; font-size: .95rem; hyphens: auto; overflow-wrap: break-word; }
 /* Inhalte der Phase (z. B. Vision · Leitbild · Strategische Ziele) */
@@ -113,7 +113,7 @@ a { color: var(--series-1); }
   border: 2px dashed var(--baseline); border-bottom: none; border-radius: 8px 8px 0 0; opacity: .7; }
 .procflow-control-no { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
   font-weight: 700; font-size: .95rem; color: #fff;
-  background: linear-gradient(135deg, var(--series-1), color-mix(in srgb, var(--series-1) 55%, #7b3ff2));
+  background: var(--series-1);
   box-shadow: var(--shadow-sm); }
 .procflow-control-body { min-width: 0; }
 .procflow-control-body strong { font-size: 1rem; }
@@ -917,6 +917,162 @@ button:active { transform: translateY(1px); }
 }
 
 /* Print / PDF – nur das Dossier drucken */
+/* ===== Reduzierte Gestaltung =====
+   Leitgedanke: Ruhe durch Weglassen. Flächen tragen sich über Weißraum und
+   Haarlinien statt über Rahmen, Schatten und Farbverläufe. Farbe bleibt der
+   Bedeutung vorbehalten – Bewertungen, Status, Abweichungen –, alles Übrige
+   arbeitet in neutralen Grautönen mit einem einzigen Akzent. */
+:root {
+  --radius: 12px; --radius-sm: 8px; --radius-lg: 18px;
+  --shadow-sm: none;
+  --shadow-md: 0 4px 16px rgba(0,0,0,.05);
+  --shadow-lg: 0 12px 36px rgba(0,0,0,.09);
+  --accent: var(--series-1);
+  --hairline: 1px solid var(--border);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shadow-sm: none;
+    --shadow-md: 0 4px 18px rgba(0,0,0,.5);
+    --shadow-lg: 0 14px 40px rgba(0,0,0,.6);
+  }
+}
+
+/* Schrift: die Systemschrift der Plattform, eng gesetzte Überschriften */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue",
+    "Segoe UI", system-ui, sans-serif;
+  line-height: 1.5;
+  letter-spacing: -0.003em;
+}
+h1, h2, h3, h4, h5 { font-weight: 600; letter-spacing: -0.021em; }
+h1 { letter-spacing: -0.028em; }
+.lead { color: var(--text-secondary); }
+
+/* Kleine Beschriftungen: Kleinbuchstaben statt gesperrter Versalien */
+.procflow-cap, .derived-label, .sub, .dossier-sub, .kb-body h4, .fc-hint, .quiz-tag,
+.nav-head, .hero-eyebrow, .tool-anchor .anchor-label, .cons-group-head, .coach-head,
+.dash-cons-head, .snap-group h5, .procflow-control-tag, .force-level {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+.sub { font-size: 1.05rem; color: var(--text-primary); margin: 34px 0 12px; }
+.hero-eyebrow {
+  background: none; padding: 0; border-radius: 0; margin-bottom: 10px;
+  font-size: .82rem; font-weight: 400; color: var(--muted);
+}
+.hero-title { font-size: 2.6rem; letter-spacing: -0.03em; max-width: 20ch; }
+.hero .lead { font-size: 1.12rem; }
+.view-head h2, .view > h2 { font-size: 1.7rem; letter-spacing: -0.024em; }
+.quiz-tag { background: none; color: var(--muted); padding: 0; }
+
+/* Flächen: Haarlinie statt Schatten, großzügigere Innenabstände */
+.list-card, .swot-cell, .tows-cell, .bsc-card, .scenario-card, .calc-card, .know,
+.force, .quiz-card, .bcg-chart-box, .bcg-side .bcg-form, .fs-profile, .dossier,
+.forces-result, .procphase, .kz-col, .kz-viz, details.chap, .sw-panel, .pager-btn {
+  box-shadow: none;
+}
+.list-card, .swot-cell, .tows-cell, .bsc-card, .scenario-card, .calc-card, .know,
+.quiz-card { padding: 18px; }
+.wrap { max-width: 1020px; padding: 0 24px; }
+
+/* Kopfzeile: nur eine Haarlinie, kein Schlagschatten */
+.app-header { box-shadow: none; border-bottom: var(--hairline); background: var(--surface-1); }
+.brand-mark {
+  background: var(--accent); border-radius: 22%; box-shadow: none;
+  width: 34px; height: 34px; font-size: 1.05rem;
+}
+.brand-text h1 { font-size: 1.15rem; font-weight: 600; }
+.brand-text .tagline { color: var(--muted); }
+
+/* Navigation: aktives Kapitel als ruhige Tönung, kein Verlauf */
+.nav-item.is-active {
+  background: color-mix(in srgb, var(--series-1) 10%, transparent);
+  color: var(--series-1);
+  font-weight: 600;
+  box-shadow: none;
+}
+.nav-item { border-radius: var(--radius-sm); }
+.nav-head { font-size: .78rem; color: var(--muted); font-weight: 600; }
+details.nav-group > summary.nav-head:hover { background: transparent; color: var(--text-primary); }
+
+/* Schaltflächen: flach, ohne Verlauf; die Hauptaktion als Pille */
+button, .primary-btn { font-family: inherit; letter-spacing: -0.01em; }
+.primary-btn, .bcg-form button, .bsc-form button, .ziele-form button, #fs-apply {
+  background: var(--accent); border: none; box-shadow: none; font-weight: 500;
+}
+.primary-btn { border-radius: 980px; padding: 9px 20px; }
+.primary-btn:hover, .bcg-form button:hover, .bsc-form button:hover,
+.ziele-form button:hover, #fs-apply:hover {
+  background: color-mix(in srgb, var(--series-1) 85%, #000);
+}
+
+/* Prozess-Übersicht: Nummern flach, Karten ohne farbige Oberkante */
+.procphase-no, .procflow-control-no { background: var(--accent); box-shadow: none; }
+/* Die Phasenkarten behalten ihre engere Polsterung: mehr Rand ließe die
+   Überschriften mitten im Wort brechen. Silbentrennung statt Notumbruch. */
+.procphase-title, .procphase-items, .procphase-tools { overflow-wrap: normal; hyphens: auto; }
+
+/* Karten heben sich beim Überfahren nur minimal ab */
+.list-card:hover, .swot-cell:hover, .force:hover, .quiz-card:hover, details.kb:hover {
+  box-shadow: none; border-color: var(--baseline);
+}
+.pager-btn:hover { transform: none; box-shadow: none; border-color: var(--baseline); }
+
+/* Eingaben: ruhiger Fokusring im Akzent */
+input, select, textarea { font-family: inherit; }
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--series-1) 18%, transparent);
+}
+
+/* Tabellen: Trennlinien statt Flächen */
+.bcg-table thead th, .kpi-table thead th, .sw-matrix thead th {
+  background: transparent; color: var(--muted); font-weight: 600;
+  border-bottom: var(--hairline);
+}
+
+/* Hinweise und Vergleich: Farbe nur an der Kante, ruhiger Grund */
+.consistency-list li { background: var(--surface-2); border-color: transparent; }
+.coach-panel { background: transparent; border: var(--hairline); }
+.snap-diff { background: transparent; border: var(--hairline); }
+.snap-list li { background: transparent; }
+
+
+.force-level { font-weight: 500; background: var(--surface-2); color: var(--text-secondary); }
+
+/* Farbige Kanten: dünner, damit die Farbe informiert statt zu dominieren */
+.swot-cell { border-top-width: 2px; }
+.procphase { border-top: var(--hairline); }
+
+/* Statusmarken: getönt mit farbiger Schrift statt vollflächig */
+.badge { font-weight: 500; padding: 3px 9px; }
+.badge.ok {
+  background: color-mix(in srgb, var(--good) 14%, transparent);
+  color: color-mix(in srgb, var(--good) 88%, var(--text-primary));
+}
+.badge.warn {
+  background: color-mix(in srgb, var(--warning) 16%, transparent);
+  color: color-mix(in srgb, var(--warning) 82%, var(--text-primary));
+}
+
+/* Prozessband: eine ruhige Fläche statt gestrichelter Umrandung */
+.procflow-control {
+  border: var(--hairline);
+  background: var(--surface-2);
+}
+.procflow-control::before { border-color: var(--border); opacity: 1; }
+.procflow-control-tag {
+  background: none; padding: 0; margin-left: 10px;
+  font-size: .8rem; font-weight: 400; color: var(--muted);
+}
+
+/* Listeneinträge: Tönung statt Kasten */
+.item-list li, .tows-list li { background: var(--surface-2); }
+
+/* Hinzufügen-Schaltflächen bleiben unaufdringlich */
+.add-form button, .list-card form button { border-radius: var(--radius-sm); font-weight: 400; }
+
 /* Seitenformat der PDF-/Druckausgabe (Dossier und Fallstudien-Report) */
 @page { size: A4 portrait; margin: 20mm 18mm; }
 
